@@ -1,12 +1,13 @@
 {
   "name": "mongorito",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
     "backbone-class": "0.0.1",
     "co": "^3.1.0",
     "co-monk": "^1.0.0",
+    "koa-compose": "^2.3.0",
     "monk": "^0.9.0"
   },
   "devDependencies": {
@@ -16,23 +17,23 @@
   },
   "main": "./index.js",
   "scripts": {
-	"test": "./node_modules/.bin/mocha --harmony"
+    "test": "./node_modules/.bin/mocha --harmony"
   },
   "repository": {
-	"type": "git",
-	"url": "https://github.com/vdemedes/mongorito"
+    "type": "git",
+    "url": "https://github.com/vdemedes/mongorito"
   },
   "bugs": {
     "url": "https://github.com/vdemedes/mongorito/issues"
   },
   "keywords": [
-	"mongo",
-	"mongodb",
-	"co-mongo",
-	"co-mongodb",
-	"orm",
-	"odm",
-	"es6"
+    "mongo",
+    "mongodb",
+    "co-mongo",
+    "co-mongodb",
+    "orm",
+    "odm",
+    "es6"
   ],
   "license": "MIT"
 }

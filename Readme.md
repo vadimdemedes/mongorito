@@ -2,6 +2,14 @@
 
 ES6 generator-based MongoDB ODM for Node.js v0.11.x.
 
+## Features
+
+- Based on ES6 generators, which means **no callbacks**
+- Common, established API you've already used to
+- Hooks (before:save, around:create, after:remove, etc)
+- Very simple and easy-to-understand implementation
+- Fully covered by tests
+
 ## Installation
 
 ```
@@ -38,6 +46,8 @@ Mongorito.close(); // alias for disconnect
 ```
 
 #### Define a model
+
+That's right. No schema.
 
 ```javascript
 var Post = Model.extend({
@@ -110,6 +120,53 @@ Or you can remove multiple documents using:
 
 ```javascript
 yield Post.remove({ title: 'Some title' }); // query
+```
+
+### Hooks
+
+Mongorito models support *before*, *create* and *around* (*before* + *create*) hooks for these events:
+
+- save (executes on both create and update)
+- create
+- update
+- remove
+
+To setup a hook for some event:
+
+```javascript
+var Post = Model.extend({
+   collection: 'posts',
+   
+   customHandling: function *(next) {
+       // processing, validating, etc
+       
+       yield next; // MUST be present
+   }.before('save')
+});
+```
+
+Same goes for other hooks:
+
+```javascript
+myAfterCreateHook: function *(next) {
+    // executes after document was created
+    
+    yield next;
+}.after('create'),
+
+myAroundRemoveHook: function *(next) {
+    // executes before and after document was removed
+    
+    yield next;
+}.around('remove')
+```
+
+If you want to break the chain and prevent executing of the next hooks, just throw an **Error**:
+
+```javascript
+myHook: function *(next) {
+    throw new Error('Next hooks will not be executed');
+}.before('update')
 ```
 
 ## Tests
