@@ -107,7 +107,7 @@ posts = yield Post.gt('position', 5).find();
 #### Find and populate
 
 Let's say you have such Post document:
-```json
+```
 {
     "_id": ObjectId("5234d25244e937489c000004"),
     "title": "Great title",
