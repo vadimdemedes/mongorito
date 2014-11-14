@@ -142,6 +142,26 @@ describe ('Mongorito', function () {
 			posts.length.should.equal(0);
 		});
 		
+		it ('should remove many documents', function *() {
+			var n = 10;
+			
+			while (n--) {
+				var data = postFixture();
+				var post = new Post(data);
+				yield post.save();
+			}
+			
+			var posts;
+			
+			posts = yield Post.all();
+			posts.length.should.equal(10);
+			
+			yield Post.remove();
+			
+			posts = yield Post.all();
+			posts.length.should.equal(0);
+		});
+		
 		describe ('Queries', function () {
 			it ('should find all documents', function *() {
 				var n = 10;
