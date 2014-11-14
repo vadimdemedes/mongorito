@@ -85,6 +85,13 @@ describe ('Mongorito', function () {
 			parsed.body.should.equal(data.body);
 		});
 		
+		it ('should setup an index', function *() {
+			yield Post.index('title');
+			
+			var indexes = yield Post.indexes();
+			indexes.should.have.property('title_1');
+		});
+		
 		it ('should create new a document', function *() {
 			var timestamp = Math.round(new Date().getTime() / 1000);
 			var data = postFixture();
