@@ -81,6 +81,7 @@ describe ('Mongorito', function () {
 		});
 		
 		it ('should create new a document', function *() {
+			var timestamp = Math.round(new Date().getTime() / 1000);
 			var data = postFixture();
 			var post = new Post(data);
 			yield post.save();
@@ -90,9 +91,12 @@ describe ('Mongorito', function () {
 			
 			posts.length.should.equal(1);
 			createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+			createdPost.get('created_at').should.equal(timestamp);
+			createdPost.get('updated_at').should.equal(timestamp);
 		});
 		
 		it ('should update a document', function *() {
+			var createdAt = Math.round(new Date().getTime() / 1000);
 			var data = postFixture();
 			var post = new Post(data);
 			yield post.save();
@@ -106,6 +110,8 @@ describe ('Mongorito', function () {
 			createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			createdPost.get('title').should.equal(post.get('title'));
 			
+			var updatedAt = Math.round(new Date().getTime() / 1000);
+			
 			var title = chance.sentence();
 			post.set('title', title);
 			yield post.save();
@@ -116,6 +122,8 @@ describe ('Mongorito', function () {
 			var updatedPost = yield Post.findOne();
 			updatedPost.get('_id').toString().should.equal(post.get('_id').toString());
 			updatedPost.get('title').should.equal(post.get('title'));
+			updatedPost.get('created_at').should.equal(createdAt);
+			updatedPost.get('updated_at').should.equal(updatedAt);
 		});
 		
 		it ('should remove a document', function *() {
