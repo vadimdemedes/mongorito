@@ -36,7 +36,7 @@ Function.prototype.isGenerator = function () {
 });
 
 describe ('Mongorito', function () {
-	var Post;
+	var Post, Comment;
 	
 	before (function () {
 		Mongorito.connect('localhost/mongorito_test');
@@ -46,10 +46,15 @@ describe ('Mongorito', function () {
 		Post = Model.extend({
 			collection: 'posts'
 		});
+		
+		Comment = Model.extend({
+			collection: 'comments'
+		});
 	});
 	
 	beforeEach (function *() {
 		yield Post.remove();
+		yield Comment.remove();
 	});
 	
 	describe ('Model', function () {
@@ -360,6 +365,39 @@ describe ('Mongorito', function () {
 				
 				var posts = yield Post.where('index').in([4, 5]).find();
 				posts.length.should.equal(2);
+			});
+			
+			it ('should populate the response', function *() {
+				var n = 3;
+				var comments = [];
+				
+				while (n--) {
+					var data = commentFixture();
+					var comment = new Comment(data);
+					yield comment.save();
+					
+					comments.push(comment);
+				}
+				
+				var data = postFixture({
+					comments: comments.map(function (comment) { return comment.get('_id'); })
+				});
+				var post = new Post(data);
+				yield post.save();
+				
+				var createdPost = yield Post.populate('comments', Comment).findOne();
+				createdPost.get('comments').forEach(function (comment, index) {
+					comment.get('_id').toString().should.equal(comments[index].get('_id').toString());
+				});
+				
+				// now confirm that populated documents
+				// don't get saved to database
+				yield createdPost.save();
+				
+				createdPost = yield Post.findOne();
+				createdPost.get('comments').forEach(function (id, index) {
+					id.toString().should.equal(comments[index].get('_id').toString());
+				});
 			});
 		});
 		

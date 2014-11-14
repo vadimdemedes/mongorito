@@ -104,6 +104,51 @@ posts = yield Post.where('position').gt(5).find();
 posts = yield Post.gt('position', 5).find();
 ```
 
+#### Find and populate
+
+Let's say you have such Post document:
+```json
+{
+    "_id": ObjectId("5234d25244e937489c000004"),
+    "title": "Great title",
+    "body": "Great body",
+    "comments": [
+        ObjectId("5234d25244e937489c000005"),
+        ObjectId("5234d25244e937489c000006"),
+        ObjectId("5234d25244e937489c000007")
+    ]
+}
+```
+
+And you need to fetch each Comment document from *comments* field:
+
+```javascript
+var post = yield Post.findOne();
+var comments = post.get('comments');
+
+var index = 0;
+var commentId;
+
+while (commentId = comments[index]) {
+    comments[index] = yield Comment.findById(commentId);
+    
+    index++;
+}
+```
+
+With populating, you don't need to write all that and instead do this:
+
+```javascript
+// .populate() tells query to populate comments field
+// with documents fetched using Comment model
+var post = yield Post.populate('comments', Comment).findOne();
+var comments = post.get('comments');
+
+// comments is an array of Comment models now
+```
+
+**Note**: When you will try to save a document with populated fields, they will be reverted back to _id's.
+
 #### Find one
 
 Finds only one document. Returns either Model instance (Post, in these examples) or undefined.
