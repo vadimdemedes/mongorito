@@ -67,7 +67,7 @@ var posts = yield Post.all();
 
 Always returns an array.
 
-```
+```javascript
 var posts;
 
 posts = yield Post.find(); // same as .all()
