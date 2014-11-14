@@ -71,7 +71,37 @@ Always returns an array.
 var posts;
 
 posts = yield Post.find(); // same as .all()
+
+// match documents with title = "Great title"
 posts = yield Post.find({ title: 'Great title' });
+posts = yield Post.where('title', 'Great title').find();
+posts = yield Post.where('title').equals('Great title').find();
+
+// match documents with regex
+posts = yield Post.where('title', /great/i).find();
+
+// match documents matching sub-property
+posts = yield Post.where('author.name', 'John Doe').find();
+
+// match documents matching sub-documents
+// matching posts where at least one comment.body is "Nice comment"
+posts = yield Post.where('comments', { body: 'Nice comment' }).find();
+
+// match documents with limit
+posts = yield Post.limit(5).find();
+
+// match documents with skip
+posts = yield Post.skip(5).find();
+
+// match documents where some field exists
+posts = yield Post.where('title').exists().find();
+
+// match documents with $in
+posts = yield Post.where('title').in(['First title', 'Second title']).find();
+
+// match documents with $gt, $gte, $lt, $lte
+posts = yield Post.where('position').gt(5).find();
+posts = yield Post.gt('position', 5).find();
 ```
 
 #### Find one

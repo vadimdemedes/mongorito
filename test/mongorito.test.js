@@ -81,40 +81,6 @@ describe ('Mongorito', function () {
 			createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 		});
 		
-		it ('should find all documents', function *() {
-			var n = 10;
-			var posts = [];
-			
-			while (n--) {
-				var data = postFixture();
-				var post = new Post(data);
-				yield post.save();
-				
-				posts.push(post);
-			}
-			
-			var posts = yield Post.all();
-			posts.length.should.equal(10);
-			posts.forEach(function (post, index) {
-				post.get('_id').toString().should.equal(posts[index].get('_id').toString());
-			});
-		});
-		
-		it ('should find one document', function *() {
-			var data = postFixture();
-			var post = new Post(data);
-			yield post.save();
-			
-			var posts = yield Post.all();
-			posts.length.should.equal(1);
-			
-			var createdPost = yield Post.findOne();
-			createdPost.get('_id').toString().should.equal(post.get('_id').toString());
-			
-			createdPost = yield Post.findOne({ title: post.get('title') });
-			createdPost.get('_id').toString().should.equal(post.get('_id').toString());
-		});
-		
 		it ('should update a document', function *() {
 			var data = postFixture();
 			var post = new Post(data);
@@ -155,6 +121,207 @@ describe ('Mongorito', function () {
 			
 			posts = yield Post.all();
 			posts.length.should.equal(0);
+		});
+		
+		describe ('Queries', function () {
+			it ('should find all documents', function *() {
+				var n = 10;
+
+				while (n--) {
+					var data = postFixture();
+					var post = new Post(data);
+					yield post.save();
+				}
+				
+				var posts = yield Post.all();
+
+				var createdPosts = yield Post.find();
+				createdPosts.length.should.equal(10);
+				
+				createdPosts.forEach(function (post, index) {
+					post.get('_id').toString().should.equal(posts[index].get('_id').toString());
+				});
+			});
+			
+			it ('should count all documents', function *() {
+				var n = 10;
+				var createdPosts = [];
+
+				while (n--) {
+					var data = postFixture();
+					var post = new Post(data);
+					yield post.save();
+
+					createdPosts.push(post);
+				}
+				
+				var posts = yield Post.count();
+				posts.should.equal(10);
+			});
+
+			it ('should find one document', function *() {
+				var data = postFixture();
+				var post = new Post(data);
+				yield post.save();
+
+				var posts = yield Post.all();
+				posts.length.should.equal(1);
+
+				var createdPost = yield Post.findOne();
+				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+
+				createdPost = yield Post.findOne({ title: post.get('title') });
+				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+			});
+			
+			it ('should find a document with .where()', function *() {
+				var data = postFixture();
+				var post = new Post(data);
+				yield post.save();
+				
+				var posts = yield Post.where('title', data.title).find();
+				posts.length.should.equal(1);
+				
+				var createdPost = posts[0];
+				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+			});
+			
+			it ('should find a document with .where() matching sub-properties', function *() {
+				var data = postFixture();
+				var post = new Post(data);
+				yield post.save();
+				
+				var posts = yield Post.where('author.name', data.author.name).find();
+				posts.length.should.equal(1);
+				
+				var createdPost = posts[0];
+				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+			});
+			
+			it ('should find a document with .where() matching sub-documents using elemMatch', function *() {
+				var data = postFixture();
+				var post = new Post(data);
+				yield post.save();
+				
+				var posts = yield Post.where('comments', { body: data.comments[0].body }).find();
+				posts.length.should.equal(1);
+				
+				var createdPost = posts[0];
+				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+			});
+			
+			it ('should find a document with .where() matching with regex', function *() {
+				var data = postFixture({ title: 'Something' });
+				var post = new Post(data);
+				yield post.save();
+				
+				var posts = yield Post.where('title', /something/i).find();
+				posts.length.should.equal(1);
+				
+				var createdPost = posts[0];
+				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+			});
+			
+			it ('should find documents with .limit()', function *() {
+				var n = 10;
+				
+				while (n--) {
+					var data = postFixture();
+					var post = new Post(data);
+					yield post.save();
+				}
+				
+				var posts = yield Post.all();
+				
+				var createdPosts = yield Post.limit(5).find();
+				createdPosts.length.should.equal(5);
+				createdPosts.forEach(function (post, index) {
+					post.get('_id').toString().should.equal(posts[index].get('_id').toString());
+				});
+			});
+			
+			it ('should find documents with .limit() and .skip()', function *() {
+				var n = 10;
+				
+				while (n--) {
+					var data = postFixture();
+					var post = new Post(data);
+					yield post.save();
+				}
+				
+				var posts = yield Post.all();
+				
+				var createdPosts = yield Post.limit(5).skip(5).find();
+				createdPosts.length.should.equal(5);
+				createdPosts.forEach(function (post, index) {
+					post.get('_id').toString().should.equal(posts[5 + index].get('_id').toString());
+				});
+			});
+			
+			it ('should find documents with .exists()', function *() {
+				var n = 10;
+				
+				while (n--) {
+					var data = postFixture();
+					if (n < 5) {
+						delete data.title;
+					}
+					
+					var post = new Post(data);
+					yield post.save();
+				}
+				
+				var posts;
+				
+				posts = yield Post.exists('title').find();
+				posts.length.should.equal(5);
+				
+				posts = yield Post.exists('title', false).find();
+				posts.length.should.equal(5);
+				
+				posts = yield Post.where('title').exists().find();
+				posts.length.should.equal(5);
+				
+				posts = yield Post.where('title').exists(false).find();
+				posts.length.should.equal(5);
+			});
+			
+			it ('should find documents with .lt(), .lte(), .gt(), .gte()', function *() {
+				var n = 10;
+				
+				while (n--) {
+					var data = postFixture({ index: n });
+					var post = new Post(data);
+					yield post.save();
+				}
+				
+				var posts;
+				
+				posts = yield Post.where('index').lt(5).find();
+				posts.length.should.equal(5);
+				
+				posts = yield Post.where('index').lte(5).find();
+				posts.length.should.equal(6);
+				
+				posts = yield Post.where('index').gt(7).find();
+				posts.length.should.equal(2);
+				
+				posts = yield Post.where('index').gte(7).find();
+				posts.length.should.equal(3);
+			});
+			
+			it ('should find documents with .in()', function *() {
+				var n = 10;
+				
+				while (n--) {
+					var data = postFixture({ index: n });
+					var post = new Post(data);
+					yield post.save();
+				}
+				
+				var posts = yield Post.where('index').in([4, 5]).find();
+				posts.length.should.equal(2);
+			});
 		});
 		
 		describe ('Hooks', function () {
@@ -327,9 +494,32 @@ describe ('Mongorito', function () {
 	});
 });
 
-function postFixture () {
-	return {
+function postFixture (attrs) {
+	var n = 2;
+	var comments = [];
+	
+	while (n--) {
+		comments.push(commentFixture());
+	}
+	
+	var post = {
 		title: chance.sentence(),
+		body: chance.paragraph(),
+		author: {
+			name: chance.word()
+		},
+		comments: comments
+	};
+	
+	for (var key in attrs) {
+		post[key] = attrs[key];
+	}
+	
+	return post;
+}
+
+function commentFixture() {
+	return {
 		body: chance.paragraph()
 	};
 }
