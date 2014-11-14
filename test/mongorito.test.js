@@ -69,6 +69,17 @@ describe ('Mongorito', function () {
 			}
 		});
 		
+		it ('should correctly convert model to JSON', function () {
+			var data = postFixture();
+			var post = new Post(data);
+			
+			var json = JSON.stringify(post);
+			var parsed = JSON.parse(json);
+			
+			parsed.title.should.equal(data.title);
+			parsed.body.should.equal(data.body);
+		});
+		
 		it ('should create new a document', function *() {
 			var data = postFixture();
 			var post = new Post(data);
