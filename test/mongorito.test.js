@@ -7,6 +7,14 @@ var Mongorito = require('../');
 var Model = Mongorito.Model;
 
 /**
+ * Fixtures
+ */
+
+var commentFixture = require('./fixtures/comment');
+var postFixture = require('./fixtures/post');
+
+
+/**
  * isGenerator polyfill
  * 
  * see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/isGenerator
@@ -14,6 +22,7 @@ var Model = Mongorito.Model;
 Function.prototype.isGenerator = function () {
 	return /^function[\s]*\*/.test(this.toString());
 };
+
 
 /**
  * Make Mocha compatible with generators
@@ -34,6 +43,11 @@ Function.prototype.isGenerator = function () {
 		originalFn.apply(null, args);
 	};
 });
+
+
+/*
+ * Tests
+ */
 
 describe ('Mongorito', function () {
 	var Post, Comment;
@@ -577,33 +591,3 @@ describe ('Mongorito', function () {
 		Mongorito.disconnect();
 	});
 });
-
-function postFixture (attrs) {
-	var n = 2;
-	var comments = [];
-	
-	while (n--) {
-		comments.push(commentFixture());
-	}
-	
-	var post = {
-		title: chance.sentence(),
-		body: chance.paragraph(),
-		author: {
-			name: chance.word()
-		},
-		comments: comments
-	};
-	
-	for (var key in attrs) {
-		post[key] = attrs[key];
-	}
-	
-	return post;
-}
-
-function commentFixture() {
-	return {
-		body: chance.paragraph()
-	};
-}
