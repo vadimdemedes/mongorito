@@ -1,7 +1,7 @@
-var chai = require('chai');
-var should = chai.should();
+require('chai').should();
+require('mocha-generators')();
+
 var chance = require('chance')();
-var run = require('co');
 
 var Mongorito = require('../');
 var Model = Mongorito.Model;
@@ -12,37 +12,6 @@ var Model = Mongorito.Model;
 
 var commentFixture = require('./fixtures/comment');
 var postFixture = require('./fixtures/post');
-
-
-/**
- * isGenerator polyfill
- * 
- * see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/isGenerator
- */
-Function.prototype.isGenerator = function () {
-	return /^function[\s]*\*/.test(this.toString());
-};
-
-
-/**
- * Make Mocha compatible with generators
- */
-['it', 'before', 'after', 'beforeEach', 'afterEach'].forEach(function (name) {
-	var originalFn = global[name];
-	global[name] = function () {
-		var args = Array.prototype.slice.call(arguments);
-		var lastIndex = args.length - 1;
-		var test = args[lastIndex];
-		
-		if (test.isGenerator()) {
-			args[lastIndex] = function (done) {
-				run(test).call(null, done);
-			};
-		}
-		
-		originalFn.apply(null, args);
-	};
-});
 
 
 /*

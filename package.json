@@ -5,7 +5,6 @@
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
     "backbone-class": "0.0.1",
-    "co": "^3.1.0",
     "co-monk": "^1.0.0",
     "koa-compose": "^2.3.0",
     "monk": "^0.9.0"
@@ -13,7 +12,8 @@
   "devDependencies": {
     "chai": "^1.10.0",
     "chance": "^0.6.1",
-    "mocha": "^2.0.1"
+    "mocha": "^2.0.1",
+    "mocha-generators": "^1.0.0"
   },
   "main": "./index.js",
   "scripts": {
