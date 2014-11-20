@@ -553,6 +553,48 @@ describe ('Mongorito', function () {
 					posts.length.should.equal(0);
 				}
 			});
+			
+			it ('should define hooks via .configure()', function *() {
+				var hooks = [];
+				
+				var Post = Model.extend({
+					collection: 'posts',
+					
+					configure: function () {
+						Model.prototype.configure.call(this);
+						
+						this.before('save', 'firstBeforeSave');
+						this.before('save', 'secondBeforeSave');
+					},
+					
+					firstBeforeSave: function *(next) {
+						hooks.push('firstBeforeSave');
+						
+						yield next;
+					},
+					
+					secondBeforeSave: function *(next) {
+						hooks.push('secondBeforeSave');
+						
+						yield next;
+					}
+				});
+				
+				var posts;
+				
+				posts = yield Post.all();
+				posts.length.should.equal(0);
+				
+				var data = postFixture();
+				var post = new Post(data);
+				yield post.save();
+				hooks.length.should.equal(2);
+				hooks[0].should.equal('firstBeforeSave');
+				hooks[1].should.equal('secondBeforeSave');
+				
+				posts = yield Post.all();
+				posts.length.should.equal(1);
+			});
 		});
 	});
 	
