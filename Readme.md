@@ -248,6 +248,21 @@ myHook: function *(next) {
 }.before('update')
 ```
 
+**Note**: There's an alternative way of adding hooks:
+
+```javascript
+var Post = Model.extend({
+    // ...
+    configure: function () {
+        // call super .configure()
+        Model.prototype.configure.call(this);
+        
+        this.before('save', 'myHook');
+    }
+    // ...
+})
+```
+
 ## Tests
 
 To execute tests run:
