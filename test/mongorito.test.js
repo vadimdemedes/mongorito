@@ -598,6 +598,45 @@ describe ('Mongorito', function () {
 		});
 	});
 	
+	it ('should be able to use multiple databases', function *() {
+		// Post1 will be stored in first database
+		// Post2 will be stored in second database
+		var Post1 = Mongorito.Model.extend({
+			db: Mongorito.db,
+			collection: 'posts'
+		});
+		
+		var secondaryDb = Mongorito.connect('localhost/mongorito_test_2');
+		
+		var Post2 = Mongorito.Model.extend({
+			db: secondaryDb,
+			collection: 'posts'
+		});
+		
+		yield Post1.remove();
+		yield Post2.remove();
+		
+		var posts, post;
+		
+		post = new Post1({ title: 'Post in first db' });
+		yield post.save();
+		
+		post = new Post2({ title: 'Post in second db' });
+		yield post.save();
+		
+		posts = yield Post1.all();
+		posts.length.should.equal(1);
+		post = posts[0];
+		post.get('title').should.equal('Post in first db');
+		
+		posts = yield Post2.all();
+		posts.length.should.equal(1);
+		post = posts[0];
+		post.get('title').should.equal('Post in second db');
+		
+		secondaryDb.close();
+	});
+	
 	after (function () {
 		Mongorito.disconnect();
 	});

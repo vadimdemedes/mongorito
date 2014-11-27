@@ -263,6 +263,37 @@ var Post = Model.extend({
 })
 ```
 
+### Bonus: Connecting to multiple databases
+
+There may be situations, where you will need to use separate databases for different models.
+Here is an example on how to use multiple connections:
+
+```
+// first connection will always be default
+// and there is no need to specify it
+// manually in the models
+Mongorito.connect('localhost/first_db');
+
+
+// following connections are additional
+// and need to be specified manually
+// in the desired models
+var otherDb = Mongorito.connect('localhost/second_db');
+
+// define models
+
+// this model will be stored in first_db
+var Post = Mongorito.Model.extend({
+    collection: 'posts'
+});
+
+// this model will be stored in second_db
+var Post = Mongorito.Model.extend({
+    db: otherDb,
+    collection: 'posts'
+});
+```
+
 ## Tests
 
 To execute tests run:
