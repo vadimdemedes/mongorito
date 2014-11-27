@@ -268,7 +268,7 @@ var Post = Model.extend({
 There may be situations, where you will need to use separate databases for different models.
 Here is an example on how to use multiple connections:
 
-```
+```javascript
 // first connection will always be default
 // and there is no need to specify it
 // manually in the models
