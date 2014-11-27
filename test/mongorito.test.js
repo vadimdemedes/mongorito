@@ -22,7 +22,7 @@ describe ('Mongorito', function () {
 	var Post, Comment;
 	
 	before (function () {
-		Mongorito.connect('localhost/mongorito_test');
+		Mongorito.connect('mongo://localhost/mongorito_test');
 	});
 	
 	before (function () {
