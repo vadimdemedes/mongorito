@@ -1,0 +1,39 @@
+<%= Rouge::Themes::Base16::Solarized.render(:scope => '.highlight') %>
+
+div.highlight {
+  display: inline-block;
+  
+  pre {
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+    color: #586e75;
+    padding: 0;
+  }
+  
+  td.gutter {
+    display: none;
+  }
+  
+  span.err {
+    color: #d0d0d0;
+    background: none;
+  }
+  
+  span.nx {
+    color: #6a9fb5;
+  }
+}
+
+body.guides {
+  div.highlight {
+    margin: -10px 0 20px;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    padding: 6px;
+    
+    td.code {
+      padding: 5px 20px;
+    }
+  }
+}

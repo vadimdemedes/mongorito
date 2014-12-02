@@ -1,0 +1,10 @@
+---
+title: Index
+---
+
+<h1>Guides</h1>
+
+<% guides.each do |guide| %>
+<a href="<%= guide.url %>"><h3><%= guide.data["title"] %></h3></a>
+<p><%= guide.data["description"] %></p>
+<% end %>

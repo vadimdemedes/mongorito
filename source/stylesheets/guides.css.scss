@@ -1,0 +1,81 @@
+@charset 'utf-8';
+@import 'compass';
+@import 'fonts';
+@import 'syntax-highlighting';
+
+body {
+  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 18px;
+}
+
+p {
+  margin-bottom: 30px;
+}
+
+p, li {
+  line-height: 1.6em;
+}
+
+mark {
+  background: #fdffb6;
+  padding: 2px 4px;
+}
+
+h1 {
+  text-align: center;
+  margin: 60px 0;
+}
+
+h3 {
+  margin: 40px 0 10px;
+}
+
+h4 {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+blockquote {
+  margin-bottom: 30px;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+div.container {
+  margin-top: 40px;
+  max-width: 800px;
+}
+
+nav.navbar {
+  @include border-radius(0);
+  background: none;
+  border: 0;
+
+  a {
+    font-size: 16px;
+    color: #666 !important;
+    
+    &:hover {
+      color: #111 !important;
+    }
+    
+    &.navbar-brand i {
+      @include border-radius(50px);
+      border: 1px solid #eee;
+      color: #ccc;
+      padding: 6px;
+      font-size: 14px;
+    }
+  }
+
+  div.container-fluid {
+    padding: 0;
+  }
+}
+
+footer {
+  margin: 60px 0 20px;
+  text-align: center;
+}

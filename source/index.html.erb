@@ -1,0 +1,153 @@
+---
+title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
+---
+
+<header>
+  <img src="/images/logo@3x.jpg" class="logo img-responsive center-block">
+  <h1 class="text-center">Mongorito</h1>
+  <h4 class="text-center">MongoDB ODM for Node.js based on ES6 generators.</h4>
+  <h4 class="text-center">No callbacks or promises.</h4>
+  <% code('javascript') do %>
+  var post = new Post({
+  	title: 'Node.js with --harmony rocks!'
+  });
+
+  yield post.save();
+
+  var posts = yield Post.limit(5).find();
+  <% end %>
+</header>
+
+<nav class="fluid-container">
+  <ul>
+    <li>
+      <%= link_to 'Github', 'https://github.com/vdemedes/mongorito' %>
+    </li>
+    <li>
+      <%= link_to 'Quick Start', '/guides/getting-started' %>
+    </li>
+    <li>
+      <%= link_to 'Guides', '/guides' %>
+    </li>
+  </ul>
+</nav>
+
+<section>
+  <h2 class="text-center">Features</h2>
+	
+	<div class="container-fluid features">
+		<div class="row">
+			<div class="col-md-5 col-md-offset-1">
+				<h4>No callbacks <span class="badge">very cool</span></h4>
+				<p>
+					Mongorito is based on ES6 generators, so you will not need to write a single callback (or promise).
+					Enjoy the comfort of writing synchronous code, while retaining the power of Node.js' async nature.
+				</p>
+			</div>
+			
+			<div class="col-md-5 col-md-offset-1">
+				<h4>Common and established API</h4>
+				<p>
+					Mongorito does not re-invent the wheel. Take a look at the code example above, same principles as in ActiveRecord, Mongoose and others.
+					Learning curve is so low, you'll forget when you opened the docs last time.
+				</p>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-md-5 col-md-offset-1">
+				<h4>Middleware</h4>
+				<p>
+					Yes, like in Express and Koa. Put functions before or after CRUD methods and control the flow.
+					Modify data, abort the operation and everything else I could not think of.
+				</p>
+			</div>
+			
+			<div class="col-md-5 col-md-offset-1">
+				<h4>No Schema</h4>
+				<p>
+					That's right, no schema. One of the best MongoDB strengths is that it's totally schema-less.
+					Mongorito does not want to take that feature away from you.
+					Just use <strong>get</strong> and <strong>set</strong> methods and everything will go smooth.
+				</p>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-md-5 col-md-offset-1">
+				<h4>Query population</h4>
+				<p>
+					Mongorito borrowed that idea from the awesome Mongoose.
+					Population allows replacing ObjectID's in query response with actual documents from other collections.
+				</p>
+			</div>
+			
+			<div class="col-md-5 col-md-offset-1">
+				<h4>Full test coverage</h4>
+				<p>
+					Every bit of Mongorito's functionality is tested. Just as main codebase, tests are easy to read and understand.
+					If you don't believe it, check it yourself by running <b>npm test</b> after cloning the repository.
+				</p>
+			</div>
+		</div>
+		
+		<div class="row">
+		  <div class="col-md-5 col-md-offset-1">
+		    <h4>Multiple database support <span class="badge">new</span></h4>
+		    <p>
+		      Mongorito supports multiple database connections at the same time.
+		      Every model can have different database connection and API stays the same.
+		      All models that don't have custom connection, use the global default.
+		  </div>
+		  
+		  <div class="col-md-5 col-md-offset-1">
+		    <p class="coming-soon">
+		      More features coming soon.
+		      Open a <a href="https://github.com/vdemedes/mongorito/issues" target="_blank">github issue</a> if you have suggestions.
+		    </p>
+		  </div>
+		</div>
+	</div>
+</section>
+
+<section>
+  <h2 class="text-center">Try it out!</h2>
+  <p>
+    Mongorito is very easy to learn and a pleasure to work with.
+    To get you started, I wrote a <%= link_to 'quick tutorial', '/guides/getting-started' %>, where you will manage posts for a blog.
+    There are also <b>non-boring</b> <%= link_to 'guides', '/guides' %> available, if you decided to use Mongorito in your projects.
+  </p>
+  
+  <blockquote class="warning">
+    <label>Warning</label>
+    <p>
+      Make sure you've got Node.js v0.11.x or newer installed and program is executed with <mark>--harmony</mark> option.
+      I recommend <%= link_to 'nvm', 'https://github.com/creationix/nvm' %> or <%= link_to 'n', 'https://github.com/tj/n' %> to manage Node.js versions.
+    </p>
+  </blockquote>
+</section>
+
+<section>
+  <h2 class="text-center">Show some <i class="icon icon-heart"></i></h2>
+  <p class="text-center">Yes, that's all it takes! Tweet, follow and star it on GitHub!</p>
+  
+  <ol class="sharing">
+    <li>
+      <a class="twitter-share-button"
+          data-text="Check out Mongorito, new MongoDB library for Node.js based on ES6 generators, which means no callbacks or promises!"
+          data-url="http://mongorito.com"
+          data-related="vdemedes"
+          href="https://twitter.com/share">Tweet</a>
+    </li>
+    <li>
+			<a href="https://twitter.com/vdemedes" class="twitter-follow-button" data-show-count="false">Follow @vdemedes</a>
+	  </li>
+	  <li>
+			<iframe src="http://ghbtns.com/github-btn.html?user=vdemedes&repo=mongorito&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100" height="20"></iframe>
+	  </li>
+	</ol>
+</section>
+
+<script>
+window.twttr=(function(d,s,id){var t,js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id)){return}js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);return window.twttr||(t={_e:[],ready:function(f){t._e.push(f)}})}(document,"script","twitter-wjs"));
+</script>

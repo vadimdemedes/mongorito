@@ -1,0 +1,129 @@
+@charset "utf-8";
+
+$default-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+body {
+  font-family: 'Source Sans Pro', $default-font;
+  font-size: 18px;
+}
+
+p {
+  margin-bottom: 30px;
+}
+
+p, li {
+  line-height: 1.6em;
+}
+
+mark {
+  background: #fdffb6;
+  padding: 2px 4px;
+}
+
+header {
+  h1 {
+    font-family: 'Merienda One', 'Source Sans Pro', $default-font;
+  }
+  
+  div.highlight {
+    margin: 40px auto 0;
+    width: 390px;
+    display: block;
+  }
+}
+
+img.logo {
+  margin-top: 100px;
+  width: 280px;
+  height: 280px;
+}
+
+h1 i.icon-heart {
+  font-size: 26px;
+}
+
+nav {
+  width: 300px;
+  margin: 20px auto 0;
+  
+  a {
+    border-radius: 50px;
+    border: 1px solid #eee;
+    color: #666 !important;
+    text-decoration: none !important;
+    padding: 6px 12px;
+    
+    &:hover {
+      border: 1px solid #aaa;
+    }
+  }
+  
+  ul {
+    padding: 6px 0;
+    overflow: hidden;
+  }
+  
+  li {
+    float: left;
+    list-style: none;
+    margin-left: 14px;
+    
+    &:nth-child(1) {
+      margin-left: 0;
+    }
+  }
+}
+
+section {
+  max-width: 700px;
+  margin: 60px auto;
+  
+  div.highlight {
+    margin: 20px 0;
+  }
+}
+
+div.features {
+  div[class*='col-']{
+    margin-top: 20px;
+  }
+  
+  h4 {
+    margin-bottom: 14px;
+  }
+  
+  p {
+    font-size: 14px;
+    
+    &.coming-soon {
+      margin-top: 60px;
+    }
+  }
+}
+
+span.badge {
+  padding: 3px 7px 2px;
+  margin-left: 6px;
+  background: #bf1b22;
+  text-transform: uppercase;
+  font-size: 12px;
+  border-radius: 2px;
+}
+
+blockquote.warning {
+  border-color: #ffcd2c;
+}
+
+ol.sharing {
+  width: 180px;
+  margin: 0 auto;
+  
+  li {
+    line-height: 2em;
+  }
+}
+
+footer {
+  margin: 60px 0 20px;
+  text-align: center;
+}
