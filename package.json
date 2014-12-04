@@ -1,10 +1,10 @@
 {
   "name": "mongorito",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
-    "backbone-class": "0.0.1",
+    "class-extend": "^0.1.1",
     "co-monk": "^1.0.0",
     "koa-compose": "^2.3.0",
     "monk": "^0.9.0"
