@@ -68,6 +68,15 @@ describe ('Mongorito', function () {
 			parsed.body.should.equal(data.body);
 		});
 		
+		it ('should remember previous attributes', function () {
+		  var post = new Post({ title: 'Sad title' });
+		  post.get('title').should.equal('Sad title');
+		  post.set('title', 'Happy title');
+		  post.previous.title.should.equal('Sad title');
+		  post.changed.title.should.equal('Happy title');
+		  post.get('title').should.equal('Happy title');
+		});
+		
 		it ('should setup an index', function *() {
 			yield Post.index('title');
 			
