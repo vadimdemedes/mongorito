@@ -27,7 +27,11 @@ describe ('Mongorito', function () {
 	
 	before (function () {
 		Post = Model.extend({
-			collection: 'posts'
+			collection: 'posts',
+			
+			defaults: {
+			  title: 'Default title'
+			}
 		});
 		
 		Comment = Model.extend({
@@ -97,6 +101,16 @@ describe ('Mongorito', function () {
 			createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			createdPost.get('created_at').should.equal(timestamp);
 			createdPost.get('updated_at').should.equal(timestamp);
+		});
+		
+		it ('should create a new document with default values', function *() {
+		  var data = postFixture();
+		  delete data.title;
+		  
+		  var post = new Post(data);
+		  yield post.save();
+		  
+		  post.get('title').should.equal('Default title');
 		});
 		
 		it ('should update a document', function *() {
@@ -307,7 +321,7 @@ describe ('Mongorito', function () {
 				while (n--) {
 					var data = postFixture();
 					if (n < 5) {
-						delete data.title;
+						delete data.body;
 					}
 					
 					var post = new Post(data);
@@ -316,16 +330,16 @@ describe ('Mongorito', function () {
 				
 				var posts;
 				
-				posts = yield Post.exists('title').find();
+				posts = yield Post.exists('body').find();
 				posts.length.should.equal(5);
 				
-				posts = yield Post.exists('title', false).find();
+				posts = yield Post.exists('body', false).find();
 				posts.length.should.equal(5);
 				
-				posts = yield Post.where('title').exists().find();
+				posts = yield Post.where('body').exists().find();
 				posts.length.should.equal(5);
 				
-				posts = yield Post.where('title').exists(false).find();
+				posts = yield Post.where('body').exists(false).find();
 				posts.length.should.equal(5);
 			});
 			
