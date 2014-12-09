@@ -357,6 +357,36 @@ describe ('Mongorito', function () {
 				posts.length.should.equal(2);
 			});
 			
+			it ('should sort documents', function *() {
+			  var n = 10;
+			  
+			  while (n--) {
+			    var data = postFixture({ index: n });
+			    var post = new Post(data);
+			    yield post.save();
+			  }
+			  
+			  var posts = yield Post.sort({ _id: -1 }).find();
+			  posts.length.should.equal(10);
+			  
+			  n = 10;
+			  
+			  while (n--) {
+			    var post = posts[n];
+			    post.get('index').should.equal(n);
+			  }
+			  
+			  posts = yield Post.sort({ _id: 1 }).find();
+			  posts.length.should.equal(10);
+			  
+			  n = 10;
+			  
+			  while (n--) {
+			    var post = posts[n];
+			    post.get('index').should.equal(9 - n);
+			  }
+			});
+			
 			it ('should populate the response', function *() {
 				var n = 3;
 				var comments = [];
