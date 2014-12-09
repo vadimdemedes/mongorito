@@ -398,81 +398,99 @@ describe ('Mongorito', function () {
 				var Post = Model.extend({
 					collection: 'posts',
 					
+					configure: function () {
+					  this.before('save', 'beforeSave');
+					  this.after('save', 'afterSave');
+					  this.around('save', 'aroundSave');
+					  
+					  this.before('create', 'beforeCreate');
+					  this.after('create', 'afterCreate');
+					  this.around('create', 'aroundCreate');
+					  
+					  this.before('update', 'beforeUpdate');
+					  this.after('update', 'afterUpdate');
+					  this.around('update', 'aroundUpdate');
+					  
+					  this.before('remove', 'beforeRemove');
+					  this.after('remove', 'afterRemove');
+					  this.around('remove', 'aroundRemove');
+					},
+					
 					// Save hooks
 					beforeSave: function *(next) {
 						hooks.push('before:save');
 						
 						yield next;
-					}.before('save'),
+					},
 					
 					afterSave: function *(next) {
 						hooks.push('after:save');
 						
 						yield next;
-					}.after('save'),
+					},
 					
 					aroundSave: function *(next) {
 						hooks.push('around:save');
 						
 						yield next;
-					}.around('save'),
+					},
 					
 					// Create hooks
 					beforeCreate: function *(next) {
 						hooks.push('before:create');
 						
 						yield next;
-					}.before('create'),
+					},
 					
 					afterCreate: function *(next) {
 						hooks.push('after:create');
 						
 						yield next;
-					}.after('create'),
+					},
 					
 					aroundCreate: function *(next) {
 						hooks.push('around:create');
 						
 						yield next;
-					}.around('create'),
+					},
 					
 					// Update hooks
 					beforeUpdate: function *(next) {
 						hooks.push('before:update');
 						
 						yield next;
-					}.before('update'),
+					},
 					
 					afterUpdate: function *(next) {
 						hooks.push('after:update');
 						
 						yield next;
-					}.after('update'),
+					},
 					
 					aroundUpdate: function *(next) {
 						hooks.push('around:update');
 						
 						yield next;
-					}.around('update'),
+					},
 					
 					// Remove hooks
 					beforeRemove: function *(next) {
 						hooks.push('before:remove');
 						
 						yield next;
-					}.before('remove'),
+					},
 					
 					afterRemove: function *(next) {
 						hooks.push('after:remove');
 						
 						yield next;
-					}.after('remove'),
+					},
 					
 					aroundRemove: function *(next) {
 						hooks.push('around:remove');
 						
 						yield next;
-					}.around('remove'),
+					},
 				});
 				
 				var data = postFixture();
@@ -480,39 +498,39 @@ describe ('Mongorito', function () {
 				yield post.save();
 				
 				hooks.length.should.equal(8);
-				hooks[0].should.equal('before:save');
-				hooks[1].should.equal('around:save');
-				hooks[2].should.equal('before:create');
-				hooks[3].should.equal('around:create');
-				hooks[4].should.equal('around:create');
-				hooks[5].should.equal('after:create');
-				hooks[6].should.equal('around:save');
-				hooks[7].should.equal('after:save');
-				
-				hooks = [];
-				
-				post.set('title', 'New title');
-				yield post.save();
-				
-				hooks.length.should.equal(8);
-				hooks[0].should.equal('before:save');
-				hooks[1].should.equal('around:save');
-				hooks[2].should.equal('before:update');
-				hooks[3].should.equal('around:update');
-				hooks[4].should.equal('around:update');
-				hooks[5].should.equal('after:update');
-				hooks[6].should.equal('around:save');
-				hooks[7].should.equal('after:save');
-				
-				hooks = [];
-				
-				yield post.remove();
-				
-				hooks.length.should.equal(4);
-				hooks[0].should.equal('before:remove');
-				hooks[1].should.equal('around:remove');
-				hooks[2].should.equal('around:remove');
-				hooks[3].should.equal('after:remove');
+        hooks[0].should.equal('before:save');
+        hooks[1].should.equal('around:save');
+        hooks[2].should.equal('before:create');
+        hooks[3].should.equal('around:create');
+        hooks[4].should.equal('around:create');
+        hooks[5].should.equal('after:create');
+        hooks[6].should.equal('around:save');
+        hooks[7].should.equal('after:save');
+        
+        hooks = [];
+        
+        post.set('title', 'New title');
+        yield post.save();
+        
+        hooks.length.should.equal(8);
+        hooks[0].should.equal('before:save');
+        hooks[1].should.equal('around:save');
+        hooks[2].should.equal('before:update');
+        hooks[3].should.equal('around:update');
+        hooks[4].should.equal('around:update');
+        hooks[5].should.equal('after:update');
+        hooks[6].should.equal('around:save');
+        hooks[7].should.equal('after:save');
+        
+        hooks = [];
+        
+        yield post.remove();
+        
+        hooks.length.should.equal(4);
+        hooks[0].should.equal('before:remove');
+        hooks[1].should.equal('around:remove');
+        hooks[2].should.equal('around:remove');
+        hooks[3].should.equal('after:remove');
 			});
 			
 			it ('should abort if a hook throws an error', function *() {
@@ -521,54 +539,15 @@ describe ('Mongorito', function () {
 				var Post = Model.extend({
 					collection: 'posts',
 					
-					firstBeforeSave: function *(next) {
-						hooks.push('firstBeforeSave');
-						
-						throw new Error('firstBeforeSave failed.');
-						
-						yield next;
-					}.before('save'),
-					
-					secondBeforeSave: function *(next) {
-						hooks.push('secondBeforeSave');
-						
-						yield next;
-					}.before('save')
-				});
-				
-				var posts;
-				
-				posts = yield Post.all();
-				posts.length.should.equal(0);
-				
-				var data = postFixture();
-				var post = new Post(data);
-				try {
-					yield post.save();
-				} catch (e) {
-					hooks.length.should.equal(1);
-					hooks[0].should.equal('firstBeforeSave');
-				} finally {
-					posts = yield Post.all();
-					posts.length.should.equal(0);
-				}
-			});
-			
-			it ('should define hooks via .configure()', function *() {
-				var hooks = [];
-				
-				var Post = Model.extend({
-					collection: 'posts',
-					
 					configure: function () {
-						Model.prototype.configure.call(this);
-						
-						this.before('save', 'firstBeforeSave');
-						this.before('save', 'secondBeforeSave');
+					  this.before('save', 'firstBeforeSave');
+					  this.before('save', 'secondBeforeSave');
 					},
 					
 					firstBeforeSave: function *(next) {
 						hooks.push('firstBeforeSave');
+						
+						throw new Error('firstBeforeSave failed.');
 						
 						yield next;
 					},
@@ -587,13 +566,15 @@ describe ('Mongorito', function () {
 				
 				var data = postFixture();
 				var post = new Post(data);
-				yield post.save();
-				hooks.length.should.equal(2);
-				hooks[0].should.equal('firstBeforeSave');
-				hooks[1].should.equal('secondBeforeSave');
-				
-				posts = yield Post.all();
-				posts.length.should.equal(1);
+				try {
+					yield post.save();
+				} catch (e) {
+					hooks.length.should.equal(1);
+					hooks[0].should.equal('firstBeforeSave');
+				} finally {
+					posts = yield Post.all();
+					posts.length.should.equal(0);
+				}
 			});
 		});
 	});
