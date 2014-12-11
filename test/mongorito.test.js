@@ -638,19 +638,13 @@ describe ('Mongorito', function () {
 						collection: 'posts',
 						configure: function(){
 							this.hook({
-						  	before: [
-						  		{action: 'save', method: 'beforeSave'},
-						  		{action: 'create', method: ['firstBeforeCreate', 'secondBeforeCreate']}
-						  		],
-						  	after: [
-						  		{action: 'save', method: 'afterSave'},
-						  		{action: 'create', method: 'firstAfterCreate'}
-						  	],
-						  	around: [
-						  		{action: 'create', method: ['firstAroundCreate', 'secondAroundCreate']}
-						  	]
-						  	});
-
+								'before:save':'beforeSave',
+								'before:create': ['firstBeforeCreate', 'secondBeforeCreate'],
+								'after:save':'afterSave',
+								'after:create': 'firstAfterCreate',
+								'around:create': ['firstAroundCreate', 'secondAroundCreate']
+							});
+							
 						  	this.after('create', ['secondAfterCreate', 'thirdAfterCreate']);
 						},
 						beforeSave: function *(next){
