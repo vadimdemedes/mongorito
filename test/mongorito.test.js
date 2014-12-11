@@ -467,6 +467,7 @@ describe ('Mongorito', function () {
 					  this.before('remove', 'beforeRemove');
 					  this.after('remove', 'afterRemove');
 					  this.around('remove', 'aroundRemove');
+
 					},
 					
 					// Save hooks
@@ -628,6 +629,87 @@ describe ('Mongorito', function () {
 					posts = yield Post.all();
 					posts.length.should.equal(0);
 				}
+			});
+
+			it('should allow registration of hooks through an object, or with an array of methods', function * (){
+				var hooks = [];
+
+				var Post = Model.extend({
+						collection: 'posts',
+						configure: function(){
+							this.hook({
+								'before:save':'beforeSave',
+								'before:create': ['firstBeforeCreate', 'secondBeforeCreate'],
+								'after:save':'afterSave',
+								'after:create': 'firstAfterCreate',
+								'around:create': ['firstAroundCreate', 'secondAroundCreate']
+							});
+							
+						  	this.after('create', ['secondAfterCreate', 'thirdAfterCreate']);
+						},
+						beforeSave: function *(next){
+							hooks.push('beforeSave');
+
+							yield next;
+						},
+						firstBeforeCreate: function *(next){
+							hooks.push('firstBeforeCreate');
+
+							yield next;
+						},
+						secondBeforeCreate: function *(next){
+							hooks.push('secondBeforeCreate');
+
+							yield next;
+						},
+						afterSave: function *(next){
+							hooks.push('afterSave');
+
+							yield next;
+						},
+						firstAfterCreate: function *(next){
+							hooks.push('firstAfterCreate');
+
+							yield next;
+						},
+						firstAroundCreate: function *(next){
+							hooks.push('firstAroundCreate');
+
+							yield next;
+						},
+						secondAroundCreate: function *(next){
+							hooks.push('secondAroundCreate');
+
+							yield next;
+						},
+						secondAfterCreate: function *(next){
+							hooks.push('secondAfterCreate');
+
+							yield next;
+						},
+						thirdAfterCreate: function *(next){
+							hooks.push('thirdAfterCreate');
+
+							yield next;
+						}
+					});
+
+				var data = postFixture();
+				var post = new Post(data);
+				yield post.save();
+
+				hooks.length.should.equal(11);
+				hooks[0].should.equal('beforeSave');
+				hooks[1].should.equal('firstBeforeCreate');
+				hooks[2].should.equal('secondBeforeCreate');
+				hooks[3].should.equal('firstAroundCreate');
+				hooks[4].should.equal('secondAroundCreate');
+				hooks[5].should.equal('secondAroundCreate');
+				hooks[6].should.equal('firstAroundCreate');
+				hooks[7].should.equal('firstAfterCreate');
+				hooks[8].should.equal('secondAfterCreate');
+				hooks[9].should.equal('thirdAfterCreate');
+				hooks[10].should.equal('afterSave');
 			});
 		});
 	});
