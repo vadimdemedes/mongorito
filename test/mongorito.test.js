@@ -631,68 +631,78 @@ describe ('Mongorito', function () {
 				}
 			});
 
-			it('should allow registration of hooks through an object, or with an array of methods', function * (){
+			it ('should allow registration of hooks through an object, or with an array of methods', function *() {
 				var hooks = [];
 
 				var Post = Model.extend({
-						collection: 'posts',
-						configure: function(){
-							this.hook({
-								'before:save':'beforeSave',
-								'before:create': ['firstBeforeCreate', 'secondBeforeCreate'],
-								'after:save':'afterSave',
-								'after:create': 'firstAfterCreate',
-								'around:create': ['firstAroundCreate', 'secondAroundCreate']
-							});
-							
-						  	this.after('create', ['secondAfterCreate', 'thirdAfterCreate']);
-						},
-						beforeSave: function *(next){
-							hooks.push('beforeSave');
+					collection: 'posts',
+					
+					configure: function(){
+						this.hook({
+							'before:save': 'beforeSave',
+							'before:create': ['firstBeforeCreate', 'secondBeforeCreate'],
+							'after:save': 'afterSave',
+							'after:create': 'firstAfterCreate',
+							'around:create': ['firstAroundCreate', 'secondAroundCreate']
+						});
+						
+					  this.after('create', ['secondAfterCreate', 'thirdAfterCreate']);
+					},
+					
+					beforeSave: function *(next){
+						hooks.push('beforeSave');
 
-							yield next;
-						},
-						firstBeforeCreate: function *(next){
-							hooks.push('firstBeforeCreate');
+						yield next;
+					},
+					
+					firstBeforeCreate: function *(next){
+						hooks.push('firstBeforeCreate');
 
-							yield next;
-						},
-						secondBeforeCreate: function *(next){
-							hooks.push('secondBeforeCreate');
+						yield next;
+					},
+					
+					secondBeforeCreate: function *(next){
+						hooks.push('secondBeforeCreate');
 
-							yield next;
-						},
-						afterSave: function *(next){
-							hooks.push('afterSave');
+						yield next;
+					},
+					
+					afterSave: function *(next){
+						hooks.push('afterSave');
 
-							yield next;
-						},
-						firstAfterCreate: function *(next){
-							hooks.push('firstAfterCreate');
+						yield next;
+					},
+					
+					firstAfterCreate: function *(next){
+						hooks.push('firstAfterCreate');
 
-							yield next;
-						},
-						firstAroundCreate: function *(next){
-							hooks.push('firstAroundCreate');
+						yield next;
+					},
+					
+					firstAroundCreate: function *(next){
+						hooks.push('firstAroundCreate');
 
-							yield next;
-						},
-						secondAroundCreate: function *(next){
-							hooks.push('secondAroundCreate');
+						yield next;
+					},
+					
+					secondAroundCreate: function *(next){
+						hooks.push('secondAroundCreate');
 
-							yield next;
-						},
-						secondAfterCreate: function *(next){
-							hooks.push('secondAfterCreate');
+						yield next;
+					},
+					
+					secondAfterCreate: function *(next){
+						hooks.push('secondAfterCreate');
 
-							yield next;
-						},
-						thirdAfterCreate: function *(next){
-							hooks.push('thirdAfterCreate');
+						yield next;
+					},
+					
+					thirdAfterCreate: function *(next){
+						hooks.push('thirdAfterCreate');
 
-							yield next;
-						}
-					});
+						yield next;
+					}
+				});
 
 				var data = postFixture();
 				var post = new Post(data);
