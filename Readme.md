@@ -4,7 +4,7 @@ Awesome ES6 generator-based MongoDB ODM for Node.js v0.11.x (or newer).
 Just take a look on its pretty models and beautiful API. 
 Uses [monk](https://github.com/Automattic/monk) under the hood.
 
-[![Build Status](https://travis-ci.org/vdemedes/mongorito.svg)](https://travis-ci.org/vdemedes/mongorito)
+[![Circle CI](https://circleci.com/gh/vdemedes/mongorito/tree/master.svg?style=svg)](https://circleci.com/gh/vdemedes/mongorito/tree/master)
 
 ## Features
 

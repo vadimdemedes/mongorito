@@ -1,0 +1,5 @@
+machine:
+  node:
+    version: 0.11.14
+  services:
+    - mongodb
