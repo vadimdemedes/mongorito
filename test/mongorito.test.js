@@ -90,8 +90,12 @@ describe ('Mongorito', function () {
 
       posts.length.should.equal(1);
       createdPost.get('_id').toString().should.equal(post.get('_id').toString());
-      createdPost.get('created_at').should.equal(timestamp);
-      createdPost.get('updated_at').should.equal(timestamp);
+      
+      let createdAt = Math.round(createdPost.get('created_at') / 1000);
+      let updatedAt = Math.round(createdPost.get('updated_at') / 1000);
+      
+      createdAt.should.equal(timestamp);
+      updatedAt.should.equal(timestamp);
     });
 
     it ('should create a new document with default values', function *() {
@@ -131,8 +135,9 @@ describe ('Mongorito', function () {
       let updatedPost = yield Post.findOne();
       updatedPost.get('_id').toString().should.equal(post.get('_id').toString());
       updatedPost.get('title').should.equal(post.get('title'));
-      updatedPost.get('created_at').should.equal(createdAt);
-      updatedPost.get('updated_at').should.equal(updatedAt);
+      
+      Math.round(updatedPost.get('created_at') / 1000).should.equal(createdAt);
+      Math.round(updatedPost.get('updated_at') / 1000).should.equal(updatedAt);
     });
 
     it ('should remove a document', function *() {
