@@ -35,13 +35,19 @@ Let's take a look at this example to get a better understanding. Imagine you hav
 And there are Post and Comment models defined:
 
 ```javascript
-var Post = Mongorito.Model.extend({
-	collection: 'posts'
-});
+var Model = Mongorito.Model;
 
-var Comment = Mongorito.Model.extend({
-	collection: 'comments'
-});
+class Post extends Model {
+	get collection () {
+		return 'posts';
+	}
+}
+
+class Comment extends Model {
+	get collection () {
+		return 'comments';
+	}
+}
 ```
 
 Now, to fetch this post and its comments normally you would do this (or something like this):

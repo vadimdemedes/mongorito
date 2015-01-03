@@ -64,9 +64,24 @@ All operations are buffered, so when connection becomes available, they will be 
 
 ### Defining a model
 
-To define a Post model, use ==Model.extend()== method to inherit from Model.
-When extending, you must set a collection name in ==collection== property.
+To define a Post model, extend from a Model class.
+When defining a model, getter for **collection** property should be defined and return collection name, in which documents for that model should be stored.
 You do not need to register a model or anything like that.
+
+```javascript
+class Post extends Model {
+	get collection () {
+		return 'posts';
+	}
+}
+```
+
+> There is no need to define schema or even fields that belong to this model. One of the main features of MongoDB is that it's schema-less and Mongorito does not want to take that feature away from you.
+
+After Post model is defined, you can start using it right away.
+All documents will be saved in the collection you specified in ==collection== property (posts, in this example).
+
+> If you want to use ES6 syntax to define classes, I highly recommend [6to5](https://github.com/6to5/6to5). If not, there's an alternative API left from previous versions of Mongorito to maintain backwards compatibility:
 
 ```javascript
 var Post = Model.extend({
@@ -74,10 +89,6 @@ var Post = Model.extend({
 });
 ```
 
-> There is no need to define schema or even fields that belong to this model. One of the main features of MongoDB is that it's schema-less and Mongorito does not want to take that feature away from you.
-
-After Post model is defined, you can start using it right away.
-All documents will be saved in the collection you specified in ==collection== property (posts, in this example).
 
 ### Saving documents
 

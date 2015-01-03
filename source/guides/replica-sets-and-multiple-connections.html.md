@@ -42,14 +42,23 @@ var secondaryDb = Mongorito.connect('localhost/other_db');
 Now, to tell specific models to use connection to *secondaryDb* instead of default, set ==db== property, like that:
 
 ```javascript
-var Post = Mongorito.Model.extend({
-	collection: 'posts'
-});
+var Model = Mongorito.Model;
 
-var Comment = Mongorito.Model.extend({
-	db: secondaryDb,
-	collection: 'comments'
-});
+class Post extends Model {
+	get collection () {
+		return 'posts';
+	}
+}
+
+class Comment extends Model {
+	get collection () {
+		return 'comments';
+	}
+	
+	get db () {
+		return secondaryDb;
+	}
+}
 ```
 
 Post model will talk to default database, while Comment model will communicate with *secondaryDb*. 

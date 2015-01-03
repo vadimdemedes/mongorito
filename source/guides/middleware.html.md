@@ -26,28 +26,34 @@ This could be useful for validation, data consistency confirmation, checking for
 Let's define a Post model for our examples:
 
 ```javascript
-var Post = Mongorito.Model.extend({
-	collection: 'posts'
-});
+var Model = Mongorito.Model;
+
+class Post extends Model {
+	get collection () {
+		return 'posts';
+	}
+}
 ```
 
 Now, let's see how a Post model will look with a pre-create middleware:
 
 ```javascript
-var Post = Mongorito.Model.extend({
-	collection: 'posts',
+class Post extends Model {
+	get collection () {
+		return 'posts';
+	}
 	
-	configure: function () {
+	configure () {
 		this.before('create', 'checkIfExists');
-	},
+	}
 	
-	checkIfExists: function *(next) {
+	* checkIfExists: function (next) {
 		// checking if post with the
 		// same title exists in database
 		
 		yield next;
 	}
-});
+}
 ```
 
 In this model, ==.configure()== method is like a constructor, it is executed when a new instance of Post model is created.
@@ -63,7 +69,7 @@ If middleware registered to trigger on *save*, it will be triggered on both *cre
 Here's the full example of ==.configure()== on how you may register middleware:
 
 ```javascript
-configure: function () {
+configure () {
 	this.before('create', 'executesBeforeCreate');
 	this.around('update', 'executesAroundUpdate');
 	this.after('remove', 'executesAfterRemove');
@@ -79,15 +85,17 @@ For example, after failed validation of incoming data.
 To abort middleware chain and prevent operation from executing, just throw an error, like you usually do:
 
 ```javascript
-var Post = Mongorito.Model.extend({
-	collection: 'posts',
+class Post extends Model {
+	get collection () {
+		return 'posts';
+	}
 	
-	configure: function () {
+	configure () {
 		this.before('save', 'validate');
-	},
+	}
 	
-	validate: function *(next) {
-		var isValid = true;
+	* validate (next) {
+		let isValid = true;
 		
 		// let's assume that validation went wrong
 		// and isValid is set to false here
@@ -98,7 +106,7 @@ var Post = Mongorito.Model.extend({
 		
 		yield next;
 	}
-});
+}
 
 var post = new Post();
 yield post.save();
@@ -106,25 +114,3 @@ yield post.save();
 
 After the *Error* is thrown, nothing will be executed.
 Use *try/catch* construction to catch errors.
-
-
-### Alternative API for middleware
-
-There is also prettier and simpler alternative API for registering middleware, inspired by Ember.js.
-If you are using this API, you don't need .configure() method.
-
-```javascript
-var Post = Mongorito.Model.extend({
-	collection: 'posts',
-	
-	validate: function *(next) {
-		var isValid = false;
-		
-		if (!isValid) {
-			throw new Error('Post title is missing');
-		}
-	}.before('save')
-});
-```
-
-> It is recommended to use the original API with ==.configure()== method.
