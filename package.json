@@ -1,16 +1,16 @@
 {
   "name": "mongorito",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
-    "6to5": "^2.2.0",
     "class-extend": "^0.1.1",
     "co-monk": "^1.0.0",
     "koa-compose": "^2.3.0",
     "monk": "^0.9.1"
   },
   "devDependencies": {
+    "6to5": "^2.7.2",
     "chai": "^1.10.0",
     "chance": "^0.6.1",
     "mocha": "^2.0.1",
