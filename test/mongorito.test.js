@@ -81,6 +81,7 @@ describe ('Mongorito', function () {
 
     it ('should create new a document', function *() {
       let timestamp = Math.round(new Date().getTime() / 1000);
+      
       let data = postFixture();
       let post = new Post(data);
       yield post.save();
@@ -91,8 +92,8 @@ describe ('Mongorito', function () {
       posts.length.should.equal(1);
       createdPost.get('_id').toString().should.equal(post.get('_id').toString());
       
-      let createdAt = Math.round(createdPost.get('created_at') / 1000);
-      let updatedAt = Math.round(createdPost.get('updated_at') / 1000);
+      let createdAt = Math.round(createdPost.get('created_at').getTime() / 1000);
+      let updatedAt = Math.round(createdPost.get('updated_at').getTime() / 1000);
       
       createdAt.should.equal(timestamp);
       updatedAt.should.equal(timestamp);
@@ -136,8 +137,8 @@ describe ('Mongorito', function () {
       updatedPost.get('_id').toString().should.equal(post.get('_id').toString());
       updatedPost.get('title').should.equal(post.get('title'));
       
-      Math.round(updatedPost.get('created_at') / 1000).should.equal(createdAt);
-      Math.round(updatedPost.get('updated_at') / 1000).should.equal(updatedAt);
+      Math.round(updatedPost.get('created_at').getTime() / 1000).should.equal(createdAt);
+      Math.round(updatedPost.get('updated_at').getTime() / 1000).should.equal(updatedAt);
     });
 
     it ('should remove a document', function *() {

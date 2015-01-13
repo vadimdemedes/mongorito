@@ -51,26 +51,6 @@ Mongorito.connect = function () {
     urls[_key] = arguments[_key];
   }
 
-  urls = urls.map(function (url) {
-    return url.replace(/^mongo\:\/\//, "");
-  });
-
-  var db = monk.apply(null, urls);
-
-  if (!this.db) this.db = db;
-
-  return db;
-};
-
-var Mongorito = function Mongorito() {};
-
-Mongorito.connect = function () {
-  var urls = [];
-
-  for (var _key2 = 0; _key2 < arguments.length; _key2++) {
-    urls[_key2] = arguments[_key2];
-  }
-
   // convert mongo:// urls to monk-supported ones
   urls = urls.map(function (url) {
     return url.replace(/^mongo\:\/\//, "");
@@ -326,10 +306,10 @@ Model.prototype.create = function* () {
   var _collection3 = this._collection;
   var attrs = this.attributes;
 
-  var timestamp = new Date().getTime();
+  var date = new Date();
   this.set({
-    created_at: timestamp,
-    updated_at: timestamp
+    created_at: date,
+    updated_at: date
   });
 
   yield this.runHooks("before", "create");
@@ -346,8 +326,7 @@ Model.prototype.update = function* () {
   var _collection4 = this._collection;
   var attrs = this.attributes;
 
-  var timestamp = new Date().getTime();
-  this.set("updated_at", timestamp);
+  this.set("updated_at", new Date());
 
   yield this.runHooks("before", "update");
   yield _collection4.updateById(attrs._id, attrs);
