@@ -1,6 +1,10 @@
 @charset "utf-8";
+@import 'compass';
+@import 'normalize';
+@import 'skeleton';
 @import 'fonts';
 @import 'syntax-highlighting';
+@import 'common';
 
 $default-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
@@ -13,15 +17,6 @@ p {
   margin-bottom: 30px;
 }
 
-p, li {
-  line-height: 1.6em;
-}
-
-mark {
-  background: #fdffb6;
-  padding: 2px 4px;
-}
-
 header {
   h1 {
     font-family: 'Merienda One', 'Source Sans Pro', $default-font;
@@ -30,7 +25,6 @@ header {
   div.highlight {
     margin: 40px auto 0;
     width: 390px;
-    display: block;
   }
 }
 
@@ -52,7 +46,6 @@ nav {
     border-radius: 50px;
     border: 1px solid #eee;
     color: #666 !important;
-    text-decoration: none !important;
     padding: 6px 12px;
     
     &:hover {
@@ -86,9 +79,7 @@ section {
 }
 
 div.features {
-  div[class*='col-']{
-    margin-top: 20px;
-  }
+  margin-top: 40px;
   
   h4 {
     margin-bottom: 14px;
@@ -98,22 +89,9 @@ div.features {
     font-size: 14px;
     
     &.coming-soon {
-      margin-top: 60px;
+      margin-top: 44px;
     }
   }
-}
-
-span.badge {
-  padding: 3px 7px 2px;
-  margin-left: 6px;
-  background: #bf1b22;
-  text-transform: uppercase;
-  font-size: 12px;
-  border-radius: 2px;
-}
-
-blockquote.warning {
-  border-color: #ffcd2c;
 }
 
 ol.sharing {

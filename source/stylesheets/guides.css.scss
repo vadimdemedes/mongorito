@@ -1,7 +1,10 @@
 @charset 'utf-8';
 @import 'compass';
+@import 'normalize';
+@import 'skeleton';
 @import 'fonts';
 @import 'syntax-highlighting';
+@import 'common';
 
 body {
   font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -10,15 +13,6 @@ body {
 
 p {
   margin-bottom: 30px;
-}
-
-p, li {
-  line-height: 1.6em;
-}
-
-mark {
-  background: #fdffb6;
-  padding: 2px 4px;
 }
 
 h1 {
@@ -43,15 +37,27 @@ a {
   text-decoration: none !important;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
 div.container {
   margin-top: 40px;
   max-width: 800px;
 }
 
 nav.navbar {
-  @include border-radius(0);
-  background: none;
-  border: 0;
+  li {
+    list-style: none;
+    display: inline;
+    margin-left: 20px;
+    
+    &:first-child {
+      margin-left: 0;
+    }
+  }
 
   a {
     font-size: 16px;
@@ -61,7 +67,7 @@ nav.navbar {
       color: #111 !important;
     }
     
-    &.navbar-brand i {
+    &.logo i {
       @include border-radius(50px);
       border: 1px solid #eee;
       color: #ccc;
@@ -69,9 +75,19 @@ nav.navbar {
       font-size: 14px;
     }
   }
+}
 
-  div.container-fluid {
-    padding: 0;
+@media (max-width: 550px) {
+  nav.navbar {
+    text-align: center;
+    
+    li:first-child {
+      display: block;
+    }
+  }
+  
+  h1 {
+    margin-top: 20px;
   }
 }
 

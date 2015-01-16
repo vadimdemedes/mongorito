@@ -2,11 +2,11 @@
 title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
 ---
 
-<header>
-  <img src="/images/logo@3x.jpg" class="logo img-responsive center-block">
-  <h1 class="text-center">Mongorito</h1>
-  <h4 class="text-center">MongoDB ODM for Node.js based on ES6 generators.</h4>
-  <h4 class="text-center">No callbacks or promises.</h4>
+<header class="text-center">
+  <img src="/images/logo@3x.jpg" class="logo img-responsive block-center">
+  <h1>Mongorito</h1>
+  <h4>MongoDB ODM for Node.js based on ES6 generators.</h4>
+  <h4>No callbacks or promises.</h4>
   <% code('javascript') do %>
   var post = new Post({
   	title: 'Node.js with --harmony rocks!'
@@ -18,7 +18,7 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
   <% end %>
 </header>
 
-<nav class="fluid-container">
+<nav>
   <ul>
     <li>
       <%= link_to 'Github', 'https://github.com/vdemedes/mongorito' %>
@@ -35,9 +35,9 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
 <section>
   <h2 class="text-center">Features</h2>
 	
-	<div class="container-fluid features">
+	<div class="container features">
 		<div class="row">
-			<div class="col-md-5 col-md-offset-1">
+			<div class="five columns">
 				<h4>No callbacks <span class="badge">very cool</span></h4>
 				<p>
 					Mongorito is based on ES6 generators, so you will not need to write a single callback (or promise).
@@ -45,7 +45,7 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
 				</p>
 			</div>
 			
-			<div class="col-md-5 col-md-offset-1">
+			<div class="five columns">
 				<h4>Common and established API</h4>
 				<p>
 					Mongorito does not re-invent the wheel. Take a look at the code example above, same principles as in ActiveRecord, Mongoose and others.
@@ -55,7 +55,7 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
 		</div>
 		
 		<div class="row">
-			<div class="col-md-5 col-md-offset-1">
+			<div class="five columns">
 				<h4>Middleware</h4>
 				<p>
 					Yes, like in Express and Koa. Put functions before or after CRUD methods and control the flow.
@@ -63,7 +63,7 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
 				</p>
 			</div>
 			
-			<div class="col-md-5 col-md-offset-1">
+			<div class="five columns">
 				<h4>No Schema</h4>
 				<p>
 					That's right, no schema. One of the best MongoDB strengths is that it's totally schema-less.
@@ -74,7 +74,7 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
 		</div>
 		
 		<div class="row">
-			<div class="col-md-5 col-md-offset-1">
+			<div class="five columns">
 				<h4>Query population</h4>
 				<p>
 					Mongorito borrowed that idea from the awesome Mongoose.
@@ -82,7 +82,7 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
 				</p>
 			</div>
 			
-			<div class="col-md-5 col-md-offset-1">
+			<div class="five columns">
 				<h4>Full test coverage</h4>
 				<p>
 					Every bit of Mongorito's functionality is tested. Just as main codebase, tests are easy to read and understand.
@@ -92,15 +92,15 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
 		</div>
 		
 		<div class="row">
-		  <div class="col-md-5 col-md-offset-1">
-		    <h4>Multiple database support <span class="badge">new</span></h4>
+		  <div class="five columns">
+		    <h4>Multiple database support</h4>
 		    <p>
 		      Mongorito supports multiple database connections at the same time.
 		      Every model can have different database connection and API stays the same.
 		      All models that don't have custom connection, use the global default.
 		  </div>
 		  
-		  <div class="col-md-5 col-md-offset-1">
+		  <div class="five columns">
 		    <p class="coming-soon">
 		      More features coming soon.
 		      Open a <a href="https://github.com/vdemedes/mongorito/issues" target="_blank">github issue</a> if you have suggestions.
@@ -121,7 +121,7 @@ title: Mongorito - MongoDB ODM for Node.js based on ES6 generators
   <blockquote class="warning">
     <label>Warning</label>
     <p>
-      Make sure you've got Node.js v0.11.x or newer installed and program is executed with <mark>--harmony</mark> option.
+      Make sure you've got Node.js v0.11.x or newer installed and program is executed with<br><mark>--harmony</mark> option.
       I recommend <%= link_to 'nvm', 'https://github.com/creationix/nvm' %> or <%= link_to 'n', 'https://github.com/tj/n' %> to manage Node.js versions.
     </p>
   </blockquote>

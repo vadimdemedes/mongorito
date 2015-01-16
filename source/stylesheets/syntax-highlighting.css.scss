@@ -1,18 +1,32 @@
-<%= Rouge::Themes::Base16::Solarized.render(:scope => '.highlight') %>
+@import 'code-theme';
 
 div.highlight {
   display: inline-block;
+  overflow: auto;
+  max-width: 100%;
   
   pre {
     background-color: transparent;
     border: 0;
     border-radius: 0;
     color: #586e75;
+    margin: 0;
     padding: 0;
+    font-size: 13px;
+    line-height: 1.42857143;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   }
   
-  td.gutter {
-    display: none;
+  table {
+    margin: 0;
+  }
+  
+  td {
+    border: 0;
+    
+    &.gutter {
+      display: none;
+    }
   }
   
   span.err {
@@ -30,7 +44,7 @@ body.guides {
     margin: -10px 0 20px;
     border: 1px solid #eee;
     border-radius: 3px;
-    padding: 6px;
+    padding: 16px 6px;
     
     td.code {
       padding: 5px 20px;
