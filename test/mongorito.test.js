@@ -11,6 +11,7 @@ var Mongorito = require('../');
 var Model = Mongorito.Model;
 
 var Post = require('./models/post');
+var Task = require('./models/task');
 var Comment = require('./models/comment');
 
 /**
@@ -32,6 +33,7 @@ describe ('Mongorito', function () {
 
   beforeEach (function *() {
     yield Post.remove();
+    yield Task.remove();
     yield Comment.remove();
   });
 
@@ -71,12 +73,35 @@ describe ('Mongorito', function () {
       post.changed.title.should.equal('Happy title');
       post.get('title').should.equal('Happy title');
     });
-
+    
     it ('should setup an index', function *() {
       yield Post.index('title');
 
       let indexes = yield Post.indexes();
       indexes.should.have.property('title_1');
+    });
+    
+    it ('should setup a unique index', function *() {
+      yield Task.index('name', { unique: true });
+      
+      let indexes = yield Task.indexes();
+      indexes.should.have.property('name_1');
+      
+      let firstTask = new Task({ name: 'first' });
+      let secondTask = new Task({ name: 'first' });
+      
+      yield firstTask.save();
+      
+      let err;
+      
+      try {
+        yield secondTask.save();
+      } catch (e) {
+        err = e;
+        e.name.should.equal('MongoError');
+      }
+      
+      (typeof err).should.equal('object');
     });
 
     it ('should create new a document', function *() {

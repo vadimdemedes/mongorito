@@ -378,10 +378,10 @@ var Model = (function () {
     return yield query;
   };
 
-  Model.index = function* index(fields) {
+  Model.index = function* index() {
     var collection = this.collection();
 
-    return yield collection.index(fields);
+    return yield collection.index.apply(collection, arguments);
   };
 
   Model.indexes = function* indexes() {
