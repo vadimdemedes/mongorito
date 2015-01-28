@@ -1,5 +1,5 @@
 require('6to5/register')({
-  blacklist: ['generators']
+  blacklist: ['regenerator']
 });
 
 require('./mongorito.test');

@@ -150,7 +150,7 @@ describe ('Mongorito', function () {
       posts = yield Post.all();
       posts.length.should.equal(1);
 
-      let post = posts[0];
+      post = posts[0];
       yield post.remove();
 
       posts = yield Post.all();

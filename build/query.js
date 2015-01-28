@@ -1,14 +1,5 @@
 "use strict";
 
-var _defineProperty = function (obj, key, value) {
-  return Object.defineProperty(obj, key, {
-    value: value,
-    enumerable: true,
-    configurable: true,
-    writable: true
-  });
-};
-
 /**
 * Module dependencies
 */
@@ -27,173 +18,174 @@ var isArray = util.isArray;
 * Query
 */
 
-var Query = function Query(collection, model, key) {
-  this.collection = collection;
-  this.model = model;
-  this.query = {};
-  this.options = { populate: {} };
-  this.lastKey = key;
-};
-
-Query.prototype.where = function (key, value) {
-  var _this = this;
-  // if object was passed instead of key-value pair
-  // iterate over that object and call .where(key, value)
-  if (isObject(key)) {
-    (function () {
-      var conditions = key;
-      var keys = Object.keys(conditions);
-
-      keys.forEach(function (key) {
-        return _this.where(key, conditions[key]);
-      });
-    })();
+var Query = (function () {
+  function Query(collection, model, key) {
+    this.collection = collection;
+    this.model = model;
+    this.query = {};
+    this.options = { populate: {} };
+    this.lastKey = key;
   }
 
-  if (isString(key)) {
-    // if only one argument was supplied
-    // save the key in this.lastKey
-    // for future methods, like .equals()
-    if (undefined == value) {
-      this.lastKey = key;
-      return this;
+  Query.prototype.where = function where(key, value) {
+    var _this = this;
+    // if object was passed instead of key-value pair
+    // iterate over that object and call .where(key, value)
+    if (isObject(key)) {
+      (function () {
+        var conditions = key;
+        var keys = Object.keys(conditions);
+
+        keys.forEach(function (key) {
+          return _this.where(key, conditions[key]);
+        });
+      })();
     }
 
-    // 1. if regular expression
-    // 2. if object and not ObjectID
-    if (isRegExp(value)) {
-      value = { $regex: value };
-    } else if (isObject(value) && false === isObjectID(value)) {
-      value = { $elemMatch: value };
-    }
-
-    this.query[key] = value;
-  }
-
-  return this;
-};
-
-Query.prototype.limit = function (limit) {
-  this.options.limit = limit;
-
-  return this;
-};
-
-Query.prototype.skip = function (skip) {
-  this.options.skip = skip;
-
-  return this;
-};
-
-Query.prototype.sort = function (sort) {
-  this.options.sort = sort;
-
-  return this;
-};
-
-Query.prototype.equals = function (value) {
-  var key = this.lastKey;
-  this.lastKey = null;
-
-  this.query[key] = value;
-
-  return this;
-};
-
-Query.prototype.exists = function (key, exists) {
-  if (this.lastKey) {
-    exists = key;
-    key = this.lastKey;
-    this.lastKey = null;
-  }
-
-  this.query[key] = { $exists: exists || true };
-
-  return this;
-};
-
-Query.prototype.populate = function (key, model) {
-  this.options.populate[key] = model;
-
-  return this;
-};
-
-Query.prototype.count = function* (query) {
-  this.where(query);
-
-  var collection = this.collection;
-  var model = this.model;
-
-  var _count = collection.count(this.query);
-
-  return yield _count;
-};
-
-Query.prototype.find = function* (query) {
-  this.where(query);
-
-  var collection = this.collection;
-  var model = this.model;
-  var options = this.options;
-
-  // fields to populate
-  var _populate = Object.keys(options.populate);
-
-  var docs = yield collection.find(this.query, options);
-
-  var i = 0;
-  var doc = undefined;
-
-  while (doc = docs[i++]) {
-    // options.populate is a key-model pair object
-    var j = 0;
-    var key = undefined;
-
-    while (key = _populate[j++]) {
-      // model to use when populating the field
-      var _model = options.populate[key];
-
-      var value = doc[key];
-
-      // if value is an array of IDs, loop through it
-      if (isArray(value)) {
-        // convert each _id
-        // to findById op
-        var subdocs = value.map(_model.findById, _model);
-
-        // find sub documents
-        value = yield subdocs;
-      } else {
-        value = yield _model.findById(value);
+    if (isString(key)) {
+      // if only one argument was supplied
+      // save the key in this.lastKey
+      // for future methods, like .equals()
+      if (undefined == value) {
+        this.lastKey = key;
+        return this;
       }
 
-      // replace previous ID with actual documents
-      doc[key] = value;
+      // 1. if regular expression
+      // 2. if object and not ObjectID
+      if (isRegExp(value)) {
+        value = { $regex: value };
+      } else if (isObject(value) && false === isObjectID(value)) {
+        value = { $elemMatch: value };
+      }
+
+      this.query[key] = value;
     }
 
-    // index - 1, because index here is already an index of the next document
-    docs[i - 1] = new model(doc, {
-      populate: options.populate
-    });
-  }
+    return this;
+  };
 
-  return docs;
-};
+  Query.prototype.limit = function limit(limit) {
+    this.options.limit = limit;
 
-Query.prototype.findOne = function* (query) {
-  var docs = yield this.find(query);
+    return this;
+  };
 
-  return docs[0];
-};
+  Query.prototype.skip = function skip(skip) {
+    this.options.skip = skip;
 
-Query.prototype.remove = function* (query) {
-  this.where(query);
+    return this;
+  };
 
-  var collection = this.collection;
-  var model = this.model;
+  Query.prototype.sort = function sort(sort) {
+    this.options.sort = sort;
 
-  return yield collection.remove(this.query, this.options);
-};
+    return this;
+  };
+
+  Query.prototype.equals = function equals(value) {
+    var key = this.lastKey;
+    this.lastKey = null;
+
+    this.query[key] = value;
+
+    return this;
+  };
+
+  Query.prototype.exists = function exists(key, exists) {
+    if (this.lastKey) {
+      exists = key;
+      key = this.lastKey;
+      this.lastKey = null;
+    }
+
+    this.query[key] = { $exists: exists || true };
+
+    return this;
+  };
+
+  Query.prototype.populate = function populate(key, model) {
+    this.options.populate[key] = model;
+
+    return this;
+  };
+
+  Query.prototype.count = function* count(query) {
+    this.where(query);
+
+    var collection = this.collection;
+    var model = this.model;
+
+    var count = collection.count(this.query);
+
+    return yield count;
+  };
+
+  Query.prototype.find = function* find(query) {
+    this.where(query);
+
+    var collection = this.collection;
+    var model = this.model;
+    var options = this.options;
+
+    // fields to populate
+    var populate = Object.keys(options.populate);
+
+    var docs = yield collection.find(this.query, options);
+
+    var i = 0;
+    var doc = undefined;
+
+    while (doc = docs[i++]) {
+      // options.populate is a key-model pair object
+      var j = 0;
+      var key = undefined;
+
+      while (key = populate[j++]) {
+        // model to use when populating the field
+        var childModel = options.populate[key];
+
+        var value = doc[key];
+
+        // if value is an array of IDs, loop through it
+        if (isArray(value)) {
+          // convert each _id
+          // to findById op
+          value = value.map(childModel.findById, childModel);
+        } else {
+          value = childModel.findById(value);
+        }
+
+        // replace previous ID with actual documents
+        doc[key] = yield value;
+      }
+
+      // index - 1, because index here is already an index of the next document
+      docs[i - 1] = new model(doc, {
+        populate: options.populate
+      });
+    }
+
+    return docs;
+  };
+
+  Query.prototype.findOne = function* findOne(query) {
+    var docs = yield this.find(query);
+
+    return docs[0];
+  };
+
+  Query.prototype.remove = function* remove(query) {
+    this.where(query);
+
+    var collection = this.collection;
+    var model = this.model;
+
+    return yield collection.remove(this.query, this.options);
+  };
+
+  return Query;
+})();
 
 // Setting up functions that
 // have the same implementation
@@ -209,7 +201,12 @@ methods.forEach(function (method) {
       this.lastKey = null;
     }
 
-    this.query[key] = _defineProperty({}, "$" + method, value);
+    this.query[key] = (function () {
+      var _query$key = {};
+
+      _query$key["$" + method] = value;
+      return _query$key;
+    })();
 
     return this;
   };

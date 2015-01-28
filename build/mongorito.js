@@ -1,25 +1,8 @@
 "use strict";
 
-var _slicedToArray = function (arr, i) {
-  if (Array.isArray(arr)) {
-    return arr;
-  } else {
-    var _arr = [];
+var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } };
 
-    for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-      _arr.push(_step.value);
-
-      if (i && _arr.length === i) break;
-    }
-
-    return _arr;
-  }
-};
-
-var _prototypeProperties = function (child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);
-  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 /**
 * Dependencies
@@ -43,50 +26,52 @@ var isArray = util.isArray;
 * Main class, manages mongodb connection and collections
 */
 
-var Mongorito = function Mongorito() {};
+var Mongorito = (function () {
+  function Mongorito() {}
 
-Mongorito.connect = function () {
-  var urls = [];
+  Mongorito.connect = function connect() {
+    for (var _len = arguments.length, urls = Array(_len), _key = 0; _key < _len; _key++) {
+      urls[_key] = arguments[_key];
+    }
 
-  for (var _key = 0; _key < arguments.length; _key++) {
-    urls[_key] = arguments[_key];
-  }
+    // convert mongo:// urls to monk-supported ones
+    urls = urls.map(function (url) {
+      return url.replace(/^mongo\:\/\//, "");
+    });
 
-  // convert mongo:// urls to monk-supported ones
-  urls = urls.map(function (url) {
-    return url.replace(/^mongo\:\/\//, "");
-  });
+    var db = monk.apply(null, urls);
 
-  var db = monk.apply(null, urls);
+    // if there is already a connection
+    // don't overwrite it with a new one
+    if (!this.db) this.db = db;
 
-  // if there is already a connection
-  // don't overwrite it with a new one
-  if (!this.db) this.db = db;
+    return db;
+  };
 
-  return db;
-};
+  Mongorito.disconnect = function disconnect() {
+    this.db.close();
+  };
 
-Mongorito.disconnect = function () {
-  this.db.close();
-};
+  Mongorito.close = function close() {
+    return this.disconnect.apply(this, arguments);
+  };
 
-Mongorito.close = function () {
-  return this.disconnect.apply(this, arguments);
-};
+  Mongorito.collection = function collection(db, name) {
+    var url = db.driver._connect_args[0];
+    var collections = this.collections[url];
 
-Mongorito.collection = function (db, name) {
-  var url = db.driver._connect_args[0];
-  var collections = this.collections[url];
+    if (!collections) {
+      collections = this.collections[url] = {};
+    }
 
-  if (!collections) {
-    collections = this.collections[url] = {};
-  }
+    if (collections[name]) return collections[name];
 
-  if (collections[name]) return collections[name];
+    var collection = db.get(name);
+    return collections[name] = wrap(collection);
+  };
 
-  var _collection2 = db.get(name);
-  return collections[name] = wrap(_collection2);
-};
+  return Mongorito;
+})();
 
 Mongorito.collections = {};
 
@@ -109,327 +94,327 @@ var Query = require("./query");
 * Model
 */
 
-var Model = function Model() {
-  var attrs = arguments[0] === undefined ? {} : arguments[0];
-  var options = arguments[1] === undefined ? {} : arguments[1];
-  this.attributes = attrs;
-  this.changed = {};
-  this.previous = {};
-  this.options = options;
+var Model = (function () {
+  function Model() {
+    var attrs = arguments[0] === undefined ? {} : arguments[0];
+    var options = arguments[1] === undefined ? {} : arguments[1];
+    this.attributes = attrs;
+    this.changed = {};
+    this.previous = {};
+    this.options = options;
 
-  // reset hooks
-  Object.defineProperty(this, "_hooks", {
-    value: {
-      before: {
-        create: [],
-        update: [],
-        remove: [],
-        save: []
+    // reset hooks
+    Object.defineProperty(this, "_hooks", {
+      value: {
+        before: {
+          create: [],
+          update: [],
+          remove: [],
+          save: []
+        },
+        after: {
+          create: [],
+          update: [],
+          remove: [],
+          save: []
+        }
       },
-      after: {
-        create: [],
-        update: [],
-        remove: [],
-        save: []
-      }
-    },
-    enumerable: false
-  });
+      enumerable: false
+    });
 
-  // run custom per-model configuration
-  this.configure();
-};
-
-Model.prototype.get = function (key) {
-  var attrs = this.attributes;
-
-  return key ? attrs[key] : attrs;
-};
-
-Model.prototype.set = function (key, value) {
-  var _this = this;
-  // if object passed instead of key-value pair
-  // iterate and call set on each item
-  if (isObject(key)) {
-    var _ret = (function () {
-      var attrs = key;
-      var keys = Object.keys(attrs);
-
-      keys.forEach(function (key) {
-        return _this.set(key, attrs[key]);
-      });
-
-      return {
-        v: undefined
-      };
-    })();
-
-    if (typeof _ret === "object") return _ret.v;
+    // run custom per-model configuration
+    this.configure();
   }
 
-  this.previous[key] = this.get(key);
-  this.attributes[key] = value;
-  this.changed[key] = value;
+  Model.prototype.get = function get(key) {
+    var attrs = this.attributes;
 
-  return value;
-};
+    return key ? attrs[key] : attrs;
+  };
 
-Model.prototype.setDefaults = function () {
-  var _this2 = this;
-  var defaults = this.defaults || {};
-  var keys = Object.keys(defaults);
+  Model.prototype.set = function set(key, value) {
+    var _this = this;
+    // if object passed instead of key-value pair
+    // iterate and call set on each item
+    if (isObject(key)) {
+      var _ret = (function () {
+        var attrs = key;
+        var keys = Object.keys(attrs);
 
-  keys.forEach(function (key) {
-    var defaultValue = defaults[key];
-    var actualValue = _this2.get(key);
+        keys.forEach(function (key) {
+          return _this.set(key, attrs[key]);
+        });
 
-    if (undefined == actualValue) {
-      _this2.set(key, defaultValue);
+        return {
+          v: undefined
+        };
+      })();
+
+      if (typeof _ret === "object") return _ret.v;
     }
-  });
-};
 
-Model.prototype.toJSON = function () {
-  return this.attributes;
-};
+    this.previous[key] = this.get(key);
+    this.attributes[key] = value;
+    this.changed[key] = value;
 
-Model.prototype.configure = function () {};
+    return value;
+  };
 
-Model.prototype.hook = function (when, action, method) {
-  var _this3 = this;
-  if (isObject(when)) {
-    var _ret2 = (function () {
-      var _hooks = when;
-      var keys = Object.keys(_hooks);
+  Model.prototype.setDefaults = function setDefaults() {
+    var _this = this;
+    var defaults = this.defaults || {};
+    var keys = Object.keys(defaults);
 
-      keys.forEach(function (key) {
-        var _key$split = key.split(":");
+    keys.forEach(function (key) {
+      var defaultValue = defaults[key];
+      var actualValue = _this.get(key);
 
-        var _key$split2 = _slicedToArray(_key$split, 2);
+      if (undefined == actualValue) {
+        _this.set(key, defaultValue);
+      }
+    });
+  };
 
-        var _when = _key$split2[0];
-        var _action = _key$split2[1];
-        var _method = _hooks[key];
+  Model.prototype.toJSON = function toJSON() {
+    return this.attributes;
+  };
 
-        _this3.hook(_when, _action, _method);
-      });
+  Model.prototype.configure = function configure() {};
 
-      return {
-        v: undefined
-      };
-    })();
+  Model.prototype.hook = function hook(when, action, method) {
+    var _this = this;
+    if (isObject(when)) {
+      var _ret = (function () {
+        var hooks = when;
+        var keys = Object.keys(hooks);
 
-    if (typeof _ret2 === "object") return _ret2.v;
-  }
+        keys.forEach(function (key) {
+          var _key$split = key.split(":");
 
-  if (isArray(method)) {
-    var _ret3 = (function () {
+          var _key$split2 = _slicedToArray(_key$split, 2);
+
+          var when = _key$split2[0];
+          var action = _key$split2[1];
+          var method = hooks[key];
+
+          _this.hook(when, action, method);
+        });
+
+        return {
+          v: undefined
+        };
+      })();
+
+      if (typeof _ret === "object") return _ret.v;
+    }
+
+    if (isArray(method)) {
       var _methods = method;
 
       _methods.forEach(function (method) {
-        return _this3.hook(when, action, method);
+        return _this.hook(when, action, method);
       });
 
-      return {
-        v: undefined
-      };
-    })();
-
-    if (typeof _ret3 === "object") return _ret3.v;
-  }
-
-  if (false === isFunction(method)) method = this[method];
-
-  if ("around" === when) {
-    this._hooks.before[action].push(method);
-    this._hooks.after[action].unshift(method);
-  } else {
-    this._hooks[when][action].push(method);
-  }
-};
-
-Model.prototype.hooks = function () {
-  return this.hook.apply(this, arguments);
-};
-
-Model.prototype.before = function (action, method) {
-  this.hook("before", action, method);
-};
-
-Model.prototype.after = function (action, method) {
-  this.hook("after", action, method);
-};
-
-Model.prototype.around = function (action, method) {
-  this.hook("around", action, method);
-};
-
-Model.prototype.runHooks = function* (when, action) {
-  var _hooks2 = this._hooks[when][action];
-
-  yield compose(_hooks2).call(this);
-};
-
-Model.prototype.save = function* () {
-  var _this4 = this;
-  // set default values if needed
-  this.setDefaults();
-
-  var _id = this.get("_id");
-  var fn = _id ? this.update : this.create;
-
-  // revert populated documents to _id's
-  var populate = this.options.populate || emptyObject;
-  var keys = Object.keys(populate);
-
-  keys.forEach(function (key) {
-    var value = _this4.get(key);
-
-    if (isArray(value)) {
-      value = value.map(function (doc) {
-        return doc.get("_id");
-      });
-    } else {
-      value = value.get("_id");
+      return;
     }
 
-    _this4.set(key, value);
+    if (false === isFunction(method)) method = this[method];
+
+    if ("around" === when) {
+      this._hooks.before[action].push(method);
+      this._hooks.after[action].unshift(method);
+    } else {
+      this._hooks[when][action].push(method);
+    }
+  };
+
+  Model.prototype.hooks = function hooks() {
+    return this.hook.apply(this, arguments);
+  };
+
+  Model.prototype.before = function before(action, method) {
+    this.hook("before", action, method);
+  };
+
+  Model.prototype.after = function after(action, method) {
+    this.hook("after", action, method);
+  };
+
+  Model.prototype.around = function around(action, method) {
+    this.hook("around", action, method);
+  };
+
+  Model.prototype.runHooks = function* runHooks(when, action) {
+    var hooks = this._hooks[when][action];
+
+    yield compose(hooks).call(this);
+  };
+
+  Model.prototype.save = function* save() {
+    var _this = this;
+    // set default values if needed
+    this.setDefaults();
+
+    var id = this.get("_id");
+    var fn = id ? this.update : this.create;
+
+    // revert populated documents to _id's
+    var populate = this.options.populate || emptyObject;
+    var keys = Object.keys(populate);
+
+    keys.forEach(function (key) {
+      var value = _this.get(key);
+
+      if (isArray(value)) {
+        value = value.map(function (doc) {
+          return doc.get("_id");
+        });
+      } else {
+        value = value.get("_id");
+      }
+
+      _this.set(key, value);
+    });
+
+    yield this.runHooks("before", "save");
+    var result = yield fn.call(this);
+    yield this.runHooks("after", "save");
+
+    return result;
+  };
+
+  Model.prototype.create = function* create() {
+    var collection = this._collection;
+    var attrs = this.attributes;
+
+    var date = new Date();
+    this.set({
+      created_at: date,
+      updated_at: date
+    });
+
+    yield this.runHooks("before", "create");
+
+    var doc = yield collection.insert(attrs);
+    this.set("_id", doc._id);
+
+    yield this.runHooks("after", "create");
+
+    return this;
+  };
+
+  Model.prototype.update = function* update() {
+    var collection = this._collection;
+    var attrs = this.attributes;
+
+    this.set("updated_at", new Date());
+
+    yield this.runHooks("before", "update");
+    yield collection.updateById(attrs._id, attrs);
+    yield this.runHooks("after", "update");
+
+    return this;
+  };
+
+  Model.prototype.remove = function* remove() {
+    var collection = this._collection;
+
+    yield this.runHooks("before", "remove");
+    yield collection.remove({ _id: this.get("_id") });
+    yield this.runHooks("after", "remove");
+
+    return this;
+  };
+
+  Model.collection = function collection() {
+    var name = this.prototype.collection;
+
+    // support for multiple connections
+    // if model has a custom database assigned
+    // use it, otherwise use the default
+    var db = this.prototype.db || Mongorito.db;
+
+    return Mongorito.collection(db, name);
+  };
+
+  Model.find = function* find(query) {
+    var collection = this.collection();
+    var model = this;
+
+    var q = new Query(collection, model).find(query);
+
+    return yield q;
+  };
+
+  Model.count = function* count(query) {
+    var collection = this.collection();
+    var model = this;
+
+    var count = new Query(collection, model).count(query);
+
+    return yield count;
+  };
+
+  Model.all = function* all() {
+    return yield this.find();
+  };
+
+  Model.findOne = function* findOne(query) {
+    var docs = yield this.find(query);
+
+    return docs[0];
+  };
+
+  Model.findById = function* findById(id) {
+    return yield this.findOne({ _id: id });
+  };
+
+  Model.remove = function* remove(query) {
+    var collection = this.collection();
+    var model = this;
+
+    var query = new Query(collection, model).remove(query);
+
+    return yield query;
+  };
+
+  Model.index = function* index(fields) {
+    var collection = this.collection();
+
+    return yield collection.index(fields);
+  };
+
+  Model.indexes = function* indexes() {
+    var collection = this.collection();
+
+    return yield collection.indexes();
+  };
+
+  Model.id = function id() {
+    var collection = this.collection();
+
+    return collection.id.apply(collection, arguments);
+  };
+
+  _prototypeProperties(Model, null, {
+    _collection: {
+      get: function () {
+        return Mongorito.collection(this._db, this.collection);
+      },
+      enumerable: true,
+      configurable: true
+    },
+    _db: {
+      get: function () {
+        return this.db || Mongorito.db;
+      },
+      enumerable: true,
+      configurable: true
+    }
   });
 
-  yield this.runHooks("before", "save");
-  var result = yield fn.call(this);
-  yield this.runHooks("after", "save");
-
-  return result;
-};
-
-Model.prototype.create = function* () {
-  var _collection3 = this._collection;
-  var attrs = this.attributes;
-
-  var date = new Date();
-  this.set({
-    created_at: date,
-    updated_at: date
-  });
-
-  yield this.runHooks("before", "create");
-
-  var doc = yield _collection3.insert(attrs);
-  this.set("_id", doc._id);
-
-  yield this.runHooks("after", "create");
-
-  return this;
-};
-
-Model.prototype.update = function* () {
-  var _collection4 = this._collection;
-  var attrs = this.attributes;
-
-  this.set("updated_at", new Date());
-
-  yield this.runHooks("before", "update");
-  yield _collection4.updateById(attrs._id, attrs);
-  yield this.runHooks("after", "update");
-
-  return this;
-};
-
-Model.prototype.remove = function* () {
-  var _collection5 = this._collection;
-
-  yield this.runHooks("before", "remove");
-  yield _collection5.remove({ _id: this.get("_id") });
-  yield this.runHooks("after", "remove");
-
-  return this;
-};
-
-Model.collection = function () {
-  var name = this.prototype.collection;
-
-  // support for multiple connections
-  // if model has a custom database assigned
-  // use it, otherwise use the default
-  var db = this.prototype.db || Mongorito.db;
-
-  return Mongorito.collection(db, name);
-};
-
-Model.find = function* (query) {
-  var _collection6 = this.collection();
-  var model = this;
-
-  var q = new Query(_collection6, model).find(query);
-
-  return yield q;
-};
-
-Model.count = function* (query) {
-  var _collection7 = this.collection();
-  var model = this;
-
-  var _count = new Query(_collection7, model).count(query);
-
-  return yield _count;
-};
-
-Model.all = function* () {
-  return yield this.find();
-};
-
-Model.findOne = function* (query) {
-  var docs = yield this.find(query);
-
-  return docs[0];
-};
-
-Model.findById = function* (id) {
-  return yield this.findOne({ _id: id });
-};
-
-Model.remove = function* (query) {
-  var _collection8 = this.collection();
-  var model = this;
-
-  var _query = new Query(_collection8, model).remove(_query);
-
-  return yield _query;
-};
-
-Model.index = function* (fields) {
-  var _collection9 = this.collection();
-
-  return yield _collection9.index(fields);
-};
-
-Model.indexes = function* () {
-  var _collection10 = this.collection();
-
-  return yield _collection10.indexes();
-};
-
-Model.id = function () {
-  var _collection11 = this.collection();
-
-  return _collection11.id.apply(_collection11, arguments);
-};
-
-_prototypeProperties(Model, null, {
-  _collection: {
-    get: function () {
-      return Mongorito.collection(this._db, this.collection);
-    },
-    enumerable: true
-  },
-  _db: {
-    get: function () {
-      return this.db || Mongorito.db;
-    },
-    enumerable: true
-  }
-});
+  return Model;
+})();
 
 // Setting up functions that have
 // the same implementation
@@ -438,10 +423,10 @@ var methods = ["where", "limit", "skip", "sort", "exists", "lt", "lte", "gt", "g
 
 methods.forEach(function (method) {
   Model[method] = function () {
-    var _collection12 = this.collection();
+    var collection = this.collection();
     var model = this;
 
-    var query = new Query(_collection12, model);
+    var query = new Query(collection, model);
     query[method].apply(query, arguments);
 
     return query;
