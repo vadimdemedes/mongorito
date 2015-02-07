@@ -1,5 +1,7 @@
 "use strict";
 
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 /**
 * Module dependencies
 */
@@ -20,6 +22,8 @@ var isArray = util.isArray;
 
 var Query = (function () {
   function Query(collection, model, key) {
+    _classCallCheck(this, Query);
+
     this.collection = collection;
     this.model = model;
     this.query = {};
@@ -110,7 +114,17 @@ var Query = (function () {
     return this;
   };
 
-  Query.prototype.count = function* count(query) {
+  Query.prototype.count = (function (_count) {
+    var _countWrapper = function count() {
+      return _count.apply(this, arguments);
+    };
+
+    _countWrapper.toString = function () {
+      return _count.toString();
+    };
+
+    return _countWrapper;
+  })(function* (query) {
     this.where(query);
 
     var collection = this.collection;
@@ -119,8 +133,7 @@ var Query = (function () {
     var count = collection.count(this.query);
 
     return yield count;
-  };
-
+  });
   Query.prototype.find = function* find(query) {
     this.where(query);
 
@@ -139,13 +152,13 @@ var Query = (function () {
     while (doc = docs[i++]) {
       // options.populate is a key-model pair object
       var j = 0;
-      var key = undefined;
+      var _key = undefined;
 
-      while (key = populate[j++]) {
+      while (_key = populate[j++]) {
         // model to use when populating the field
-        var childModel = options.populate[key];
+        var childModel = options.populate[_key];
 
-        var value = doc[key];
+        var value = doc[_key];
 
         // if value is an array of IDs, loop through it
         if (isArray(value)) {
@@ -157,7 +170,7 @@ var Query = (function () {
         }
 
         // replace previous ID with actual documents
-        doc[key] = yield value;
+        doc[_key] = yield value;
       }
 
       // index - 1, because index here is already an index of the next document

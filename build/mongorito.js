@@ -4,10 +4,13 @@ var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; }
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 /**
 * Dependencies
 */
 
+var ObjectID = require("monk/node_modules/mongoskin").ObjectID;
 var Class = require("class-extend");
 var compose = require("koa-compose");
 var monk = require("monk");
@@ -27,7 +30,9 @@ var isArray = util.isArray;
 */
 
 var Mongorito = (function () {
-  function Mongorito() {}
+  function Mongorito() {
+    _classCallCheck(this, Mongorito);
+  }
 
   Mongorito.connect = function connect() {
     for (var _len = arguments.length, urls = Array(_len), _key = 0; _key < _len; _key++) {
@@ -56,7 +61,17 @@ var Mongorito = (function () {
     return this.disconnect.apply(this, arguments);
   };
 
-  Mongorito.collection = function collection(db, name) {
+  Mongorito.collection = (function (_collection) {
+    var _collectionWrapper = function collection() {
+      return _collection.apply(this, arguments);
+    };
+
+    _collectionWrapper.toString = function () {
+      return _collection.toString();
+    };
+
+    return _collectionWrapper;
+  })(function (db, name) {
     var url = db.driver._connect_args[0];
     var collections = this.collections[url];
 
@@ -68,19 +83,11 @@ var Mongorito = (function () {
 
     var collection = db.get(name);
     return collections[name] = wrap(collection);
-  };
-
+  });
   return Mongorito;
 })();
 
 Mongorito.collections = {};
-
-
-/**
-* Expose `Mongorito`
-*/
-
-var exports = module.exports = Mongorito;
 
 
 /**
@@ -98,6 +105,8 @@ var Model = (function () {
   function Model() {
     var attrs = arguments[0] === undefined ? {} : arguments[0];
     var options = arguments[1] === undefined ? {} : arguments[1];
+    _classCallCheck(this, Model);
+
     this.attributes = attrs;
     this.changed = {};
     this.previous = {};
@@ -346,15 +355,24 @@ var Model = (function () {
     return yield q;
   };
 
-  Model.count = function* count(query) {
+  Model.count = (function (_count) {
+    var _countWrapper = function count() {
+      return _count.apply(this, arguments);
+    };
+
+    _countWrapper.toString = function () {
+      return _count.toString();
+    };
+
+    return _countWrapper;
+  })(function* (query) {
     var collection = this.collection();
     var model = this;
 
     var count = new Query(collection, model).count(query);
 
     return yield count;
-  };
-
+  });
   Model.all = function* all() {
     return yield this.find();
   };
@@ -401,14 +419,12 @@ var Model = (function () {
       get: function () {
         return Mongorito.collection(this._db, this.collection);
       },
-      enumerable: true,
       configurable: true
     },
     _db: {
       get: function () {
         return this.db || Mongorito.db;
       },
-      enumerable: true,
       configurable: true
     }
   });
@@ -435,6 +451,14 @@ methods.forEach(function (method) {
 
 Model.extend = Class.extend;
 
+
+/**
+* Expose Mongorito
+*/
+
+var exports = module.exports = Mongorito;
+
+exports.ObjectID = ObjectID;
 exports.Model = Model;
 
 var emptyObject = {};
