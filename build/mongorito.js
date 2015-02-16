@@ -456,7 +456,13 @@ Model.extend = Class.extend;
 
 var exports = module.exports = Mongorito;
 
-exports.ObjectID = ObjectID;
 exports.Model = Model;
+
+// expose mongodb properties
+var mongodb = require("monk/node_modules/mongoskin/node_modules/mongodb");
+
+Object.keys(mongodb).forEach(function (key) {
+  if ("connect" !== key && "version" !== key) exports[key] = mongodb[key];
+});
 
 var emptyObject = {};

@@ -28,6 +28,14 @@ var postFixture = require('./fixtures/post');
 */
 
 describe ('Mongorito', function () {
+  it ('should expose mongodb module properties', function () {
+    let mongodb = require('monk/node_modules/mongoskin/node_modules/mongodb');
+    
+    Object.keys(mongodb).forEach(key => {
+      if ('connect' !== key && 'version' !== key) Mongorito[key].should.equal(mongodb[key]);
+    });
+  });
+  
   before (function () {
     Mongorito.connect('mongo://localhost/mongorito_test');
   });
