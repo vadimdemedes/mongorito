@@ -7,6 +7,11 @@
     "class-extend": "^0.1.1",
     "co-monk": "^1.0.0",
     "koa-compose": "^2.3.0",
+    "lodash.isarray": "^3.0.0",
+    "lodash.isfunction": "^3.0.1",
+    "lodash.isobject": "^3.0.0",
+    "lodash.isregexp": "^3.0.0",
+    "lodash.isstring": "^3.0.0",
     "monk": "^0.9.1",
     "pluralize": "^1.1.2"
   },

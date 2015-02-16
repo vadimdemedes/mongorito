@@ -19,10 +19,9 @@ var monk = require("monk");
 var wrap = require("co-monk");
 var util = require("./util");
 
-var isFunction = util.isFunction;
-var isObject = util.isObject;
-var isArray = util.isArray;
-
+var isFunction = require("lodash.isfunction");
+var isObject = require("lodash.isobject");
+var isArray = require("lodash.isarray");
 
 
 /**

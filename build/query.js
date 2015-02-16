@@ -6,13 +6,14 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 * Module dependencies
 */
 
+var isRegExp = require("lodash.isregexp");
+var isObject = require("lodash.isobject");
+var isString = require("lodash.isstring");
+var isArray = require("lodash.isarray");
+
 var util = require("./util");
 
 var isObjectID = util.isObjectID;
-var isRegExp = util.isRegExp;
-var isObject = util.isObject;
-var isString = util.isString;
-var isArray = util.isArray;
 
 
 
