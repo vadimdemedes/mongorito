@@ -400,15 +400,32 @@ describe ('Mongorito', function () {
       });
 
       it ('should find documents with .or()', function *() {
-        yield new Post({isPublic: true, authorId: 'user1', title: 'first post'}).save();
-        yield new Post({isPublic: false, authorId: 'user2', title: 'second post'}).save();
-        yield new Post({isPublic: false, authorId: 'user3', title: 'third post'}).save();
-
-        let posts = yield Post.or([{isPublic: true}, {authorId: 'user2'}]).find();
+        yield new Post(postFixture({
+          isPublic: true,
+          author: {
+            name: 'user1'
+          }
+        })).save();
+        
+        yield new Post(postFixture({
+          isPublic: false,
+          author: {
+            name: 'user2'
+          }
+        })).save();
+        
+        yield new Post(postFixture({
+          isPublic: false,
+          author: {
+            name: 'user3'
+          }
+        })).save();
+        
+        let posts = yield Post.or([{ isPublic: true }, { ['author.name']: 'user2' }]).find();
 
         posts.length.should.equal(2);
-        posts[0].get('title').should.equal('first post');
-        posts[1].get('title').should.equal('second post');
+        posts[0].get('author').name.should.equal('user1');
+        posts[1].get('author').name.should.equal('user2');
       });
 
       it ('should find documents with .in()', function *() {
