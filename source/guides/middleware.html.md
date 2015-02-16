@@ -29,9 +29,7 @@ Let's define a Post model for our examples:
 var Model = Mongorito.Model;
 
 class Post extends Model {
-	get collection () {
-		return 'posts';
-	}
+	
 }
 ```
 
@@ -39,10 +37,6 @@ Now, let's see how a Post model will look with a pre-create middleware:
 
 ```javascript
 class Post extends Model {
-	get collection () {
-		return 'posts';
-	}
-	
 	configure () {
 		this.before('create', 'checkIfExists');
 	}
@@ -86,10 +80,6 @@ To abort middleware chain and prevent operation from executing, just throw an er
 
 ```javascript
 class Post extends Model {
-	get collection () {
-		return 'posts';
-	}
-	
 	configure () {
 		this.before('save', 'validate');
 	}

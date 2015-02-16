@@ -38,15 +38,11 @@ And there are Post and Comment models defined:
 var Model = Mongorito.Model;
 
 class Post extends Model {
-	get collection () {
-		return 'posts';
-	}
+	
 }
 
 class Comment extends Model {
-	get collection () {
-		return 'comments';
-	}
+	
 }
 ```
 

@@ -15,16 +15,17 @@ After reading this guide you will know:
 
 ### Installation
 
-Before we start doing anything, we need to ensure that we've got Node.js **v0.11.x or newer** installed:
+Before we start doing anything, we need to ensure that we've got Node.js **v0.11.x or newer** or io.js installed:
 
 ```bash
 $ node -v
+$ iojs -v
 ```
 
-If you've got v0.10.x or lower, you need to upgrade to the latest **unstable** (stable version 0.12 is coming soon) version of Node.js.
+If you've got Node.js v0.10.x or lower, you need to upgrade to the latest **unstable** (stable version 0.12 is coming soon) version.
 If you need to maintain multiple versions on your system, I recommend using either [nvm](https://github.com/creationix/nvm) or [n](https://github.com/tj/n).
 
-Also, beware that when you want ES6 features to be enabled, you should run your programs with ==-\\\-harmony== option, like this:
+Also, if you are using Node.js, beware that when you want ES6 features to be enabled, you should run your programs with ==-\\\-harmony== option, like this:
 
 ```bash
 $ node --harmony script.js
@@ -65,27 +66,32 @@ All operations are buffered, so when connection becomes available, they will be 
 ### Defining a model
 
 To define a Post model, extend from a Model class.
-When defining a model, getter for **collection** property should be defined and return collection name, in which documents for that model should be stored.
 You do not need to register a model or anything like that.
+
+> Mongorito automatically sets collection name, if missing. If custom name should be used, define `collection` property or function, which returns collection name.
 
 ```javascript
 class Post extends Model {
-	get collection () {
-		return 'posts';
-	}
+	
 }
 ```
 
 > There is no need to define schema or even fields that belong to this model. One of the main features of MongoDB is that it's schema-less and Mongorito does not want to take that feature away from you.
 
 After Post model is defined, you can start using it right away.
-All documents will be saved in the collection you specified in ==collection== property (posts, in this example).
+All documents will be saved in the **posts** collection, in the following examples.
 
-> If you want to use ES6 syntax to define classes, I highly recommend [6to5](https://github.com/6to5/6to5). If not, there's an alternative API left from previous versions of Mongorito to maintain backwards compatibility:
+> If you want to use ES6 syntax to define classes, I highly recommend [babel](https://github.com/babel/babel). If not, there's an alternative API left from previous versions of Mongorito to maintain backwards compatibility:
 
 ```javascript
 var Post = Model.extend({
-	collection: 'posts'
+	collection: 'posts',
+	
+	// OR
+	
+	collection: function () {
+		return 'posts';
+	}
 });
 ```
 
