@@ -10,9 +10,10 @@ var chance = require('chance')();
 var Mongorito = require('../');
 var Model = Mongorito.Model;
 
+var Account = require('./models/account');
+var Comment = require('./models/comment');
 var Post = require('./models/post');
 var Task = require('./models/task');
-var Comment = require('./models/comment');
 
 /**
 * Fixtures
@@ -32,9 +33,10 @@ describe ('Mongorito', function () {
   });
 
   beforeEach (function *() {
+    yield Account.remove();
+    yield Comment.remove();
     yield Post.remove();
     yield Task.remove();
-    yield Comment.remove();
   });
 
   describe ('Model', function () {
@@ -748,6 +750,16 @@ describe ('Mongorito', function () {
         hooks[9].should.equal('thirdAfterCreate');
         hooks[10].should.equal('afterSave');
       });
+    });
+    
+    it ('should automatically set collection name', function *() {
+      let account = new Account();
+      yield account.save();
+      
+      account.collection.should.equal('accounts');
+      
+      let accounts = yield Account.find();
+      accounts.length.should.equal(1);
     });
   });
 

@@ -7,7 +7,8 @@
     "class-extend": "^0.1.1",
     "co-monk": "^1.0.0",
     "koa-compose": "^2.3.0",
-    "monk": "^0.9.1"
+    "monk": "^0.9.1",
+    "pluralize": "^1.1.2"
   },
   "devDependencies": {
     "babel": "^4.0.1",

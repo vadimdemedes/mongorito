@@ -41,7 +41,7 @@ Mongorito.connect('localhost/blog');
 
 // define model
 class Post extends Model {
-  get collection () { return 'posts'; }
+	
 }
 
 

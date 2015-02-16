@@ -12,6 +12,8 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var ObjectID = require("monk/node_modules/mongoskin").ObjectID;
 var Class = require("class-extend");
+
+var pluralize = require("pluralize");
 var compose = require("koa-compose");
 var monk = require("monk");
 var wrap = require("co-monk");
@@ -330,7 +332,11 @@ var Model = (function () {
     return this;
   };
 
-  Model.collection = function collection() {
+  Model._collection = function _collection() {
+    if (!this.prototype.collection) {
+      this.prototype.collection = pluralize(this.name).toLowerCase();
+    }
+
     var name = this.prototype.collection;
 
     // support for multiple connections
@@ -342,7 +348,7 @@ var Model = (function () {
   };
 
   Model.find = function* find(query) {
-    var collection = this.collection();
+    var collection = this._collection();
     var model = this;
 
     var q = new Query(collection, model).find(query);
@@ -351,7 +357,7 @@ var Model = (function () {
   };
 
   Model.count = function* count(query) {
-    var collection = this.collection();
+    var collection = this._collection();
     var model = this;
 
     var count = new Query(collection, model).count(query);
@@ -374,7 +380,7 @@ var Model = (function () {
   };
 
   Model.remove = function* remove(query) {
-    var collection = this.collection();
+    var collection = this._collection();
     var model = this;
 
     var query = new Query(collection, model).remove(query);
@@ -383,19 +389,19 @@ var Model = (function () {
   };
 
   Model.index = function* index() {
-    var collection = this.collection();
+    var collection = this._collection();
 
     return yield collection.index.apply(collection, arguments);
   };
 
   Model.indexes = function* indexes() {
-    var collection = this.collection();
+    var collection = this._collection();
 
     return yield collection.indexes();
   };
 
   Model.id = function id() {
-    var collection = this.collection();
+    var collection = this._collection();
 
     return collection.id.apply(collection, arguments);
   };
@@ -403,6 +409,12 @@ var Model = (function () {
   _prototypeProperties(Model, null, {
     _collection: {
       get: function () {
+        if (!this.collection) {
+          var _constructor = this.constructor;
+
+          this.collection = _constructor.prototype.collection = pluralize(_constructor.name).toLowerCase();
+        }
+
         return Mongorito.collection(this._db, this.collection);
       },
       configurable: true
@@ -425,7 +437,7 @@ var methods = ["where", "limit", "skip", "sort", "exists", "lt", "lte", "gt", "g
 
 methods.forEach(function (method) {
   Model[method] = function () {
-    var collection = this.collection();
+    var collection = this._collection();
     var model = this;
 
     var query = new Query(collection, model);
