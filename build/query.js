@@ -206,12 +206,16 @@ methods.forEach(function (method) {
       this.lastKey = null;
     }
 
-    this.query[key] = (function () {
-      var _query$key = {};
+    if (!value) {
+      this.query["$" + method] = key;
+    } else {
+      this.query[key] = (function () {
+        var _query$key = {};
 
-      _query$key["$" + method] = value;
-      return _query$key;
-    })();
+        _query$key["$" + method] = value;
+        return _query$key;
+      })();
+    }
 
     return this;
   };
