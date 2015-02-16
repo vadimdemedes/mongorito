@@ -114,17 +114,7 @@ var Query = (function () {
     return this;
   };
 
-  Query.prototype.count = (function (_count) {
-    var _countWrapper = function count() {
-      return _count.apply(this, arguments);
-    };
-
-    _countWrapper.toString = function () {
-      return _count.toString();
-    };
-
-    return _countWrapper;
-  })(function* (query) {
+  Query.prototype.count = function* count(query) {
     this.where(query);
 
     var collection = this.collection;
@@ -133,7 +123,8 @@ var Query = (function () {
     var count = collection.count(this.query);
 
     return yield count;
-  });
+  };
+
   Query.prototype.find = function* find(query) {
     this.where(query);
 
@@ -152,13 +143,13 @@ var Query = (function () {
     while (doc = docs[i++]) {
       // options.populate is a key-model pair object
       var j = 0;
-      var _key = undefined;
+      var key = undefined;
 
-      while (_key = populate[j++]) {
+      while (key = populate[j++]) {
         // model to use when populating the field
-        var childModel = options.populate[_key];
+        var childModel = options.populate[key];
 
-        var value = doc[_key];
+        var value = doc[key];
 
         // if value is an array of IDs, loop through it
         if (isArray(value)) {
@@ -170,7 +161,7 @@ var Query = (function () {
         }
 
         // replace previous ID with actual documents
-        doc[_key] = yield value;
+        doc[key] = yield value;
       }
 
       // index - 1, because index here is already an index of the next document
