@@ -1,4 +1,4 @@
-require('6to5/register')({
+require('babel/register')({
   blacklist: ['regenerator']
 });
 
