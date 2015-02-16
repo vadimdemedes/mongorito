@@ -15,6 +15,7 @@ var Class = require("class-extend");
 
 var pluralize = require("pluralize");
 var compose = require("koa-compose");
+var result = require("lodash.result");
 var monk = require("monk");
 var wrap = require("co-monk");
 var util = require("./util");
@@ -332,11 +333,11 @@ var Model = (function () {
   };
 
   Model._collection = function _collection() {
-    if (!this.prototype.collection) {
-      this.prototype.collection = pluralize(this.name).toLowerCase();
-    }
+    var name = result(this.prototype, "collection", pluralize(this.name).toLowerCase());
 
-    var name = this.prototype.collection;
+    if (!this.prototype.collection) {
+      this.prototype.collection = name;
+    }
 
     // support for multiple connections
     // if model has a custom database assigned
@@ -408,10 +409,10 @@ var Model = (function () {
   _prototypeProperties(Model, null, {
     _collection: {
       get: function () {
-        if (!this.collection) {
-          var _constructor = this.constructor;
+        var name = result(this, "collection", pluralize(this.constructor.name).toLowerCase());
 
-          this.collection = _constructor.prototype.collection = pluralize(_constructor.name).toLowerCase();
+        if (!this.collection) {
+          this.collection = this.constructor.prototype.collection = name;
         }
 
         return Mongorito.collection(this._db, this.collection);

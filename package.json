@@ -12,6 +12,7 @@
     "lodash.isobject": "^3.0.0",
     "lodash.isregexp": "^3.0.0",
     "lodash.isstring": "^3.0.0",
+    "lodash.result": "^3.0.0",
     "monk": "^0.9.1",
     "pluralize": "^1.1.2"
   },
