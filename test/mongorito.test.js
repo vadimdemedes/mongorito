@@ -421,11 +421,42 @@ describe ('Mongorito', function () {
           }
         })).save();
         
-        let posts = yield Post.or([{ isPublic: true }, { ['author.name']: 'user2' }]).find();
+        let posts = yield Post.or({ isPublic: true }, { ['author.name']: 'user2' }).find();
 
         posts.length.should.equal(2);
         posts[0].get('author').name.should.equal('user1');
         posts[1].get('author').name.should.equal('user2');
+      });
+      
+      it ('should find documents with .and()', function *() {
+        yield new Post(postFixture({
+          isPublic: true,
+          author: {
+            name: 'user1'
+          }
+        })).save();
+        
+        yield new Post(postFixture({
+          isPublic: false,
+          author: {
+            name: 'user2'
+          },
+          title: 'second'
+        })).save();
+        
+        yield new Post(postFixture({
+          isPublic: false,
+          author: {
+            name: 'user2'
+          },
+          title: 'third'
+        })).save();
+        
+        let posts = yield Post.and({ isPublic: false }, { ['author.name']: 'user2' }).find();
+
+        posts.length.should.equal(2);
+        posts[0].get('title').should.equal('second');
+        posts[1].get('title').should.equal('third');
       });
 
       it ('should find documents with .in()', function *() {

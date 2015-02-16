@@ -194,7 +194,7 @@ var Query = (function () {
 
 // Setting up functions that
 // have the same implementation
-var methods = ["lt", "lte", "gt", "gte", "in", "nin", "and", "or", "ne", "nor"];
+var methods = ["lt", "lte", "gt", "gte", "in", "nin", "ne"];
 
 methods.forEach(function (method) {
   Query.prototype[method] = function (key, value) {
@@ -216,6 +216,17 @@ methods.forEach(function (method) {
         return _query$key;
       })();
     }
+
+    return this;
+  };
+});
+
+// or, nor and and share the same imlpementation
+["or", "nor", "and"].forEach(function (method) {
+  Query.prototype[method] = function () {
+    var args = isArray(arguments[0]) ? arguments[0] : Array.from(arguments);
+
+    this.query["$" + method] = args;
 
     return this;
   };
