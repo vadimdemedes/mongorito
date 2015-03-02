@@ -16,7 +16,8 @@ module.exports = function postFixture (attrs) {
 		author: {
 			name: chance.word()
 		},
-		comments: comments
+		comments: comments,
+		views: 0
 	};
 	
 	for (var key in attrs) {

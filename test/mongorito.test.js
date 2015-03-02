@@ -211,6 +211,27 @@ describe ('Mongorito', function () {
       posts = yield Post.all();
       posts.length.should.equal(0);
     });
+    
+    it ('should atomically increment a property', function *() {
+      let data = postFixture();
+      let post = new Post(data);
+      
+      let errorThrown = false;
+      
+      try {
+        yield post.inc({ views: 1 });
+      } catch (err) {
+        errorThrown = true;
+      }
+      
+      errorThrown.should.equal(true);
+      
+      yield post.save();
+      post.get('views').should.equal(0);
+      
+      yield post.inc({ views: 1 });
+      post.get('views').should.equal(1);
+    });
 
     describe ('Queries', function () {
       it ('should find all documents', function *() {

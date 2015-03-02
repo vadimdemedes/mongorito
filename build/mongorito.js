@@ -332,6 +332,40 @@ var Model = (function () {
     return this;
   };
 
+  Model.prototype.inc = function* inc(props) {
+    var _this = this;
+    var id = this.get("_id");
+
+    if (!id) {
+      throw new Error("Can't atomically increment a property of unsaved document.");
+    }
+
+    var collection = this._collection;
+
+    yield this.runHooks("before", "save");
+    yield this.runHooks("before", "update");
+
+    yield collection.updateById(id, {
+      $inc: props
+    });
+
+    Object.keys(props).forEach(function (key) {
+      // get current value
+      var value = _this.get(key);
+
+      // perform increment
+      value += props[key];
+
+      // save
+      _this.set(key, value);
+    });
+
+    yield this.runHooks("after", "update");
+    yield this.runHooks("after", "save");
+
+    return this;
+  };
+
   Model._collection = function _collection() {
     var name = result(this.prototype, "collection", pluralize(this.name).toLowerCase());
 
