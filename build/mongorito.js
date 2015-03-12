@@ -2,7 +2,7 @@
 
 var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
 
-var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
@@ -24,10 +24,9 @@ var isFunction = require("lodash.isfunction");
 var isObject = require("lodash.isobject");
 var isArray = require("lodash.isarray");
 
-
 /**
 * Mongorito
-* 
+*
 * Main class, manages mongodb connection and collections
 */
 
@@ -82,13 +81,11 @@ var Mongorito = (function () {
 
 Mongorito.collections = {};
 
-
 /**
 * Query
 */
 
 var Query = require("./query");
-
 
 /**
 * Model
@@ -98,6 +95,7 @@ var Model = (function () {
   function Model() {
     var attrs = arguments[0] === undefined ? {} : arguments[0];
     var options = arguments[1] === undefined ? {} : arguments[1];
+
     _classCallCheck(this, Model);
 
     this.attributes = attrs;
@@ -136,6 +134,7 @@ var Model = (function () {
 
   Model.prototype.set = function set(key, value) {
     var _this = this;
+
     // if object passed instead of key-value pair
     // iterate and call set on each item
     if (isObject(key)) {
@@ -157,15 +156,19 @@ var Model = (function () {
       }
     }
 
-    this.previous[key] = this.get(key);
-    this.attributes[key] = value;
-    this.changed[key] = value;
+    // check if the value actually changed
+    if (this.get(key) !== value) {
+      this.previous[key] = this.get(key);
+      this.attributes[key] = value;
+      this.changed[key] = true;
+    }
 
     return value;
   };
 
   Model.prototype.setDefaults = function setDefaults() {
     var _this = this;
+
     var defaults = this.defaults || {};
     var keys = Object.keys(defaults);
 
@@ -187,6 +190,7 @@ var Model = (function () {
 
   Model.prototype.hook = function hook(when, action, method) {
     var _this = this;
+
     if (isObject(when)) {
       var _ret = (function () {
         var hooks = when;
@@ -199,6 +203,7 @@ var Model = (function () {
 
           var when = _key$split2[0];
           var action = _key$split2[1];
+
           var method = hooks[key];
 
           _this.hook(when, action, method);
@@ -258,6 +263,7 @@ var Model = (function () {
 
   Model.prototype.save = function* save() {
     var _this = this;
+
     // set default values if needed
     this.setDefaults();
 
@@ -334,6 +340,7 @@ var Model = (function () {
 
   Model.prototype.inc = function* inc(props) {
     var _this = this;
+
     var id = this.get("_id");
 
     if (!id) {
@@ -440,7 +447,7 @@ var Model = (function () {
     return collection.id.apply(collection, arguments);
   };
 
-  _prototypeProperties(Model, null, {
+  _createClass(Model, {
     _collection: {
       get: function () {
         var name = result(this, "collection", pluralize(this.constructor.name).toLowerCase());
@@ -450,14 +457,12 @@ var Model = (function () {
         }
 
         return Mongorito.collection(this._db, this.collection);
-      },
-      configurable: true
+      }
     },
     _db: {
       get: function () {
         return this.db || Mongorito.db;
-      },
-      configurable: true
+      }
     }
   });
 
@@ -482,7 +487,6 @@ methods.forEach(function (method) {
 });
 
 Model.extend = Class.extend;
-
 
 /**
 * Expose Mongorito

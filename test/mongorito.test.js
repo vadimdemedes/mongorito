@@ -2,7 +2,7 @@
 * Dependencies
 */
 
-require('chai').should();
+var should = require('chai').should();
 require('mocha-generators')();
 
 var chance = require('chance')();
@@ -30,12 +30,12 @@ var postFixture = require('./fixtures/post');
 describe ('Mongorito', function () {
   it ('should expose mongodb module properties', function () {
     let mongodb = require('monk/node_modules/mongoskin/node_modules/mongodb');
-    
+
     Object.keys(mongodb).forEach(key => {
       if ('connect' !== key && 'version' !== key) Mongorito[key].should.equal(mongodb[key]);
     });
   });
-  
+
   before (function () {
     Mongorito.connect('mongo://localhost/mongorito_test');
   });
@@ -80,43 +80,52 @@ describe ('Mongorito', function () {
       post.get('title').should.equal('Sad title');
       post.set('title', 'Happy title');
       post.previous.title.should.equal('Sad title');
-      post.changed.title.should.equal('Happy title');
       post.get('title').should.equal('Happy title');
+      post.changed.title.should.be.true;
     });
-    
+
+    it ('should not remember anything if nothing changed', function () {
+      let post = new Post({ title: 'Sad title' });
+      post.get('title').should.equal('Sad title');
+      post.set('title', 'Sad title');
+      should.not.exist(post.previous.title);
+      post.get('title').should.equal('Sad title');
+      should.not.exist(post.changed.title);
+    });
+
     it ('should setup an index', function *() {
       yield Post.index('title');
 
       let indexes = yield Post.indexes();
       indexes.should.have.property('title_1');
     });
-    
+
     it ('should setup a unique index', function *() {
       yield Task.index('name', { unique: true });
-      
+
       let indexes = yield Task.indexes();
       indexes.should.have.property('name_1');
-      
+
       let firstTask = new Task({ name: 'first' });
       let secondTask = new Task({ name: 'first' });
-      
+
       yield firstTask.save();
-      
+
       let err;
-      
+
       try {
         yield secondTask.save();
       } catch (e) {
         err = e;
         e.name.should.equal('MongoError');
       }
-      
+
       (typeof err).should.equal('object');
     });
 
     it ('should create new a document', function *() {
       let timestamp = Math.round(new Date().getTime() / 1000);
-      
+
       let data = postFixture();
       let post = new Post(data);
       yield post.save();
@@ -126,10 +135,10 @@ describe ('Mongorito', function () {
 
       posts.length.should.equal(1);
       createdPost.get('_id').toString().should.equal(post.get('_id').toString());
-      
+
       let createdAt = Math.round(createdPost.get('created_at').getTime() / 1000);
       let updatedAt = Math.round(createdPost.get('updated_at').getTime() / 1000);
-      
+
       createdAt.should.equal(timestamp);
       updatedAt.should.equal(timestamp);
     });
@@ -171,7 +180,7 @@ describe ('Mongorito', function () {
       let updatedPost = yield Post.findOne();
       updatedPost.get('_id').toString().should.equal(post.get('_id').toString());
       updatedPost.get('title').should.equal(post.get('title'));
-      
+
       Math.round(updatedPost.get('created_at').getTime() / 1000).should.equal(createdAt);
       Math.round(updatedPost.get('updated_at').getTime() / 1000).should.equal(updatedAt);
     });
@@ -211,24 +220,24 @@ describe ('Mongorito', function () {
       posts = yield Post.all();
       posts.length.should.equal(0);
     });
-    
+
     it ('should atomically increment a property', function *() {
       let data = postFixture();
       let post = new Post(data);
-      
+
       let errorThrown = false;
-      
+
       try {
         yield post.inc({ views: 1 });
       } catch (err) {
         errorThrown = true;
       }
-      
+
       errorThrown.should.equal(true);
-      
+
       yield post.save();
       post.get('views').should.equal(0);
-      
+
       yield post.inc({ views: 1 });
       post.get('views').should.equal(1);
     });
@@ -427,28 +436,28 @@ describe ('Mongorito', function () {
             name: 'user1'
           }
         })).save();
-        
+
         yield new Post(postFixture({
           isPublic: false,
           author: {
             name: 'user2'
           }
         })).save();
-        
+
         yield new Post(postFixture({
           isPublic: false,
           author: {
             name: 'user3'
           }
         })).save();
-        
+
         let posts = yield Post.or({ isPublic: true }, { ['author.name']: 'user2' }).find();
 
         posts.length.should.equal(2);
         posts[0].get('author').name.should.equal('user1');
         posts[1].get('author').name.should.equal('user2');
       });
-      
+
       it ('should find documents with .and()', function *() {
         yield new Post(postFixture({
           isPublic: true,
@@ -456,7 +465,7 @@ describe ('Mongorito', function () {
             name: 'user1'
           }
         })).save();
-        
+
         yield new Post(postFixture({
           isPublic: false,
           author: {
@@ -464,7 +473,7 @@ describe ('Mongorito', function () {
           },
           title: 'second'
         })).save();
-        
+
         yield new Post(postFixture({
           isPublic: false,
           author: {
@@ -472,7 +481,7 @@ describe ('Mongorito', function () {
           },
           title: 'third'
         })).save();
-        
+
         let posts = yield Post.and({ isPublic: false }, { ['author.name']: 'user2' }).find();
 
         posts.length.should.equal(2);
@@ -703,37 +712,37 @@ describe ('Mongorito', function () {
 
       it ('should abort if a hook throws an error', function *() {
         let hooks = [];
-      
+
         class Post extends Model {
           get collection () {
             return 'posts';
           }
-      
+
           configure () {
             this.before('save', 'firstBeforeSave');
             this.before('save', 'secondBeforeSave');
           }
-      
+
           * firstBeforeSave (next) {
             hooks.push('firstBeforeSave');
-      
+
             throw new Error('firstBeforeSave failed.');
-      
+
             yield next;
           }
-      
+
           * secondBeforeSave (next) {
             hooks.push('secondBeforeSave');
-      
+
             yield next;
           }
         }
-      
+
         let posts;
-      
+
         posts = yield Post.all();
         posts.length.should.equal(0);
-      
+
         let data = postFixture();
         let post = new Post(data);
         try {
@@ -840,13 +849,13 @@ describe ('Mongorito', function () {
         hooks[10].should.equal('afterSave');
       });
     });
-    
+
     it ('should automatically set collection name', function *() {
       let account = new Account();
       yield account.save();
-      
+
       account.collection.should.equal('accounts');
-      
+
       let accounts = yield Account.find();
       accounts.length.should.equal(1);
     });
@@ -900,18 +909,18 @@ describe ('Mongorito', function () {
 
     secondaryDb.close();
   });
-  
+
   describe ('Backwards compatibility', function () {
     it ('should work with old ES5-ish API', function *() {
       var Post = Model.extend({
         collection: 'posts'
       });
-      
+
       var data = postFixture();
       var post = new Post(data);
-      
+
       yield post.save();
-      
+
       post.get('title').should.equal(data.title);
     });
   });
