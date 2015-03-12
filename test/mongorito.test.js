@@ -2,10 +2,9 @@
 * Dependencies
 */
 
+var chance = require('chance')();
 var should = require('chai').should();
 require('mocha-generators')();
-
-var chance = require('chance')();
 
 var Mongorito = require('../');
 var Model = Mongorito.Model;
