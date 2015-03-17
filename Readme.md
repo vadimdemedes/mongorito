@@ -1,6 +1,6 @@
 # Mongorito
 
-Awesome ES6 generator-based MongoDB ODM for Node.js v0.11.x (or newer).
+Awesome ES6 generator-based MongoDB ODM for Node.js v0.11.x (or newer) and io.js.
 Just take a look on its pretty models and beautiful API. 
 Uses [monk](https://github.com/Automattic/monk) under the hood.
 
@@ -20,14 +20,14 @@ Uses [monk](https://github.com/Automattic/monk) under the hood.
 npm install mongorito --save
 ```
 
-**Warning**: You should have Node.js v0.11.x installed (or newer). Run node with `--harmony` option:
+**Warning**: You should have Node.js v0.11.x or io.js installed (or newer). Run node with `--harmony` option (not applicable to io.js):
 
 ```
-node --harmony something.js
+node --harmony script.js
 ```
 
 **Note**: In order for the following examples to work, you need use something like [co](https://github.com/tj/co) to run generators.
-**Another note**: If you want to use ES6 classes (like in the following examples), use [6to5](https://github.com/6to5/6to5). If not, there is an alternative API left from previous versions of Mongorito.
+**Another note**: If you want to use ES6 classes (like in the following examples), use [babel](https://github.com/babel/babel). If not, there is an alternative API left from previous versions of Mongorito.
 
 ## Overview
 
