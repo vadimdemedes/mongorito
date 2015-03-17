@@ -6,10 +6,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 * Module dependencies
 */
 
-var isRegExp = require("lodash.isregexp");
-var isObject = require("lodash.isobject");
-var isString = require("lodash.isstring");
-var isArray = require("lodash.isarray");
+var is = require("is_js");
 
 var util = require("./util");
 
@@ -36,7 +33,7 @@ var Query = (function () {
     var _this = this;
     // if object was passed instead of key-value pair
     // iterate over that object and call .where(key, value)
-    if (isObject(key)) {
+    if (is.object(key)) {
       (function () {
         var conditions = key;
         var keys = Object.keys(conditions);
@@ -47,20 +44,20 @@ var Query = (function () {
       })();
     }
 
-    if (isString(key)) {
+    if (is.string(key)) {
       // if only one argument was supplied
       // save the key in this.lastKey
       // for future methods, like .equals()
-      if (undefined == value) {
+      if (is.undefined(value)) {
         this.lastKey = key;
         return this;
       }
 
       // 1. if regular expression
       // 2. if object and not ObjectID
-      if (isRegExp(value)) {
+      if (is.regexp(value)) {
         value = { $regex: value };
-      } else if (isObject(value) && false === isObjectID(value)) {
+      } else if (is.object(value) && !isObjectID(value)) {
         value = { $elemMatch: value };
       }
 
@@ -153,7 +150,7 @@ var Query = (function () {
         var value = doc[key];
 
         // if value is an array of IDs, loop through it
-        if (isArray(value)) {
+        if (is.array(value)) {
           // convert each _id
           // to findById op
           value = value.map(childModel.findById, childModel);
@@ -224,7 +221,7 @@ methods.forEach(function (method) {
 // or, nor and and share the same imlpementation
 ["or", "nor", "and"].forEach(function (method) {
   Query.prototype[method] = function () {
-    var args = isArray(arguments[0]) ? arguments[0] : Array.from(arguments);
+    var args = is.array(arguments[0]) ? arguments[0] : Array.from(arguments);
 
     this.query["$" + method] = args;
 

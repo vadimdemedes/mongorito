@@ -19,10 +19,7 @@ var result = require("lodash.result");
 var monk = require("monk");
 var wrap = require("co-monk");
 var util = require("./util");
-
-var isFunction = require("lodash.isfunction");
-var isObject = require("lodash.isobject");
-var isArray = require("lodash.isarray");
+var is = require("is_js");
 
 
 /**
@@ -138,7 +135,7 @@ var Model = (function () {
     var _this = this;
     // if object passed instead of key-value pair
     // iterate and call set on each item
-    if (isObject(key)) {
+    if (is.object(key)) {
       var _ret = (function () {
         var attrs = key;
         var keys = Object.keys(attrs);
@@ -176,7 +173,7 @@ var Model = (function () {
       var defaultValue = defaults[key];
       var actualValue = _this.get(key);
 
-      if (undefined == actualValue) {
+      if (is.undefined(actualValue)) {
         _this.set(key, defaultValue);
       }
     });
@@ -190,7 +187,7 @@ var Model = (function () {
 
   Model.prototype.hook = function hook(when, action, method) {
     var _this = this;
-    if (isObject(when)) {
+    if (is.object(when)) {
       var _ret = (function () {
         var hooks = when;
         var keys = Object.keys(hooks);
@@ -217,7 +214,7 @@ var Model = (function () {
       }
     }
 
-    if (isArray(method)) {
+    if (is.array(method)) {
       var _methods = method;
 
       _methods.forEach(function (method) {
@@ -227,9 +224,9 @@ var Model = (function () {
       return;
     }
 
-    if (false === isFunction(method)) method = this[method];
+    if (is.not["function"](method)) method = this[method];
 
-    if ("around" === when) {
+    if (when === "around") {
       this._hooks.before[action].push(method);
       this._hooks.after[action].unshift(method);
     } else {
@@ -261,7 +258,7 @@ var Model = (function () {
     var skip = options.skip;
 
     if (skip) {
-      if (typeof skip === "string") skip = [skip];
+      if (is.string(skip)) skip = [skip];
 
       hooks = hooks.filter(function (fn) {
         return skip.indexOf(fn.name) === -1;
@@ -286,7 +283,7 @@ var Model = (function () {
     keys.forEach(function (key) {
       var value = _this.get(key);
 
-      if (isArray(value)) {
+      if (is.array(value)) {
         value = value.map(function (doc) {
           return doc.get("_id");
         });
