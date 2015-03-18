@@ -41,7 +41,7 @@ class Post extends Model {
 		this.before('create', 'checkIfExists');
 	}
 	
-	* checkIfExists: function (next) {
+	* checkIfExists (next) {
 		// checking if post with the
 		// same title exists in database
 		
