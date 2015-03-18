@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Getting Started - Guides - Mongorito</title>
+    
+    <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,400italic" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/guides-52985f47.css" rel="stylesheet" type="text/css" />
+  </head>
+  
+  <body class="guides guides_getting-started guides_getting-started_index">
+    <div class="container">
+      <nav class="navbar row">
+        <ul class="nine columns">
+          <li><a class="logo" href="/"><i class="icon icon-home"></i></a></li>
+          <li><a href="/">Mongorito</a></li>
+          <li><a href="/guides/getting-started">Quick Start</a></li>
+          <li><a href="/guides">Guides</a></li>
+        </ul>
+        
+        <ul class="three columns">
+          <li><a href="https://github.com/vdemedes/mongorito" target="_blank">Github</a></li>
+        </ul>
+      </nav>
+      
+      <h1>Getting Started</h1>
+
+<p>After reading this guide you will know:</p>
+
+<ol>
+<li>How to install Mongorito and deal with generators</li>
+<li>Connect to a database</li>
+<li>Define a model</li>
+<li>Create and update documents</li>
+<li>Query database</li>
+</ol>
+
+<h3>Installation</h3>
+
+<p>Before we start doing anything, we need to ensure that we&rsquo;ve got Node.js <strong>v0.11.x or newer</strong> or io.js installed:</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="gp">$ </span>node -v
+<span class="gp">$ </span>iojs -v
+</pre></td></tr></tbody></table>
+</div>
+
+<p>If you&rsquo;ve got Node.js v0.10.x or lower, you need to upgrade to the latest <strong>unstable</strong> (stable version 0.12 is coming soon) version.
+If you need to maintain multiple versions on your system, I recommend using either <a href="https://github.com/creationix/nvm">nvm</a> or <a href="https://github.com/tj/n">n</a>.</p>
+
+<p>Also, if you are using Node.js, beware that when you want ES6 features to be enabled, you should run your programs with <mark>--harmony</mark> option, like this:</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="gp">$ </span>node --harmony script.js
+</pre></td></tr></tbody></table>
+</div>
+
+<p>In addition to all that, all code that contains generators and <strong>yield</strong> statements needs to be wrapped into <a href="https://github.com/tj/co">co</a> or similar tools, that handle generators.
+This may be confusing at first, but in practice, it is very simple.
+Read <a href="https://github.com/tj/co">co&rsquo;s</a> Readme.md to understand how it works better.</p>
+
+<p>To install Mongorito via npm:</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="gp">$ </span>npm install mongorito --save
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Great, now let&rsquo;s build some theoretical blog application and see how Mongorito would handle management of posts.</p>
+
+<h3>Connecting to database</h3>
+
+<p>Use <mark>Mongorito.connect()</mark> method to connect to a database.</p>
+
+<blockquote>
+<p>Mongorito provides support for single connections, replica sets (same database) and multiple connections to different databases. Check out <a href="/guides/replica-sets-and-multiple-connections">Replica sets and multiple connections</a> guide, where all those cases are described in detail.</p>
+</blockquote>
+
+<p>So, getting back to our tutorial.
+I also recommend to assign <mark>Mongorito.Model</mark> to a separate variable (preferably, Model) to create a shortcut for quicker access.</p>
+<div class="highlight javascript"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="kd">var</span> <span class="nx">Mongorito</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'mongorito'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">Mongorito</span><span class="p">.</span><span class="nx">Model</span><span class="p">;</span>
+
+<span class="nx">Mongorito</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="s1">'localhost/blog'</span><span class="p">);</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Here, we connected to <em>blog</em> database on <em>localhost</em> host.
+You don&rsquo;t need to wait for some callback to fire in order to start querying database.
+All operations are buffered, so when connection becomes available, they will be executed.</p>
+
+<h3>Defining a model</h3>
+
+<p>To define a Post model, extend from a Model class.
+You do not need to register a model or anything like that.</p>
+
+<blockquote>
+<p>Mongorito automatically sets collection name, if missing. If custom name should be used, define <code>collection</code> property or function, which returns collection name.</p>
+</blockquote>
+<div class="highlight javascript"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3</pre></td><td class="code"><pre><span class="kr">class</span> <span class="nx">Post</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<blockquote>
+<p>There is no need to define schema or even fields that belong to this model. One of the main features of MongoDB is that it&rsquo;s schema-less and Mongorito does not want to take that feature away from you.</p>
+</blockquote>
+
+<p>After Post model is defined, you can start using it right away.
+All documents will be saved in the <strong>posts</strong> collection, in the following examples.</p>
+
+<blockquote>
+<p>If you want to use ES6 syntax to define classes, I highly recommend <a href="https://github.com/babel/babel">babel</a>. If not, there&rsquo;s an alternative API left from previous versions of Mongorito to maintain backwards compatibility:</p>
+</blockquote>
+<div class="highlight javascript"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9</pre></td><td class="code"><pre><span class="kd">var</span> <span class="nx">Post</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="na">collection</span><span class="p">:</span> <span class="s1">'posts'</span><span class="p">,</span>
+
+    <span class="c1">// OR</span>
+
+    <span class="na">collection</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">'posts'</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Saving documents</h3>
+
+<p>To save a Post document, create a new instance of Post model and execute <mark>.save()</mark> method.</p>
+<div class="highlight javascript"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9</pre></td><td class="code"><pre><span class="kd">var</span> <span class="nx">post</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Post</span><span class="p">({</span>
+    <span class="na">title</span><span class="p">:</span> <span class="s1">'Node.js with --harmony rocks!'</span><span class="p">,</span>
+    <span class="na">body</span><span class="p">:</span> <span class="s1">'Long post body'</span><span class="p">,</span>
+    <span class="na">author</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">name</span><span class="p">:</span> <span class="s1">'John Doe'</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">yield</span> <span class="nx">post</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>To update a document, use <mark>.set()</mark> and call <mark>.save()</mark> method after that.
+It will automatically detect that this document already exists and instead of creating a new one, it should update it.</p>
+<div class="highlight javascript"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="nx">post</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span> <span class="s1">'Post got a new title!'</span><span class="p">);</span>
+<span class="nx">post</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'author.name'</span><span class="p">,</span> <span class="s1">'Doe John'</span><span class="p">);</span>
+
+<span class="nx">yield</span> <span class="nx">post</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Queries</h3>
+
+<p>Now we are going to find all posts in the database.
+The returned array contains documents wrapped into Post model.</p>
+<div class="highlight javascript"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="kd">var</span> <span class="nx">posts</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">all</span><span class="p">();</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>To find all posts where body equals &ldquo;Long post body&rdquo; or posts where author&rsquo;s name equals &ldquo;John Doe&rdquo;, use <mark>.where()</mark> method.</p>
+<div class="highlight javascript"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre></td><td class="code"><pre><span class="kd">var</span> <span class="nx">posts</span><span class="p">;</span>
+
+<span class="c1">// find posts where body equals "Long post body"</span>
+<span class="nx">posts</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'body'</span><span class="p">,</span> <span class="s1">'Long post body'</span><span class="p">).</span><span class="nx">find</span><span class="p">();</span>
+
+<span class="c1">// find posts where author's name equals "John Doe"</span>
+<span class="nx">posts</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'author.name'</span><span class="p">,</span> <span class="s1">'John Doe'</span><span class="p">).</span><span class="nx">find</span><span class="p">();</span>
+
+<span class="c1">// Bonus: find posts where title starts with "Node"</span>
+<span class="nx">posts</span> <span class="o">=</span> <span class="nx">yield</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span> <span class="sr">/^node/i</span><span class="p">).</span><span class="nx">find</span><span class="p">();</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>When all the work is done, don&rsquo;t forget to close connection to MongoDB.</p>
+<div class="highlight javascript"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="nx">Mongorito</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">();</span>
+</pre></td></tr></tbody></table>
+</div>
+
+      
+      <footer>Made by <a href="https://twitter.com/vdemedes" target="_blank">Vadim Demedes</a></footer>
+    </div>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="text/javascript"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js" type="text/javascript"></script>
+    
+    <script>
+  	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  	  ga('create', 'UA-56814364-1', 'auto');
+  	  ga('send', 'pageview');
+  	</script>
+  </body>
+</html>
