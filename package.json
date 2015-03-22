@@ -9,7 +9,7 @@
     "is_js": "^0.7.1",
     "koa-compose": "^2.3.0",
     "lodash.result": "^3.0.0",
-    "monk": "^0.9.1",
+    "monk": "^1.0.0",
     "pluralize": "^1.1.2"
   },
   "devDependencies": {

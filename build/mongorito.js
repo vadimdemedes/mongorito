@@ -504,11 +504,10 @@ var exports = module.exports = Mongorito;
 
 exports.Model = Model;
 
-// expose mongodb properties
-var mongodb = require("monk/node_modules/mongoskin/node_modules/mongodb");
+var mongoskin = require("monk/node_modules/mongoskin");
 
-Object.keys(mongodb).forEach(function (key) {
-  if ("connect" !== key && "version" !== key) exports[key] = mongodb[key];
+Object.keys(mongoskin).forEach(function (key) {
+  if (["connect", "version", "db"].indexOf(key) === -1) exports[key] = mongoskin[key];
 });
 
 var emptyObject = {};

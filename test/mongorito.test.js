@@ -28,11 +28,13 @@ var postFixture = require('./fixtures/post');
 */
 
 describe ('Mongorito', function () {
-  it ('expose mongodb module properties', function () {
-    let mongodb = require('monk/node_modules/mongoskin/node_modules/mongodb');
+  it ('expose mongoskin module properties', function () {
+    let mongoskin = require('monk/node_modules/mongoskin');
 
-    Object.keys(mongodb).forEach(key => {
-      if ('connect' !== key && 'version' !== key) Mongorito[key].should.equal(mongodb[key]);
+    Object.keys(mongoskin).forEach(function (key) {
+      if (['connect', 'version', 'db'].indexOf(key) === -1) {
+        Mongorito[key].should.equal(mongoskin[key]);
+      }
     });
   });
 
