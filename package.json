@@ -6,7 +6,7 @@
   "dependencies": {
     "class-extend": "^0.1.1",
     "co-monk": "^1.0.0",
-    "is_js": "^0.7.1",
+    "is_js": "^0.7.3",
     "koa-compose": "^2.3.0",
     "lodash.result": "^3.0.0",
     "monk": "^1.0.0",
