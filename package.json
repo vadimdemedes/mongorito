@@ -9,14 +9,14 @@
     "is_js": "^0.7.3",
     "koa-compose": "^2.3.0",
     "lodash.result": "^3.0.0",
-    "monk": "^1.0.0",
+    "monk": "^1.0.1",
     "pluralize": "^1.1.2"
   },
   "devDependencies": {
-    "babel": "^4.0.1",
-    "chai": "^1.10.0",
-    "chance": "^0.6.1",
-    "mocha": "^2.0.1",
+    "babel": "^4.7.16",
+    "chai": "^2.2.0",
+    "chance": "^0.7.3",
+    "mocha": "^2.2.1",
     "mocha-generators": "^1.0.0"
   },
   "main": "./index.js",

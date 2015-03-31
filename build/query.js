@@ -12,8 +12,6 @@ var util = require("./util");
 
 var isObjectID = util.isObjectID;
 
-
-
 /**
 * Query
 */
@@ -31,6 +29,7 @@ var Query = (function () {
 
   Query.prototype.where = function where(key, value) {
     var _this = this;
+
     // if object was passed instead of key-value pair
     // iterate over that object and call .where(key, value)
     if (is.object(key)) {
@@ -67,23 +66,53 @@ var Query = (function () {
     return this;
   };
 
-  Query.prototype.limit = function limit(limit) {
+  Query.prototype.limit = (function (_limit) {
+    var _limitWrapper = function limit(_x) {
+      return _limit.apply(this, arguments);
+    };
+
+    _limitWrapper.toString = function () {
+      return _limit.toString();
+    };
+
+    return _limitWrapper;
+  })(function (limit) {
     this.options.limit = limit;
 
     return this;
-  };
+  });
 
-  Query.prototype.skip = function skip(skip) {
+  Query.prototype.skip = (function (_skip) {
+    var _skipWrapper = function skip(_x2) {
+      return _skip.apply(this, arguments);
+    };
+
+    _skipWrapper.toString = function () {
+      return _skip.toString();
+    };
+
+    return _skipWrapper;
+  })(function (skip) {
     this.options.skip = skip;
 
     return this;
-  };
+  });
 
-  Query.prototype.sort = function sort(sort) {
+  Query.prototype.sort = (function (_sort) {
+    var _sortWrapper = function sort(_x3) {
+      return _sort.apply(this, arguments);
+    };
+
+    _sortWrapper.toString = function () {
+      return _sort.toString();
+    };
+
+    return _sortWrapper;
+  })(function (sort) {
     this.options.sort = sort;
 
     return this;
-  };
+  });
 
   Query.prototype.equals = function equals(value) {
     var key = this.lastKey;
@@ -94,7 +123,17 @@ var Query = (function () {
     return this;
   };
 
-  Query.prototype.exists = function exists(key, exists) {
+  Query.prototype.exists = (function (_exists) {
+    var _existsWrapper = function exists(_x4, _x5) {
+      return _exists.apply(this, arguments);
+    };
+
+    _existsWrapper.toString = function () {
+      return _exists.toString();
+    };
+
+    return _existsWrapper;
+  })(function (key, exists) {
     if (this.lastKey) {
       exists = key;
       key = this.lastKey;
@@ -104,7 +143,7 @@ var Query = (function () {
     this.query[key] = { $exists: exists || true };
 
     return this;
-  };
+  });
 
   Query.prototype.populate = function populate(key, model) {
     this.options.populate[key] = model;
@@ -208,7 +247,6 @@ methods.forEach(function (method) {
     } else {
       this.query[key] = (function () {
         var _query$key = {};
-
         _query$key["$" + method] = value;
         return _query$key;
       })();

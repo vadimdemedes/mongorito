@@ -1,11 +1,10 @@
-"use strict";
-
 /**
  * Dependencies
  */
 
-var ObjectID = require("monk/node_modules/mongoskin").ObjectID;
+"use strict";
 
+var ObjectID = require("monk/node_modules/mongoskin").ObjectID;
 
 /**
  * Expose utilities
