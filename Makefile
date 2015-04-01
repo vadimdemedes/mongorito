@@ -1,10 +1,8 @@
-SRC = $(wildcard lib/*.js)
-DEST = $(SRC:lib/%.js=build/%.js)
+SRC = $(wildcard src/*.js)
+LIB = $(SRC:src/%.js=lib/%.js)
 
-build: $(DEST)
-build/%.js: lib/%.js
+lib: $(LIB)
+lib/%.js: src/%.js
 	mkdir -p $(@D)
-	./node_modules/.bin/babel -b regenerator -L all $< -o $@
+	babel $< -o $@
 
-clean:
-	rm -rf build
