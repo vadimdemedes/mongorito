@@ -2,7 +2,7 @@
  * Dependencies
  */
 
-var ObjectID = require('monk/node_modules/mongoskin').ObjectID;
+const ObjectID = require('monk/node_modules/mongoskin').ObjectID;
 
 
 /**
@@ -10,6 +10,7 @@ var ObjectID = require('monk/node_modules/mongoskin').ObjectID;
  */
 
 exports.isObjectID = isObjectID;
+
 
 /**
  * Utilities

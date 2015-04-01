@@ -2,7 +2,7 @@
  * Dependencies
  */
 
-var Model = require('../../').Model;
+const Model = require('../../').Model;
 
 
 /**
@@ -10,9 +10,7 @@ var Model = require('../../').Model;
  */
 
 class Task extends Model {
-  get collection () {
-    return 'tasks';
-  }
+  
 }
 
 

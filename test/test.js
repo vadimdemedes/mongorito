@@ -1,5 +1,5 @@
 require('babel/register')({
-  blacklist: ['regenerator']
+  blacklist: ['regenerator', 'es6.constants']
 });
 
 require('./mongorito.test');

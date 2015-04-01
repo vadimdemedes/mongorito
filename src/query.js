@@ -1,12 +1,10 @@
 /**
-* Module dependencies
+* Dependencies
 */
 
-var is = require('is_js');
+const is = require('is_js');
 
-var util = require('./util');
-
-var { isObjectID } = util;
+const isObjectID = require('./util').isObjectID;
 
 
 /**
@@ -29,7 +27,9 @@ class Query {
       let conditions = key;
       let keys = Object.keys(conditions);
 
-      keys.forEach(key => this.where(key, conditions[key]));
+      keys.forEach(key => {
+        this.where(key, conditions[key]);
+      });
     }
 
     if (is.string(key)) {
@@ -103,25 +103,19 @@ class Query {
   * count (query) {
     this.where(query);
 
-    let collection = this.collection;
-    let model = this.model;
-
-    let count = collection.count(this.query);
-
-    return yield count;
+    return yield this.collection.count(this.query);
   }
 
   * find (query) {
     this.where(query);
-
-    let collection = this.collection;
+    
     let model = this.model;
     let options = this.options;
 
     // fields to populate
     let populate = Object.keys(options.populate);
 
-    let docs = yield collection.find(this.query, options);
+    let docs = yield this.collection.find(this.query, options);
 
     let i = 0;
     let doc;
@@ -168,16 +162,13 @@ class Query {
   * remove (query) {
     this.where(query);
 
-    let collection = this.collection;
-    let model = this.model;
-
-    return yield collection.remove(this.query, this.options);
+    return yield this.collection.remove(this.query, this.options);
   }
 }
 
 // Setting up functions that
 // have the same implementation
-var methods = [
+const methods = [
   'lt',
   'lte',
   'gt',
@@ -219,5 +210,10 @@ methods.forEach(method => {
     return this;
   };
 });
+
+
+/**
+ * Expose Query
+ */
 
 module.exports = Query;

@@ -2,7 +2,7 @@
  * Dependencies
  */
 
-var Model = require('../../').Model;
+const Model = require('../../').Model;
 
 
 /**

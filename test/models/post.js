@@ -2,7 +2,7 @@
  * Dependencies
  */
 
-var Model = require('../../').Model;
+const Model = require('../../').Model;
 
 
 /**
@@ -10,11 +10,7 @@ var Model = require('../../').Model;
  */
 
 class Post extends Model {
-  get collection () {
-    return 'posts';
-  }
-  
-  get defaults () {
+  defaults () {
     return {
       title: 'Default title'
     };
