@@ -690,10 +690,10 @@ describe ('Mongorito', function () {
         hooks[1].should.equal('around:save');
         hooks[2].should.equal('before:create');
         hooks[3].should.equal('around:create');
-        hooks[4].should.equal('around:create');
-        hooks[5].should.equal('after:create');
-        hooks[6].should.equal('around:save');
-        hooks[7].should.equal('after:save');
+        hooks[4].should.equal('around:save');
+        hooks[5].should.equal('after:save');
+        hooks[6].should.equal('around:create');
+        hooks[7].should.equal('after:create');
 
         hooks = [];
 
@@ -705,10 +705,10 @@ describe ('Mongorito', function () {
         hooks[1].should.equal('around:save');
         hooks[2].should.equal('before:update');
         hooks[3].should.equal('around:update');
-        hooks[4].should.equal('around:update');
-        hooks[5].should.equal('after:update');
-        hooks[6].should.equal('around:save');
-        hooks[7].should.equal('after:save');
+        hooks[4].should.equal('around:save');
+        hooks[5].should.equal('after:save');
+        hooks[6].should.equal('around:update');
+        hooks[7].should.equal('after:update');
 
         hooks = [];
 
@@ -852,12 +852,12 @@ describe ('Mongorito', function () {
         hooks[2].should.equal('secondBeforeCreate');
         hooks[3].should.equal('firstAroundCreate');
         hooks[4].should.equal('secondAroundCreate');
-        hooks[5].should.equal('secondAroundCreate');
-        hooks[6].should.equal('firstAroundCreate');
-        hooks[7].should.equal('firstAfterCreate');
-        hooks[8].should.equal('secondAfterCreate');
-        hooks[9].should.equal('thirdAfterCreate');
-        hooks[10].should.equal('afterSave');
+        hooks[5].should.equal('afterSave');
+        hooks[6].should.equal('secondAroundCreate');
+        hooks[7].should.equal('firstAroundCreate');
+        hooks[8].should.equal('firstAfterCreate');
+        hooks[9].should.equal('secondAfterCreate');
+        hooks[10].should.equal('thirdAfterCreate');
       });
       
       it ('skip selected middleware', function * () {
@@ -886,6 +886,47 @@ describe ('Mongorito', function () {
         yield* post.save({ skip: 'beforeSave' });
         
         middlewareTriggered.should.equal(false);
+      });
+      
+      it ('rollback middleware in case of a failure', function * () {
+        let functionNames = [];
+      
+        class Post extends Model {
+          configure () {
+            this.before('save', 'firstBeforeSave');
+            this.before('save', 'secondBeforeSave');
+            this.before('save', 'thirdBeforeSave');
+          }
+        
+          * firstBeforeSave (next) {
+            yield* next;
+          }
+        
+          * secondBeforeSave (next) {
+            throw new Error();
+          
+            yield *next;
+          }
+        
+          * thirdBeforeSave (next) {
+            yield* next;
+          }
+        
+          * rollback (method) {
+            functionNames.push(method);
+          }
+        }
+      
+        let data = postFixture();
+        let post = new Post(data);
+      
+        try {
+          yield* post.save();
+        } catch (err) {
+          functionNames.length.should.equal(2);
+          functionNames[0].should.equal('secondBeforeSave');
+          functionNames[1].should.equal('firstBeforeSave');
+        }
       });
     });
 
