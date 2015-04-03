@@ -992,16 +992,19 @@ describe ('Mongorito', function () {
 
   describe ('Backwards compatibility', function () {
     it ('work with old ES5-ish API', function * () {
-      var Post = Model.extend({
+      let Post = Model.extend({
         collection: 'posts'
       });
 
-      var data = postFixture();
-      var post = new Post(data);
+      let data = postFixture();
+      let post = new Post(data);
 
       yield* post.save();
 
-      post.get('title').should.equal(data.title);
+      let posts = yield* Post.all();
+      
+      posts.length.should.equal(1);
+      posts[0].get('title').should.equal(data.title);
     });
   });
 

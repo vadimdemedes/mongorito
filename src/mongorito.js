@@ -3,7 +3,6 @@
 */
 
 const ObjectID = require('monk/node_modules/mongoskin').ObjectID;
-const Class = require('class-extend');
 
 const mongoskin = require('monk/node_modules/mongoskin');
 const pluralize = require('pluralize');
@@ -759,7 +758,12 @@ methods.forEach(method => {
   };
 });
 
-Model.extend = Class.extend;
+
+/**
+ * Backwards compatibility for ES5-ish way of defining models
+ */
+
+Model.extend = require('./extend')(Model);
 
 
 /**
