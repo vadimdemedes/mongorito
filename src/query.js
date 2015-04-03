@@ -20,6 +20,15 @@ class Query {
     this.lastKey = key;
   }
 
+
+  /**
+   * Set "where" condition
+   *
+   * @param {String} key - key
+   * @param {Mixed} value - value
+   * @api public
+   */
+  
   where (key, value) {
     // if object was passed instead of key-value pair
     // iterate over that object and call .where(key, value)
@@ -55,24 +64,59 @@ class Query {
     return this;
   }
 
+
+  /**
+   * Set query limit
+   *
+   * @param {Number} limit - limit number
+   * @api public
+   */
+  
   limit (limit) {
     this.options.limit = limit;
 
     return this;
   }
 
+
+  /**
+   * Set query skip
+   *
+   * @param {Number} skip - skip number
+   * @api public
+   */
+  
   skip (skip) {
     this.options.skip = skip;
 
     return this;
   }
 
+
+  /**
+   * Sort query results
+   *
+   * @param {Object} sort - sort params
+   * @see http://docs.mongodb.org/manual/reference/method/cursor.sort/
+   * @see https://github.com/Automattic/monk
+   * @api public
+   */
+  
   sort (sort) {
     this.options.sort = sort;
 
     return this;
   }
 
+
+  /**
+   * Same as .where(), only less flexible
+   *
+   * @param {String} key - key
+   * @param {Mixed} value - value
+   * @api public
+   */
+  
   equals (value) {
     let key = this.lastKey;
     this.lastKey = null;
@@ -82,6 +126,15 @@ class Query {
     return this;
   }
 
+
+  /**
+   * Set property that must or mustn't exist in resulting docs
+   *
+   * @param {String} key - key
+   * @param {Boolean} exists - exists or not
+   * @api public
+   */
+  
   exists (key, exists) {
     if (this.lastKey) {
       exists = key;
@@ -94,17 +147,42 @@ class Query {
     return this;
   }
 
+
+  /**
+   * Query population
+   *
+   * @param {String} key - key
+   * @param {Model} model - model to populate with
+   * @see http://mongorito.com/guides/query-population/
+   * @api public
+   */
+  
   populate (key, model) {
     this.options.populate[key] = model;
 
     return this;
   }
 
+
+  /**
+   * Count documents
+   *
+   * @param {Object} query - find conditions, same as this.where()
+   * @api public
+   */
+  
   * count (query) {
     this.where(query);
 
     return yield this.collection.count(this.query);
   }
+  
+  /**
+   * Find documents
+   *
+   * @param {Object} query - find conditions, same as this.where()
+   * @api public
+   */
 
   * find (query) {
     this.where(query);
@@ -153,11 +231,27 @@ class Query {
     return docs;
   }
 
+  
+  /**
+   * Find one document
+   *
+   * @param {Object} query - find conditions, same as this.where()
+   * @api public
+   */
+  
   * findOne (query) {
     let docs = yield this.find(query);
 
     return docs[0];
   }
+  
+  
+  /**
+   * Remove documents
+   *
+   * @param {Object} query - remove conditions, same as this.where()
+   * @api public
+   */
 
   * remove (query) {
     this.where(query);

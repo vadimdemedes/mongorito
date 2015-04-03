@@ -24,6 +24,13 @@ const util = require('./util');
 */
 
 class Mongorito {
+  /**
+   * Connect to a MongoDB database and return connection object
+   *
+   * @param {String} urls - connection urls (as arguments)
+   * @api public
+   */
+   
   static connect (...urls) {
     // convert mongo:// urls to monk-supported ones
     urls = urls.map(url => url.replace(/^mongo\:\/\//, ''));
@@ -37,20 +44,41 @@ class Mongorito {
     return db;
   }
 
+
+  /**
+   * Disconnect from a database
+   *
+   * @api public
+   */
+  
   static disconnect () {
     this.db.close();
   }
 
+
+  /**
+   * Alias for .disconnect()
+   *
+   * @api public
+   */
+  
   static close () {
     return this.disconnect(...arguments);
   }
 
-  static collection (db, name) {
+
+  /**
+   * Return a co-wrapped monk collection
+   *
+   * @api private
+   */
+  
+  static _collection (db, name) {
     let url = db.driver._connect_args[0];
-    let collections = this.collections[url];
+    let collections = this._collections[url];
 
     if (!collections) {
-      collections = this.collections[url] = {};
+      collections = this._collections[url] = {};
     }
 
     if (collections[name]) return collections[name];
@@ -62,7 +90,14 @@ class Mongorito {
   }
 }
 
-Mongorito.collections = {};
+
+/**
+ * Cache for monk collections
+ *
+ * @api private
+ */
+
+Mongorito._collections = {};
 
 
 /**
@@ -99,9 +134,16 @@ class Model {
     this.configure();
   }
 
+
+  /**
+   * Get collection for current model
+   *
+   * @api private
+   */
+  
   get _collection () {
     if (is.string(this.collection)) {
-      return Mongorito.collection(this._db, this.collection);
+      return Mongorito._collection(this._db, this.collection);
     }
     
     // get collectio name
@@ -114,9 +156,16 @@ class Model {
     // to avoid the same check in future
     this.collection = this.constructor.prototype.collection = name;
 
-    return Mongorito.collection(this._db, this.collection);
+    return Mongorito._collection(this._db, this.collection);
   }
 
+  
+  /**
+   * Get database for current model
+   *
+   * @api private
+   */
+  
   get _db () {
     // use either custom database
     // specified for this model
@@ -124,6 +173,14 @@ class Model {
     return this.db || Mongorito.db;
   }
 
+
+  /**
+   * Get model attribute
+   *
+   * @param {String} key - property name
+   * @api public
+   */
+  
   get (key) {
     let attrs = this.attributes;
 
@@ -132,6 +189,15 @@ class Model {
     return key ? attrs[key] : attrs;
   }
 
+
+  /**
+   * Set model attribute
+   *
+   * @param {String} key - property name
+   * @param {Mixed} value - property value
+   * @api public
+   */
+  
   set (key, value) {
     // if object passed instead of key-value pair
     // iterate and call set on each item
@@ -156,7 +222,14 @@ class Model {
     return value;
   }
 
-  setDefaults () {
+
+  /**
+   * Set default values
+   *
+   * @api private
+   */
+  
+  _setDefaults () {
     let defaults = result(this, 'defaults', {});
     let keys = Object.keys(defaults);
 
@@ -170,15 +243,72 @@ class Model {
     });
   }
 
+
+  /**
+   * Get all attributes
+   *
+   * @api public
+   */
+  
   toJSON () {
     return this.attributes;
   }
 
+
+  /**
+   * Configure model (usually, set hooks here)
+   * Supposed to be overriden
+   *
+   * @api public
+   */
+  
   configure () {
 
   }
+  
+  
+  /**
+   * Rollback given method when error occurs
+   * Supposed to be overriden
+   *
+   * @param {String} name - method name
+   * @api public
+   */
+  
+  * rollback () {
+    
+  }
+  
+  
+  /**
+   * Return a function, that in case of an error
+   * executes this.rollback() with a given method name
+   *
+   * @api private
+   */
+  
+  _rollbackFor (method) {
+    return function * (next) {
+      try {
+        yield* next;
+      } catch (err) {
+        yield this.rollback(method);
+        throw err;
+      }
+    }
+  }
 
+
+  /**
+   * Add hooks
+   *
+   * @api private
+   */
+  
   hook (when, action, method) {
+    // if object is given
+    // iterate and call .hook()
+    // for each entry
     if (is.object(when)) {
       let hooks = when;
       let keys = Object.keys(hooks);
@@ -193,6 +323,9 @@ class Model {
       return;
     }
 
+    // if array is given
+    // iterate and call .hook()
+    // for each item
     if (is.array(method)) {
       let methods = method;
 
@@ -201,8 +334,13 @@ class Model {
       return;
     }
 
+    // if method is a string
+    // get the function
     if (is.not.function(method)) method = this[method];
 
+    // around hooks should be
+    // at the end of before:*
+    // at the beginning of after:*
     if (when === 'around') {
       this._hooks.before[action].push(method);
       this._hooks.after[action].unshift(method);
@@ -210,27 +348,66 @@ class Model {
       this._hooks[when][action].push(method);
     }
   }
-
+  
+  
+  /**
+   * Add multiple hooks at once
+   *
+   * @api public
+   */
+  
   hooks () {
     return this.hook.apply(this, arguments);
   }
 
+
+  /**
+   * Add before:* hook
+   *
+   * @param {String} action - before what
+   * @param {String} method - hook name
+   * @api public
+   */
+  
   before (action, method) {
     this.hook('before', action, method);
   }
 
+
+  /**
+   * Add after:* hook
+   *
+   * @param {String} action - after what
+   * @param {String} method - hook name
+   * @api public
+   */
   after (action, method) {
     this.hook('after', action, method);
   }
 
+
+  /**
+   * Add around:* hook
+   *
+   * @param {String} action - around what
+   * @param {String} method - hook name
+   * @api public
+   */
   around (action, method) {
     this.hook('around', action, method);
   }
 
-  * runHooks (when, action, options = {}) {
-    let hooks = this._hooks[when][action];
+
+  /**
+   * Execute hooks
+   *
+   * @api private
+   */
+  
+  _runHooks (when, action, options = {}) {
+    let hooks = this._getHooks(when, action);
     
-    // skip middleware
+    // skip hooks
     let skip = options.skip;
     
     if (skip) {
@@ -238,13 +415,50 @@ class Model {
       
       hooks = hooks.filter(fn => skip.indexOf(fn.name) === -1);
     }
+    
+    let middleware = [];
+    
+    // insert a rollback fn
+    // before each hook
+    hooks.forEach(fn => {
+      let rollback = this._rollbackFor(fn.name);
+      
+      middleware.push(rollback, fn);
+    });
 
-    yield compose(hooks);
+    return compose(middleware).call(this);
+  }
+  
+  
+  /**
+   * Get hooks for a given operation
+   *
+   * @api private
+   */
+  
+  _getHooks (when, action) {
+    let hooks = this._hooks[when][action] || [];
+    
+    // if create or update hooks requested
+    // prepend save hooks also
+    if (action === 'create' || action === 'update') {
+      hooks.unshift.apply(hooks, this._hooks[when]['save']);
+    }
+    
+    return hooks;
   }
 
+
+  /**
+   * Save a model
+   *
+   * @param {Object} options - options for save operation
+   * @api public
+   */
+  
   * save (options) {
     // set default values if needed
-    this.setDefaults();
+    this._setDefaults();
 
     let id = this.get('_id');
     let fn = id ? this.update : this.create;
@@ -264,14 +478,17 @@ class Model {
 
       this.set(key, value);
     });
-
-    yield* this.runHooks('before', 'save', options);
-    let result = yield fn.call(this, options);
-    yield* this.runHooks('after', 'save', options);
-
-    return result;
+    
+    return yield fn.call(this, options);
   }
 
+
+  /**
+   * Create a model
+   *
+   * @api private
+   */
+  
   * create (options) {
     let collection = this._collection;
     let attrs = this.attributes;
@@ -282,39 +499,62 @@ class Model {
       updated_at: date
     });
 
-    yield* this.runHooks('before', 'create', options);
+    yield* this._runHooks('before', 'create', options);
 
     let doc = yield collection.insert(attrs);
     this.set('_id', doc._id);
 
-    yield* this.runHooks('after', 'create', options);
+    yield* this._runHooks('after', 'create', options);
 
     return this;
   }
 
+
+  /**
+   * Update a model
+   *
+   * @api private
+   */
+  
   * update (options) {
     let collection = this._collection;
     let attrs = this.attributes;
 
     this.set('updated_at', new Date);
 
-    yield* this.runHooks('before', 'update', options);
+    yield* this._runHooks('before', 'update', options);
     yield collection.updateById(attrs._id, attrs);
-    yield* this.runHooks('after', 'update', options);
+    yield* this._runHooks('after', 'update', options);
 
     return this;
   }
 
+
+  /**
+   * Remove a model
+   *
+   * @api private
+   */
+  
   * remove (options) {
     let collection = this._collection;
 
-    yield* this.runHooks('before', 'remove', options);
+    yield* this._runHooks('before', 'remove', options);
     yield collection.remove({ _id: this.get('_id') });
-    yield* this.runHooks('after', 'remove', options);
+    yield* this._runHooks('after', 'remove', options);
 
     return this;
   }
 
+
+  /**
+   * Atomically increment a model property
+   *
+   * @param {Object} props - set of properties and values
+   * @param {Object} options - options for update operation
+   * @api public
+   */
+  
   * inc (props, options) {
     let id = this.get('_id');
 
@@ -323,14 +563,16 @@ class Model {
     }
 
     let collection = this._collection;
-
-    yield* this.runHooks('before', 'save', options);
-    yield* this.runHooks('before', 'update', options);
+    
+    yield* this._runHooks('before', 'update', options);
 
     yield collection.updateById(id, {
       '$inc': props
     });
 
+    // perform increment locally
+    // to prevent the need to refresh
+    // the model from a database
     Object.keys(props).forEach(key => {
       // get current value
       let value = this.get(key);
@@ -342,11 +584,17 @@ class Model {
       this.set(key, value);
     });
 
-    yield* this.runHooks('after', 'update', options);
-    yield* this.runHooks('after', 'save', options);
+    yield* this._runHooks('after', 'update', options);
 
     return this;
   }
+  
+  
+  /**
+   * Get database for a model
+   *
+   * @api private
+   */
   
   static get _db () {
     // support for multiple connections
@@ -355,9 +603,16 @@ class Model {
     return this.prototype.db || Mongorito.db;
   }
 
+
+  /**
+   * Get collection for a model
+   *
+   * @api private
+   */
+  
   static get _collection () {
     if (is.string(this.prototype.collection)) {
-      return Mongorito.collection(this._db, this.prototype.collection);
+      return Mongorito._collection(this._db, this.prototype.collection);
     }
     
     // get collection name
@@ -370,51 +625,106 @@ class Model {
     // to avoid the same check in future
     this.prototype.collection = name;
 
-    return Mongorito.collection(this._db, name);
+    return Mongorito._collection(this._db, name);
   }
 
-  static find (conditions) {
-    let query = new Query(this._collection, this).find(conditions); // collection, model
-
-    return query;
+  
+  /**
+   * Find documents
+   *
+   * @param {Object} query - find conditions, same as this.where()
+   * @api public
+   */
+  
+  static find (query) {
+    return new Query(this._collection, this).find(query); // collection, model
   }
 
+
+  /**
+   * Count documents
+   *
+   * @param {Object} query - find conditions, same as this.where()
+   * @api public
+   */
+  
   static count (query) {
-    let count = new Query(this._collection, this).count(query); // collection, model
-
-    return count;
+    return new Query(this._collection, this).count(query); // collection, model
   }
 
+  
+  /**
+   * Find all documents in a collection
+   *
+   * @api public
+   */
+  
   static all () {
     return this.find();
   }
 
+
+  /**
+   * Find one document
+   *
+   * @param {Object} query - find conditions, same as this.where()
+   * @api public
+   */
+  
   static * findOne (query) {
     let docs = yield* this.find(query);
 
     return docs[0];
   }
 
+
+  /**
+   * Find a document by ID
+   *
+   * @param {ObjectID} id - document id
+   * @api public
+   */
+  
   static findById (id) {
     return this.findOne({ _id: id });
   }
 
+
+  /**
+   * Remove documents
+   *
+   * @param {Object} query - remove conditions, same as this.where()
+   * @api public
+   */
+  
   static remove (query) {
     let query = new Query(this._collection, this).remove(query); // collection, model
 
     return query;
   }
 
+
+  /**
+   * Set up an index
+   *
+   * @see https://github.com/Automattic/monk#indexes
+   * @api public
+   */
+  
   static * index () {
     return yield this._collection.index(...arguments)
   }
 
+
+  /**
+   * List all indexes
+   *
+   * @see https://github.com/Automattic/monk#indexes
+   * @api public
+   */
+  
   static * indexes () {
     return yield this._collection.indexes();
-  }
-
-  static id () {
-    return this._collection.id(...arguments);
   }
 }
 
