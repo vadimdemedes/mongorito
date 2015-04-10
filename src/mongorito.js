@@ -697,9 +697,7 @@ class Model {
    */
   
   static remove (query) {
-    let query = new Query(this._collection, this).remove(query); // collection, model
-
-    return query;
+    return new Query(this._collection, this).remove(query); // collection, model
   }
 
 
