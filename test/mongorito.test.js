@@ -686,14 +686,14 @@ describe ('Mongorito', function () {
         yield* post.save();
 
         hooks.length.should.equal(8);
-        hooks[0].should.equal('before:save');
-        hooks[1].should.equal('around:save');
-        hooks[2].should.equal('before:create');
-        hooks[3].should.equal('around:create');
-        hooks[4].should.equal('around:save');
-        hooks[5].should.equal('after:save');
-        hooks[6].should.equal('around:create');
-        hooks[7].should.equal('after:create');
+        hooks[0].should.equal('before:create');
+        hooks[1].should.equal('around:create');
+        hooks[2].should.equal('before:save');
+        hooks[3].should.equal('around:save');
+        hooks[4].should.equal('around:create');
+        hooks[5].should.equal('after:create');
+        hooks[6].should.equal('around:save');
+        hooks[7].should.equal('after:save');
 
         hooks = [];
 
@@ -701,14 +701,14 @@ describe ('Mongorito', function () {
         yield* post.save();
 
         hooks.length.should.equal(8);
-        hooks[0].should.equal('before:save');
-        hooks[1].should.equal('around:save');
-        hooks[2].should.equal('before:update');
-        hooks[3].should.equal('around:update');
-        hooks[4].should.equal('around:save');
-        hooks[5].should.equal('after:save');
-        hooks[6].should.equal('around:update');
-        hooks[7].should.equal('after:update');
+        hooks[0].should.equal('before:update');
+        hooks[1].should.equal('around:update');
+        hooks[2].should.equal('before:save');
+        hooks[3].should.equal('around:save');
+        hooks[4].should.equal('around:update');
+        hooks[5].should.equal('after:update');
+        hooks[6].should.equal('around:save');
+        hooks[7].should.equal('after:save');
 
         hooks = [];
 
@@ -847,17 +847,17 @@ describe ('Mongorito', function () {
         yield* post.save();
 
         hooks.length.should.equal(11);
-        hooks[0].should.equal('beforeSave');
-        hooks[1].should.equal('firstBeforeCreate');
-        hooks[2].should.equal('secondBeforeCreate');
-        hooks[3].should.equal('firstAroundCreate');
-        hooks[4].should.equal('secondAroundCreate');
-        hooks[5].should.equal('afterSave');
-        hooks[6].should.equal('secondAroundCreate');
-        hooks[7].should.equal('firstAroundCreate');
-        hooks[8].should.equal('firstAfterCreate');
-        hooks[9].should.equal('secondAfterCreate');
-        hooks[10].should.equal('thirdAfterCreate');
+        hooks[0].should.equal('firstBeforeCreate');
+        hooks[1].should.equal('secondBeforeCreate');
+        hooks[2].should.equal('firstAroundCreate');
+        hooks[3].should.equal('secondAroundCreate');
+        hooks[4].should.equal('beforeSave');
+        hooks[5].should.equal('secondAroundCreate');
+        hooks[6].should.equal('firstAroundCreate');
+        hooks[7].should.equal('firstAfterCreate');
+        hooks[8].should.equal('secondAfterCreate');
+        hooks[9].should.equal('thirdAfterCreate');
+        hooks[10].should.equal('afterSave');
       });
       
       it ('skip selected middleware', function * () {

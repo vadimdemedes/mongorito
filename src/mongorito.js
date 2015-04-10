@@ -441,7 +441,7 @@ class Model {
     // if create or update hooks requested
     // prepend save hooks also
     if (action === 'create' || action === 'update') {
-      hooks.unshift.apply(hooks, this._hooks[when]['save']);
+      hooks.push.apply(hooks, this._hooks[when]['save']);
     }
     
     return hooks;
