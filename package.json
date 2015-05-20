@@ -19,6 +19,10 @@
     "mocha-generators": "^1.1.0"
   },
   "main": "./index.js",
+  "files": [
+    "index.js",
+    "lib"
+  ],
   "scripts": {
     "test": "./node_modules/.bin/mocha --harmony test/test.js"
   },
