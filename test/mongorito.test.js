@@ -575,6 +575,81 @@ describe ('Mongorito', function () {
           id.toString().should.equal(comments[index].get('_id').toString());
         });
       });
+      
+      it ('find documents and include only selected fields', function * () {
+        let post = new Post({
+          title: 'San Francisco',
+          featured: true
+        });
+        
+        yield* post.save();
+        
+        let posts = yield* Post.include('title').find();
+        
+        let attrs = posts[0].toJSON();
+        let keys = Object.keys(attrs);
+        
+        keys.length.should.equal(2);
+        keys[0].should.equal('_id');
+        keys[1].should.equal('title');
+      });
+      
+      it ('find documents and exclude selected fields', function * () {
+        let post = new Post({
+          title: 'San Francisco',
+          featured: true
+        });
+        
+        yield* post.save();
+        
+        let posts = yield* Post.exclude('title').find();
+        
+        let attrs = posts[0].toJSON();
+        let keys = Object.keys(attrs);
+        
+        keys.length.should.equal(4);
+        keys[0].should.equal('_id');
+        keys[1].should.equal('featured');
+        keys[2].should.equal('created_at');
+        keys[3].should.equal('updated_at');
+      });
+      
+      it ('search documents using text index', function * () {
+        try {
+          yield* Post.drop();
+        } catch (e) {
+          
+        }
+        
+        let firstPost = new Post({
+          title: 'San Francisco'
+        });
+        
+        let secondPost = new Post({
+          title: 'New York'
+        });
+        
+        let thirdPost = new Post({
+          title: 'San Fran'
+        });
+        
+        
+        yield* firstPost.save();
+        yield* secondPost.save();
+        yield* thirdPost.save();
+        
+        yield* Post.index({ title: 'text' });
+        
+        let posts = yield* Post.search('San').sort('score', {
+          '$meta': 'textScore'
+        }).include('score', {
+          '$meta': 'textScore'
+        }).find();
+        
+        posts.length.should.equal(2);
+        posts[0].get('title').should.equal('San Francisco');
+        posts[1].get('title').should.equal('San Fran');
+      });
     });
 
     describe ('Hooks', function () {

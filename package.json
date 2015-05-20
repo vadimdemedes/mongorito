@@ -9,6 +9,7 @@
     "koa-compose": "^2.3.0",
     "lodash.result": "^3.1.2",
     "monk": "^1.0.1",
+    "object.assign": "^2.0.1",
     "pluralize": "^1.1.2"
   },
   "devDependencies": {

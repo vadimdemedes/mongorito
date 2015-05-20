@@ -2,6 +2,7 @@
 * Dependencies
 */
 
+const assign = Object.assign || require('object.assign');
 const is = require('is_js');
 
 const isObjectID = require('./util').isObjectID;
@@ -16,7 +17,11 @@ class Query {
     this.collection = collection;
     this.model = model;
     this.query = {};
-    this.options = { populate: {} };
+    this.options = {
+      populate: {},
+      sort: {},
+      fields: {}
+    };
     this.lastKey = key;
   }
 
@@ -86,6 +91,92 @@ class Query {
   match () {
     return this.matches.apply(this, arguments);
   }
+  
+  
+  /**
+   * Include fields in a result
+   *
+   * @param {String} key
+   * @param {Mixed} value
+   * @api public
+   */
+  
+  include (key, value) {
+    if (is.array(key)) {
+      let fields = key;
+      
+      fields.forEach(key => {
+        this.include(key);
+      });
+    }
+    
+    if (is.object(key)) {
+      let fields = key;
+      let keys = Object.keys(fields);
+      
+      keys.forEach(key => {
+        this.include(key, fields[key]);
+      });
+    }
+    
+    if (is.string(key)) {
+      this.options.fields[key] = value == undefined ? 1 : value;
+    }
+    
+    return this;
+  }
+  
+  
+  /**
+   * Exclude fields from result
+   *
+   * @param {String} key
+   * @param {String} value
+   * @api public
+   */
+  
+  exclude (key, value) {
+    if (is.array(key)) {
+      let fields = key;
+      
+      fields.forEach(key => {
+        this.exclude(key);
+      });
+    }
+    
+    if (is.object(key)) {
+      let fields = key;
+      let keys = Object.keys(fields);
+      
+      keys.forEach(key => {
+        this.exclude(key, fields[key]);
+      });
+    }
+    
+    if (is.string(key)) {
+      this.options.fields[key] = value == undefined ? 0 : value;
+    }
+    
+    return this;
+  }
+  
+  
+  /**
+   * Search using text index
+   *
+   * @param {String} text
+   * @api public
+   */
+  
+  search (text) {
+    this.where({
+      '$text': {
+        '$search': text
+      }
+    });
+    
+    return this;
+  }
 
 
   /**
@@ -125,8 +216,14 @@ class Query {
    * @api public
    */
   
-  sort (sort) {
-    this.options.sort = sort;
+  sort (key, value) {
+    if (is.object(key)) {
+      assign(this.options.sort, key);
+    }
+    
+    if (is.string(key) && value) {
+      this.options.sort[key] = value;
+    }
 
     return this;
   }
@@ -207,17 +304,20 @@ class Query {
    * @api public
    */
 
-  * find (query) {
+  * find (query, options) {
     this.where(query);
     
     let model = this.model;
-    let options = this.options;
+    
+    // query options
+    options = assign({}, this.options, options);
 
     // fields to populate
     let populate = Object.keys(options.populate);
-
+    
+    // find
     let docs = yield this.collection.find(this.query, options);
-
+    
     let i = 0;
     let doc;
 

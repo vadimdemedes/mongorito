@@ -699,6 +699,17 @@ class Model {
   static remove (query) {
     return new Query(this._collection, this).remove(query); // collection, model
   }
+  
+  
+  /**
+   * Drop collection
+   *
+   * @api public
+   */
+  
+  static * drop () {
+    yield this._collection.drop();
+  }
 
 
   /**
@@ -746,7 +757,10 @@ const methods = [
   'nor',
   'populate',
   'matches',
-  'match'
+  'match',
+  'include',
+  'exclude',
+  'search'
 ];
 
 methods.forEach(method => {
