@@ -744,7 +744,9 @@ const methods = [
   'or',
   'ne',
   'nor',
-  'populate'
+  'populate',
+  'matches',
+  'match'
 ];
 
 methods.forEach(method => {

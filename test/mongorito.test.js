@@ -11,7 +11,7 @@ const Comment = require('./models/comment');
 const Post = require('./models/post');
 const Task = require('./models/task');
 
-require('mocha-generators')();
+require('mocha-generators').install();
 
 const Model = Mongorito.Model;
 
@@ -320,12 +320,12 @@ describe ('Mongorito', function () {
         createdPost.get('_id').toString().should.equal(post.get('_id').toString());
       });
 
-      it ('find a document with .where() matching sub-documents using elemMatch', function * () {
+      it ('find a document with .where() matching sub-documents using $elemMatch', function * () {
         let data = postFixture();
         let post = new Post(data);
         yield* post.save();
 
-        let posts = yield* Post.where('comments', { body: data.comments[0].body }).find();
+        let posts = yield* Post.where('comments').matches({ body: data.comments[0].body }).find();
         posts.length.should.equal(1);
 
         let createdPost = posts[0];

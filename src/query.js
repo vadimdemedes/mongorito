@@ -50,18 +50,41 @@ class Query {
         return this;
       }
 
-      // 1. if regular expression
-      // 2. if object and not ObjectID
+      // if value is a regular expression
+      // use $regex modifier
       if (is.regexp(value)) {
         value = { $regex: value };
-      } else if (is.object(value) && !isObjectID(value)) {
-        value = { $elemMatch: value };
       }
 
       this.query[key] = value;
     }
 
     return this;
+  }
+  
+  
+  /**
+   * Match documents using $elemMatch
+   *
+   * @param {String} key
+   * @param {Object} value
+   * @api public
+   */
+  
+  matches (key, value) {
+    if (this.lastKey) {
+      value = key;
+      key = this.lastKey;
+      this.lastKey = null;
+    }
+    
+    this.query[key] = { $elemMatch: value };
+    
+    return this;
+  }
+  
+  match () {
+    return this.matches.apply(this, arguments);
   }
 
 
