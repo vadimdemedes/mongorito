@@ -25,7 +25,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "./node_modules/.bin/mocha --harmony test/test.js"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
