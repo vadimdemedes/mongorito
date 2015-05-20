@@ -7,16 +7,17 @@
     "co-monk": "^1.0.0",
     "is_js": "^0.7.3",
     "koa-compose": "^2.3.0",
-    "lodash.result": "^3.0.0",
+    "lodash.result": "^3.1.2",
     "monk": "^1.0.1",
     "pluralize": "^1.1.2"
   },
   "devDependencies": {
-    "babel": "^4.7.16",
-    "chai": "^2.2.0",
-    "chance": "^0.7.3",
-    "mocha": "^2.2.1",
-    "mocha-generators": "^1.1.0"
+    "babel": "^5.4.4",
+    "chai": "^2.3.0",
+    "chance": "^0.7.5",
+    "make-lint-es6": "^1.0.3",
+    "mocha": "^2.2.5",
+    "mocha-generators": "^1.1.1"
   },
   "main": "./index.js",
   "files": [
