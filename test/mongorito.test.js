@@ -66,6 +66,23 @@ describe ('Mongorito', function () {
       
       attrs.should.deep.equal(data);
     });
+    
+    it ('get nested property', function () {
+      let data = postFixture();
+      let post = new Post(data);
+      
+      let author = post.get('author.name');
+      
+      author.should.equal(data.author.name);
+    });
+    
+    it ('set nested property', function () {
+      let data = postFixture();
+      let post = new Post(data);
+      
+      post.set('author.name', 'John Doe');
+      post.get('author.name').should.equal('John Doe');
+    });
 
     it ('correctly convert model to JSON', function () {
       let data = postFixture();

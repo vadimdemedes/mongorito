@@ -11,6 +11,8 @@ const result = require('lodash.result');
 const monk = require('monk');
 const wrap = require('co-monk');
 const copy = require('copy-to');
+const get = require('get-value');
+const set = require('set-value');
 const is = require('is_js');
 
 const Query = require('./query');
@@ -182,11 +184,9 @@ class Model {
    */
   
   get (key) {
-    let attrs = this.attributes;
-
-    // if key is not set
+    // if key is empty
     // return all attributes
-    let value = key ? attrs[key] : attrs;
+    let value = key ? get(this.attributes, key) : this.attributes;
     
     // if value is object
     // return a deep copy
@@ -217,10 +217,12 @@ class Model {
     }
 
     // check if the value actually changed
-    if (this.get(key) !== value) {
-      this.previous[key] = this.get(key);
-      this.attributes[key] = value;
-      this.changed[key] = true;
+    let previousValue = this.get(key);
+    
+    if (previousValue !== value) {
+      set(this.previous, key, previousValue);
+      set(this.attributes, key, value);
+      set(this.changed, key, true);
     }
 
     return value;
