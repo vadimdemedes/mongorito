@@ -11,8 +11,11 @@ include node_modules/make-lint-es6/index.mk
 test:
 	@./node_modules/.bin/mocha --harmony test/test.js
 
+cov:
+	@node --harmony ./node_modules/istanbul-harmony/lib/cli cover --harmony ./node_modules/.bin/_mocha test/test
+
 clean:
 	@rm -rf lib/*.js
 
-.PHONY: test clean
+.PHONY: test cov clean
 
