@@ -10,6 +10,7 @@ const compose = require('koa-compose');
 const result = require('lodash.result');
 const monk = require('monk');
 const wrap = require('co-monk');
+const copy = require('copy-to');
 const is = require('is_js');
 
 const Query = require('./query');
@@ -185,7 +186,11 @@ class Model {
 
     // if key is not set
     // return all attributes
-    return key ? attrs[key] : attrs;
+    let value = key ? attrs[key] : attrs;
+    
+    // if value is object
+    // return a deep copy
+    return value && value.constructor === Object ? copy(value).to({}) : value;
   }
 
 

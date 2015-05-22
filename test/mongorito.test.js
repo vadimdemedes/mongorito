@@ -57,14 +57,14 @@ describe ('Mongorito', function () {
       data = postFixture();
       post = new Post(data);
       attrs = post.get();
-
-      Object.keys(attrs).forEach(key => post.get(key).should.equal(data[key]));
+      
+      attrs.should.deep.equal(data);
 
       data = postFixture();
       post.set(data);
       attrs = post.get();
-
-      Object.keys(attrs).forEach(key => post.get(key).should.equal(data[key]));
+      
+      attrs.should.deep.equal(data);
     });
 
     it ('correctly convert model to JSON', function () {
@@ -141,7 +141,7 @@ describe ('Mongorito', function () {
 
       let createdAt = Math.round(createdPost.get('created_at').getTime() / 1000);
       let updatedAt = Math.round(createdPost.get('updated_at').getTime() / 1000);
-
+      
       createdAt.should.equal(timestamp);
       updatedAt.should.equal(timestamp);
     });

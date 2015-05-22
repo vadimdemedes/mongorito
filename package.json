@@ -5,6 +5,7 @@
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
     "co-monk": "^1.0.0",
+    "copy-to": "^2.0.1",
     "is_js": "^0.7.3",
     "koa-compose": "^2.3.0",
     "lodash.result": "^3.1.2",
