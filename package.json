@@ -4,6 +4,7 @@
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
+    "bson": "^0.3.2",
     "co-monk": "^1.0.0",
     "copy-to": "^2.0.1",
     "get-value": "^1.1.5",
@@ -30,7 +31,8 @@
     "lib"
   ],
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "postinstall": "npm uninstall monk/node_modules/mongodb/node_modules/bson"
   },
   "repository": {
     "type": "git",

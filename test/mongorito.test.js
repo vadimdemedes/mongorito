@@ -32,8 +32,16 @@ describe ('Mongorito', function () {
   it ('expose mongoskin module properties', function () {
     let mongoskin = require('monk/node_modules/mongoskin');
 
+    let excludedKeys = [
+      'BSONNative',
+      'BSONPure',
+      'connect',
+      'version',
+      'db'
+    ];
+
     Object.keys(mongoskin).forEach(function (key) {
-      if (['connect', 'version', 'db'].indexOf(key) === -1) {
+      if (excludedKeys.indexOf(key) === -1) {
         Mongorito[key].should.equal(mongoskin[key]);
       }
     });
