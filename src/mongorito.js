@@ -13,7 +13,6 @@ const result = require('lodash.result');
 const clone = require('clone');
 const monk = require('monk');
 const wrap = require('co-monk');
-const copy = require('copy-to');
 const get = require('get-value');
 const set = require('set-value');
 const is = require('is_js');
@@ -193,7 +192,7 @@ class Model {
     
     // if value is object
     // return a deep copy
-    return value && value.constructor === Object ? copy(value).to({}) : value;
+    return value && value.constructor === Object ? clone(value) : value;
   }
 
 
