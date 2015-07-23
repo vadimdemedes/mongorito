@@ -1,3 +1,5 @@
+'use strict';
+
 /**
 * Dependencies
 */
@@ -8,6 +10,7 @@ const mongoskin = require('monk/node_modules/mongoskin');
 const pluralize = require('pluralize');
 const compose = require('koa-compose');
 const result = require('lodash.result');
+const clone = require('clone');
 const monk = require('monk');
 const wrap = require('co-monk');
 const copy = require('copy-to');
@@ -108,10 +111,10 @@ Mongorito._collections = {};
 
 class Model {
   constructor (attrs = {}, options = {}) {
-    this.attributes = attrs;
+    this.attributes = clone(attrs);
     this.changed = {};
     this.previous = {};
-    this.options = options;
+    this.options = clone(options);
 
     // reset hooks
     Object.defineProperty(this, '_hooks', {
