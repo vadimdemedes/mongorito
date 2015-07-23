@@ -233,6 +233,18 @@ class Model {
 
 
   /**
+   * Unset model attribute
+   *
+   * @param {String} key - property name
+   * @api public
+   */
+  
+  unset (key) {
+    this.set(key, undefined);
+  }
+
+
+  /**
    * Set default values
    *
    * @api private

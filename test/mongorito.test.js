@@ -151,6 +151,25 @@ describe ('Mongorito', function () {
       (typeof err).should.equal('object');
     });
 
+    it ('unset a property', function * () {
+      let data = { awesome: true };
+      let post = new Post(data);
+
+      yield* post.save(data);
+
+      post.get('awesome').should.equal(true);
+
+      post.unset('awesome');
+
+      should.not.exist(post.get('awesome'));
+
+      yield* post.save();
+
+      post = yield* Post.findOne();
+
+      should.not.exist(post.get('awesome'));
+    });
+
     it ('create new a document', function * () {
       let timestamp = Math.round(new Date().getTime() / 1000);
 
