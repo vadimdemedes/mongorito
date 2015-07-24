@@ -35,11 +35,27 @@ class Mongorito {
    * @api public
    */
    
-  static connect (...urls) {
+  static connect () {
+    // parse arguments
+    let args = Array.prototype.slice.call(arguments);
+
+    let urls = [];
+    let options = {};
+
+    args.forEach(arg => {
+      if (is.string(arg)) {
+        urls.push(arg);
+      }
+
+      if (is.object(arg)) {
+        options = arg;
+      }
+    });
+
     // convert mongo:// urls to monk-supported ones
     urls = urls.map(url => url.replace(/^mongo\:\/\//, ''));
 
-    let db = monk(...urls);
+    let db = monk(urls, options);
 
     // if there is already a connection
     // don't overwrite it with a new one
