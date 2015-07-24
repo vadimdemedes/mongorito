@@ -2,7 +2,7 @@
 * Dependencies
 */
 
-const assign = Object.assign || require('object.assign');
+const assign = Object.assign || require('object-assign');
 const is = require('is_js');
 
 const isObjectID = require('./util').isObjectID;

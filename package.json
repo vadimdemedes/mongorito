@@ -12,12 +12,12 @@
     "koa-compose": "^2.3.0",
     "lodash.result": "^3.1.2",
     "monk": "^1.0.1",
-    "object.assign": "^3.0.1",
+    "object-assign": "^3.0.0",
     "pluralize": "^1.1.2",
     "set-value": "^0.2.0"
   },
   "devDependencies": {
-    "babel": "^5.6.14",
+    "babel": "^5.8.3",
     "chai": "^3.0.0",
     "chance": "^0.7.6",
     "istanbul-harmony": "^0.3.12",
