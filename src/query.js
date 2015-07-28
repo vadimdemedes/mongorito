@@ -1,11 +1,11 @@
+'use strict';
+
 /**
 * Dependencies
 */
 
 const assign = Object.assign || require('object-assign');
 const is = require('is_js');
-
-const isObjectID = require('./util').isObjectID;
 
 
 /**
@@ -239,6 +239,7 @@ class Query {
   
   equals (value) {
     let key = this.lastKey;
+
     this.lastKey = null;
 
     this.query[key] = value;
@@ -307,7 +308,7 @@ class Query {
   * find (query, options) {
     this.where(query);
     
-    let model = this.model;
+    let Model = this.model;
     
     // query options
     options = assign({}, this.options, options);
@@ -346,7 +347,7 @@ class Query {
       }
 
       // index - 1, because index here is already an index of the next document
-      docs[i - 1] = new model(doc, {
+      docs[i - 1] = new Model(doc, {
         populate: options.populate
       });
     }

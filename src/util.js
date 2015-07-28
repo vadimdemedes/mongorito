@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Dependencies
  */
@@ -17,5 +19,5 @@ exports.isObjectID = isObjectID;
  */
 
 function isObjectID (value) {
-  return !!(value && ObjectID === value.constructor);
+  return !!(value && value.constructor === ObjectID);
 }

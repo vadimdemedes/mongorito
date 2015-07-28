@@ -4,8 +4,6 @@
 * Dependencies
 */
 
-const ObjectID = require('monk/node_modules/mongoskin').ObjectID;
-
 const mongoskin = require('monk/node_modules/mongoskin');
 const pluralize = require('pluralize');
 const compose = require('koa-compose');
@@ -18,7 +16,6 @@ const set = require('set-value');
 const is = require('is_js');
 
 const Query = require('./query');
-const util = require('./util');
 
 
 /**
@@ -59,7 +56,9 @@ class Mongorito {
 
     // if there is already a connection
     // don't overwrite it with a new one
-    if (!this.db) this.db = db;
+    if (!this.db) {
+      this.db = db;
+    }
 
     return db;
   }
@@ -101,9 +100,12 @@ class Mongorito {
       collections = this._collections[url] = {};
     }
 
-    if (collections[name]) return collections[name];
+    if (collections[name]) {
+      return collections[name];
+    }
 
     let collection = db.get(name);
+
     collections[name] = wrap(collection);
     
     return collections[name];
@@ -331,7 +333,7 @@ class Model {
         yield this.rollback(method);
         throw err;
       }
-    }
+    };
   }
 
 
@@ -372,7 +374,9 @@ class Model {
 
     // if method is a string
     // get the function
-    if (is.not.function(method)) method = this[method];
+    if (is.not.function(method)) {
+      method = this[method];
+    }
 
     // around hooks should be
     // at the end of before:*
@@ -417,6 +421,7 @@ class Model {
    * @param {String} method - hook name
    * @api public
    */
+  
   after (action, method) {
     this.hook('after', action, method);
   }
@@ -429,6 +434,7 @@ class Model {
    * @param {String} method - hook name
    * @api public
    */
+  
   around (action, method) {
     this.hook('around', action, method);
   }
@@ -447,7 +453,9 @@ class Model {
     let skip = options.skip;
     
     if (skip) {
-      if (is.string(skip)) skip = [skip];
+      if (is.string(skip)) {
+        skip = [skip];
+      }
       
       hooks = hooks.filter(fn => skip.indexOf(fn.name) === -1);
     }
@@ -478,7 +486,7 @@ class Model {
     // if create or update hooks requested
     // prepend save hooks also
     if (action === 'create' || action === 'update') {
-      hooks.push.apply(hooks, this._hooks[when]['save']);
+      hooks.push.apply(hooks, this._hooks[when].save);
     }
     
     return hooks;
@@ -530,14 +538,16 @@ class Model {
     let attrs = this.attributes;
 
     let date = new Date;
+
     this.set({
-      created_at: date,
-      updated_at: date
+      'created_at': date,
+      'updated_at': date
     });
 
     yield* this._runHooks('before', 'create', options);
 
     let doc = yield collection.insert(attrs);
+
     this.set('_id', doc._id);
 
     yield* this._runHooks('after', 'create', options);
@@ -654,7 +664,7 @@ class Model {
     // get collection name
     // from the "collection" property
     // or generate the default one
-    let defaultName = pluralize(this.name).toLowerCase()
+    let defaultName = pluralize(this.name).toLowerCase();
     let name = result(this.prototype, 'collection', defaultName);
 
     // save collection name
@@ -673,7 +683,8 @@ class Model {
    */
   
   static find (query) {
-    return new Query(this._collection, this).find(query); // collection, model
+    // collection, model
+    return new Query(this._collection, this).find(query);
   }
 
 
@@ -685,7 +696,8 @@ class Model {
    */
   
   static count (query) {
-    return new Query(this._collection, this).count(query); // collection, model
+    // collection, model
+    return new Query(this._collection, this).count(query);
   }
 
   
@@ -734,7 +746,8 @@ class Model {
    */
   
   static remove (query) {
-    return new Query(this._collection, this).remove(query); // collection, model
+    // collection, model
+    return new Query(this._collection, this).remove(query);
   }
   
   
@@ -757,7 +770,7 @@ class Model {
    */
   
   static * index () {
-    return yield this._collection.index(...arguments)
+    return yield this._collection.index(...arguments);
   }
 
 
@@ -802,7 +815,9 @@ const methods = [
 
 methods.forEach(method => {
   Model[method] = function () {
-    let query = new Query(this._collection, this); // collection, model
+    // collection, model
+    let query = new Query(this._collection, this);
+
     query[method].apply(query, arguments);
 
     return query;
@@ -821,7 +836,7 @@ Model.extend = require('./extend')(Model);
 * Expose Mongorito
 */
 
-var exports = module.exports = Mongorito;
+let exports = module.exports = Mongorito;
 
 exports.Model = Model;
 
