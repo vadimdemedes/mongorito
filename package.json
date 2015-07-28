@@ -21,7 +21,7 @@
     "chai": "^3.0.0",
     "chance": "^0.7.6",
     "istanbul-harmony": "^0.3.12",
-    "make-lint-es6": "^1.0.3",
+    "make-lint": "vdemedes/make-lint",
     "mocha": "^2.2.5",
     "mocha-generators": "^1.1.1"
   },
