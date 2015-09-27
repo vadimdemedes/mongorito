@@ -17,12 +17,12 @@
     "set-value": "^0.2.0"
   },
   "devDependencies": {
-    "babel": "^5.8.3",
-    "chai": "^3.0.0",
-    "chance": "^0.7.6",
-    "istanbul-harmony": "^0.3.12",
+    "babel": "^5.8.23",
+    "chai": "^3.3.0",
+    "chance": "^0.7.7",
+    "istanbul-harmony": "^0.3.16",
     "make-lint": "vdemedes/make-lint",
-    "mocha": "^2.2.5",
+    "mocha": "^2.3.3",
     "mocha-generators": "^1.1.1"
   },
   "main": "./index.js",
