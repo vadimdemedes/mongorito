@@ -1,4 +1,4 @@
-# Mongorito [![Circle CI](https://circleci.com/gh/vdemedes/mongorito.svg?style=svg)](https://circleci.com/gh/vdemedes/mongorito)
+# Mongorito [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito)
 
 Awesome ES6 generator-based MongoDB ODM for Node.js v0.11.x (or newer) and io.js.
 Just take a look on its pretty models and beautiful API. 
@@ -94,7 +94,7 @@ Check out [Getting Started](http://mongorito.com/guides/getting-started) guide o
 
 ### Tests
 
-[![Circle CI](https://circleci.com/gh/vdemedes/mongorito.svg?style=svg)](https://circleci.com/gh/vdemedes/mongorito)
+[![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito)
 
 To execute tests run:
 
