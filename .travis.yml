@@ -4,7 +4,6 @@ node_js:
   - '1'
   - '2'
   - '3'
-  - '0.11'
 
 before_install:
   - 'sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10'
