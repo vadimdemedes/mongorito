@@ -306,7 +306,7 @@ describe ('Mongorito', function () {
         let createdPosts = yield* Post.find();
         createdPosts.length.should.equal(10);
 
-        createdPosts.forEach((post, index) => {
+        createdPosts.forEach(function (post, index) {
           post.get('_id').toString().should.equal(posts[index].get('_id').toString());
         });
       });
@@ -403,7 +403,7 @@ describe ('Mongorito', function () {
 
         let createdPosts = yield* Post.limit(5).find();
         createdPosts.length.should.equal(5);
-        createdPosts.forEach((post, index) => {
+        createdPosts.forEach(function (post, index) {
           post.get('_id').toString().should.equal(posts[index].get('_id').toString());
         });
       });
@@ -421,7 +421,7 @@ describe ('Mongorito', function () {
 
         let createdPosts = yield* Post.limit(5).skip(5).find();
         createdPosts.length.should.equal(5);
-        createdPosts.forEach((post, index) => {
+        createdPosts.forEach(function (post, index) {
           post.get('_id').toString().should.equal(posts[5 + index].get('_id').toString());
         });
       });
@@ -504,7 +504,7 @@ describe ('Mongorito', function () {
         yield* secondPost.save();
         yield* thirdPost.save();
 
-        let posts = yield* Post.or({ isPublic: true }, { ['author.name']: 'user2' }).find();
+        let posts = yield* Post.or({ isPublic: true }, { 'author.name': 'user2' }).find();
 
         posts.length.should.equal(2);
         posts[0].get('author').name.should.equal('user1');
@@ -539,7 +539,7 @@ describe ('Mongorito', function () {
         yield* secondPost.save();
         yield* thirdPost.save();
 
-        let posts = yield* Post.and({ isPublic: false }, { ['author.name']: 'user2' }).find();
+        let posts = yield* Post.and({ isPublic: false }, { 'author.name': 'user2' }).find();
 
         posts.length.should.equal(2);
         posts[0].get('title').should.equal('second');
@@ -589,7 +589,7 @@ describe ('Mongorito', function () {
         }
       });
 
-      it ('populate the response', function * () {
+      it.skip ('populate the response', function * () {
         let n = 3;
         let comments = [];
 
@@ -602,13 +602,15 @@ describe ('Mongorito', function () {
         }
 
         let data = postFixture({
-          comments: comments.map(comment => comment.get('_id'))
+          comments: comments.map(function (comment) {
+            return comment.get('_id');
+          })
         });
         let post = new Post(data);
         yield* post.save();
 
         let createdPost = yield* Post.populate('comments', Comment).findOne();
-        createdPost.get('comments').forEach((comment, index) => {
+        createdPost.get('comments').forEach(function (comment, index) {
           comment.get('_id').toString().should.equal(comments[index].get('_id').toString());
         });
 
@@ -617,7 +619,7 @@ describe ('Mongorito', function () {
         yield* createdPost.save();
 
         createdPost = yield* Post.findOne();
-        createdPost.get('comments').forEach((id, index) => {
+        createdPost.get('comments').forEach(function (id, index) {
           id.toString().should.equal(comments[index].get('_id').toString());
         });
       });
