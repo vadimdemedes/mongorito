@@ -1111,24 +1111,6 @@ describe ('Mongorito', function () {
     secondaryDb.close();
   });
 
-  describe ('Backwards compatibility', function () {
-    it ('work with old ES5-ish API', function * () {
-      let Post = Model.extend({
-        collection: 'posts'
-      });
-
-      let data = postFixture();
-      let post = new Post(data);
-
-      yield* post.save();
-
-      let posts = yield* Post.all();
-      
-      posts.length.should.equal(1);
-      posts[0].get('title').should.equal(data.title);
-    });
-  });
-
   after (function () {
     Mongorito.disconnect();
   });

@@ -27,7 +27,6 @@ node --harmony script.js
 ```
 
 **Note**: In order for the following examples to work, you need use something like [co](https://github.com/tj/co) to run generators.
-**Another note**: If you want to use ES6 classes (like in the following examples), use [babel](https://github.com/babel/babel). If not, there is an alternative API left from previous versions of Mongorito.
 
 
 ### Overview
