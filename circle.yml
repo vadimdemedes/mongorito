@@ -1,5 +1,0 @@
-machine:
-  node:
-    version: stable
-  services:
-    - mongodb
