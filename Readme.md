@@ -1,6 +1,6 @@
 # Mongorito [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito)
 
-Awesome ES6 generator-based MongoDB ODM for Node.js v0.11.x (or newer) and io.js.
+Awesome ES6 generator-based MongoDB ODM for Node.js v4.x (or newer).
 Just take a look on its pretty models and beautiful API. 
 Uses [monk](https://github.com/Automattic/monk) under the hood.
 
@@ -15,32 +15,27 @@ Uses [monk](https://github.com/Automattic/monk) under the hood.
 ### Features
 
 - Based on ES6 generators, which means **no callbacks**
-- Common, established API you've already used to
+- Established API you've already used to
 - Hooks (before:save, around:create, after:remove, etc)
 - Very simple and easy-to-understand implementation
 - Fully covered by tests
+- Using this module results in a beautiful code
 
 
 ### Installation
 
 ```
-npm install mongorito --save
+$ npm install mongorito --save
 ```
 
-**Warning**: You should have Node.js v0.11.x or io.js installed (or newer). Run node with `--harmony` option (not applicable to io.js):
-
-```
-node --harmony script.js
-```
-
-**Note**: In order for the following examples to work, you need use something like [co](https://github.com/tj/co) to run generators.
+**Note**: In order for the following examples to work, you need to use [co](https://github.com/tj/co) to run generators.
 
 
-### Overview
+### Usage
 
-```javascript
-var Mongorito = require('mongorito');
-var Model = Mongorito.Model;
+```js
+const Mongorito = require('mongorito');
+const Model = Mongorito.Model;
 
 // connect to localhost/blog
 Mongorito.connect('localhost/blog');
@@ -52,8 +47,8 @@ class Post extends Model {
 }
 
 
-// create new Post document
-var post = new Post({
+// create and save new Post document
+let post = new Post({
     title: 'Node.js with --harmony rocks!',
     body: 'Long post body',
     author: {
@@ -61,8 +56,6 @@ var post = new Post({
     }
 });
 
-
-// create
 yield post.save();
 
 
@@ -70,42 +63,31 @@ yield post.save();
 post.set('title', 'Post got a new title!');
 post.set('author.name', 'Doe John');
 
-
-// update
 yield post.save();
 
-
-// find some posts
-var posts;
-
 // find posts where body equals "Long post body"
-posts = yield Post.where('body', 'Long post body').find();
+let posts = yield Post.where('body', 'Long post body').find();
 
 // find posts where author's name equals "John Doe"
 posts = yield Post.where('author.name', 'John Doe').find();
 
 // Bonus: find posts where title starts with "Node"
 posts = yield Post.where('title', /^node/i).find();
-
-
-// disconnect
-Mongorito.disconnect();
 ```
 
 
-### Getting Started
+### API
 
 Check out [Getting Started](http://mongorito.com/guides/getting-started) guide on [http://mongorito.com](http://mongorito.com).
+There are more guides available to learn more.
 
 
 ### Tests
 
 [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito)
 
-To execute tests run:
-
 ```
-npm test
+$ make test
 ```
 
 
