@@ -4,6 +4,13 @@ Awesome ES6 generator-based MongoDB ODM for Node.js v0.11.x (or newer) and io.js
 Just take a look on its pretty models and beautiful API. 
 Uses [monk](https://github.com/Automattic/monk) under the hood.
 
+<h1 align="center">
+  <br>
+  <img width="200" src="media/logo.png">
+  <br>
+  <br>
+</h1>
+
 
 ### Features
 
