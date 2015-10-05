@@ -11,6 +11,7 @@
     "is_js": "^0.7.4",
     "koa-compose": "^2.3.0",
     "lodash.result": "^3.1.2",
+    "mongodb": "^1.4.39",
     "monk": "^1.0.1",
     "object-assign": "^3.0.0",
     "pluralize": "^1.1.2",
@@ -32,7 +33,7 @@
   ],
   "scripts": {
     "test": "make test",
-    "postinstall": "npm uninstall monk/node_modules/mongodb/node_modules/bson"
+    "postinstall": "cd node_modules/monk/node_modules/mongodb && npm uninstall bson && cd ../../../; cd node_modules/mongodb && npm uninstall bson"
   },
   "repository": {
     "type": "git",
