@@ -11,8 +11,4 @@ coverage:
 
 include node_modules/make-lint/index.mk
 
-clean:
-	@rm -rf lib/*.js
-
 .PHONY: test coverage clean
-

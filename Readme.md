@@ -1,7 +1,7 @@
 # Mongorito [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito)
 
 Awesome ES6 generator-based MongoDB ODM for Node.js v4.x (or newer).
-Just take a look on its pretty models and beautiful API. 
+Just take a look on its pretty models and beautiful API.
 Uses [monk](https://github.com/Automattic/monk) under the hood.
 
 <h1 align="center">
@@ -38,12 +38,12 @@ const Mongorito = require('mongorito');
 const Model = Mongorito.Model;
 
 // connect to localhost/blog
-Mongorito.connect('localhost/blog');
+yield Mongorito.connect('localhost/blog');
 
 
 // define model
 class Post extends Model {
-	
+
 }
 
 

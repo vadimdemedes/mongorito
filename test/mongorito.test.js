@@ -31,33 +31,8 @@ const postFixture = require('./fixtures/post');
 */
 
 describe ('Mongorito', function () {
-  it ('expose mongoskin module properties', function () {
-    let mongoskin;
-
-    // if npm version is >= 3.x, mongoskin must be required directly
-    try {
-      mongoskin = require('monk/node_modules/mongoskin');
-    } catch (_) {
-      mongoskin = require('mongoskin');
-    }
-
-    let excludedKeys = [
-      'BSONNative',
-      'BSONPure',
-      'connect',
-      'version',
-      'db'
-    ];
-
-    Object.keys(mongoskin).forEach(function (key) {
-      if (excludedKeys.indexOf(key) === -1) {
-        Mongorito[key].should.equal(mongoskin[key]);
-      }
-    });
-  });
-
-  before (function () {
-    Mongorito.connect('mongo://localhost/mongorito_test');
+  before (function * () {
+    yield Mongorito.connect('mongodb://localhost/mongorito_test');
   });
 
   beforeEach (function * () {
@@ -68,35 +43,53 @@ describe ('Mongorito', function () {
   });
 
   describe ('Model', function () {
+    it ('expose mongodb module properties', function () {
+      const mongodb = require('mongodb');
+
+      let excludedKeys = [
+        'connect',
+        'MongoClient',
+        'Db',
+        'db'
+      ];
+
+      Mongorito.should.not.have.property('MongoClient');
+
+      Object.keys(mongodb).forEach(function (key) {
+        if (excludedKeys.indexOf(key) === -1) {
+          Mongorito[key].should.equal(mongodb[key]);
+        }
+      });
+    });
     it ('initialize model and manage attributes', function () {
       let data, post, attrs;
 
       data = postFixture();
       post = new Post(data);
       attrs = post.get();
-      
+
       attrs.should.deep.equal(data);
 
       data = postFixture();
       post.set(data);
       attrs = post.get();
-      
+
       attrs.should.deep.equal(data);
     });
-    
+
     it ('get nested property', function () {
       let data = postFixture();
       let post = new Post(data);
-      
+
       let author = post.get('author.name');
-      
+
       author.should.equal(data.author.name);
     });
-    
+
     it ('set nested property', function () {
       let data = postFixture();
       let post = new Post(data);
-      
+
       post.set('author.name', 'John Doe');
       post.get('author.name').should.equal('John Doe');
     });
@@ -134,14 +127,14 @@ describe ('Mongorito', function () {
       yield* Post.index('title');
 
       let indexes = yield* Post.indexes();
-      indexes.should.have.property('title_1');
+      indexes[indexes.length - 1].should.have.deep.property('name', 'title_1')
     });
 
     it ('setup a unique index', function * () {
       yield* Task.index('name', { unique: true });
 
       let indexes = yield* Task.indexes();
-      indexes.should.have.property('name_1');
+      indexes[indexes.length - 1].should.have.deep.property('name', 'name_1')
 
       let firstTask = new Task({ name: 'first' });
       let secondTask = new Task({ name: 'first' });
@@ -194,7 +187,7 @@ describe ('Mongorito', function () {
 
       let createdAt = Math.round(createdPost.get('created_at').getTime() / 1000);
       let updatedAt = Math.round(createdPost.get('updated_at').getTime() / 1000);
-      
+
       createdAt.should.equal(timestamp);
       updatedAt.should.equal(timestamp);
     });
@@ -349,6 +342,21 @@ describe ('Mongorito', function () {
         createdPost.get('_id').toString().should.equal(post.get('_id').toString());
       });
 
+      it ('find one document by Id', function * () {
+        let data = postFixture();
+        let post = new Post(data);
+        yield* post.save();
+
+        let posts = yield* Post.all();
+        posts.length.should.equal(1);
+
+        let createdPost = yield* Post.findById(post.get('_id'));
+        createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+
+        createdPost = yield* Post.findOne({ title: post.get('title') });
+        createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+      });
+
       it ('find a document with .where()', function * () {
         let data = postFixture();
         let post = new Post(data);
@@ -492,21 +500,21 @@ describe ('Mongorito', function () {
             name: 'user1'
           }
         }));
-        
+
         let secondPost = new Post(postFixture({
           isPublic: false,
           author: {
             name: 'user2'
           }
         }))
-        
+
         let thirdPost = new Post(postFixture({
           isPublic: false,
           author: {
             name: 'user3'
           }
         }));
-        
+
         yield* firstPost.save();
         yield* secondPost.save();
         yield* thirdPost.save();
@@ -525,7 +533,7 @@ describe ('Mongorito', function () {
             name: 'user1'
           }
         }));
-        
+
         let secondPost = new Post(postFixture({
           isPublic: false,
           author: {
@@ -533,7 +541,7 @@ describe ('Mongorito', function () {
           },
           title: 'second'
         }));
-        
+
         let thirdPost = new Post(postFixture({
           isPublic: false,
           author: {
@@ -541,7 +549,7 @@ describe ('Mongorito', function () {
           },
           title: 'third'
         }));
-        
+
         yield* firstPost.save();
         yield* secondPost.save();
         yield* thirdPost.save();
@@ -630,77 +638,77 @@ describe ('Mongorito', function () {
           id.toString().should.equal(comments[index].get('_id').toString());
         });
       });
-      
+
       it ('find documents and include only selected fields', function * () {
         let post = new Post({
           title: 'San Francisco',
           featured: true
         });
-        
+
         yield* post.save();
-        
+
         let posts = yield* Post.include('title').find();
-        
+
         let attrs = posts[0].toJSON();
         let keys = Object.keys(attrs);
-        
+
         keys.length.should.equal(2);
         keys[0].should.equal('_id');
         keys[1].should.equal('title');
       });
-      
+
       it ('find documents and exclude selected fields', function * () {
         let post = new Post({
           title: 'San Francisco',
           featured: true
         });
-        
+
         yield* post.save();
-        
+
         let posts = yield* Post.exclude('title').find();
-        
+
         let attrs = posts[0].toJSON();
         let keys = Object.keys(attrs);
-        
+
         keys.length.should.equal(4);
         keys[0].should.equal('_id');
         keys[1].should.equal('featured');
         keys[2].should.equal('created_at');
         keys[3].should.equal('updated_at');
       });
-      
+
       it ('search documents using text index', function * () {
         try {
           yield* Post.drop();
         } catch (e) {
-          
+
         }
-        
+
         let firstPost = new Post({
           title: 'San Francisco'
         });
-        
+
         let secondPost = new Post({
           title: 'New York'
         });
-        
+
         let thirdPost = new Post({
           title: 'San Fran'
         });
-        
-        
+
+
         yield* firstPost.save();
         yield* secondPost.save();
         yield* thirdPost.save();
-        
+
         yield* Post.index({ title: 'text' });
-        
+
         let posts = yield* Post.search('San').sort('score', {
           '$meta': 'textScore'
         }).include('score', {
           '$meta': 'textScore'
         }).find();
-        
+
         posts.length.should.equal(2);
         posts[0].get('title').should.equal('San Francisco');
         posts[1].get('title').should.equal('San Fran');
@@ -989,67 +997,67 @@ describe ('Mongorito', function () {
         hooks[9].should.equal('thirdAfterCreate');
         hooks[10].should.equal('afterSave');
       });
-      
+
       it ('skip selected middleware', function * () {
         let middlewareTriggered = false;
-        
+
         class Post extends Model {
           configure () {
             this.before('save', 'beforeSave');
           }
-          
+
           * beforeSave (next) {
             middlewareTriggered = true;
-            
+
             yield* next;
           }
         }
-        
+
         let data = postFixture();
         let post = new Post(data);
-        
+
         yield* post.save();
-        
+
         middlewareTriggered.should.equal(true);
         middlewareTriggered = false;
-        
+
         yield* post.save({ skip: 'beforeSave' });
-        
+
         middlewareTriggered.should.equal(false);
       });
-      
+
       it ('rollback middleware in case of a failure', function * () {
         let functionNames = [];
-      
+
         class Post extends Model {
           configure () {
             this.before('save', 'firstBeforeSave');
             this.before('save', 'secondBeforeSave');
             this.before('save', 'thirdBeforeSave');
           }
-        
+
           * firstBeforeSave (next) {
             yield* next;
           }
-        
+
           * secondBeforeSave (next) {
             throw new Error();
-          
+
             yield *next;
           }
-        
+
           * thirdBeforeSave (next) {
             yield* next;
           }
-        
+
           * rollback (method) {
             functionNames.push(method);
           }
         }
-      
+
         let data = postFixture();
         let post = new Post(data);
-      
+
         try {
           yield* post.save();
         } catch (err) {
@@ -1084,8 +1092,7 @@ describe ('Mongorito', function () {
       }
     }
 
-    let secondaryDb = Mongorito.connect('localhost/mongorito_test_2');
-
+    let secondaryDb = yield Mongorito.connect('localhost/mongorito_test_2');
     class Post2 extends Model {
       get db () {
         return secondaryDb;
@@ -1120,7 +1127,25 @@ describe ('Mongorito', function () {
     secondaryDb.close();
   });
 
+  it ('be able to yield a close call', function * (){
+    let secondaryDb = yield Mongorito.connect('localhost/mongorito_test_2');
+    yield secondaryDb.close();
+    secondaryDb = yield Mongorito.connect('localhost/mongorito_test_2');
+    yield secondaryDb.close();
+  });
+
+  it ('should fail mongo setup and reject', function * (){
+    let err;
+    try {
+      yield Mongorito.connect('badurl/nodb');
+    } catch (e) {
+      err = e;
+      e.name.should.equal('MongoError');
+    }
+    (typeof err).should.equal('object');
+  });
+
   after (function () {
-    Mongorito.disconnect();
+    Mongorito.close();
   });
 });

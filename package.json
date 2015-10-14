@@ -4,27 +4,27 @@
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
-    "bson": "^0.3.2",
+    "bson": "^0.4.16",
     "clone": "^1.0.2",
     "co-monk": "^1.0.0",
     "get-value": "^1.1.5",
     "is_js": "^0.7.4",
     "koa-compose": "^2.3.0",
     "lodash.result": "^3.1.2",
-    "mongodb": "^1.4.39",
-    "monk": "^1.0.1",
-    "object-assign": "^3.0.0",
+    "mongodb": "^2.0.45",
+    "object-assign": "^4.0.1",
     "pluralize": "^1.1.2",
     "set-value": "^0.2.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
     "chai": "^3.3.0",
-    "chance": "^0.7.7",
+    "chance": "^0.8.0",
     "istanbul-harmony": "^0.3.16",
     "make-lint": "vdemedes/make-lint",
     "mocha": "^2.3.3",
-    "mocha-generators": "^1.1.1"
+    "mocha-generators": "^1.1.1",
+    "rimraf": "^2.4.3"
   },
   "main": "./index.js",
   "files": [
@@ -32,8 +32,8 @@
     "lib"
   ],
   "scripts": {
-    "test": "make test",
-    "postinstall": "cd node_modules/monk/node_modules/mongodb && npm uninstall bson && cd ../../../; cd node_modules/mongodb && npm uninstall bson"
+    "test": "mocha --harmony test/mongorito.test",
+    "coverage": "istanbul cover _mocha --harmony test/mongorito.test"
   },
   "repository": {
     "type": "git",

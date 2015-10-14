@@ -1,0 +1,12 @@
+machine:
+  node:
+    version: 4.1.0
+
+dependencies:
+  cache_directories:
+    - mongo-linux-x86_64-3.0.7
+  pre:
+    - if [[ ! -d mongo-linux-x86_64-3.0.7 ]]; then wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.0.7.tgz && tar xzf mongodb-linux-x86_64-3.0.7.tgz; fi
+    - sudo /etc/init.d/mongodb stop
+    - sudo cp mongodb-linux-x86_64-3.0.7/bin/* /usr/bin
+    - sudo /etc/init.d/mongodb start
