@@ -20,7 +20,7 @@
   "devDependencies": {
     "chai": "^3.3.0",
     "chance": "^0.8.0",
-    "istanbul-harmony": "^0.3.16",
+    "istanbul": "^0.4.0",
     "mocha": "^2.3.3",
     "mocha-generators": "^1.1.1",
     "rimraf": "^2.4.3",
@@ -32,16 +32,10 @@
     "lib"
   ],
   "scripts": {
-    "test": "mocha --harmony test/mongorito.test",
-    "coverage": "istanbul cover _mocha --harmony test/mongorito.test"
+    "test": "make test",
+    "coverage": "make coverage"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vdemedes/mongorito"
-  },
-  "bugs": {
-    "url": "https://github.com/vdemedes/mongorito/issues"
-  },
+  "repository": "vdemedes/mongorito",
   "keywords": [
     "mongo",
     "mongodb",
