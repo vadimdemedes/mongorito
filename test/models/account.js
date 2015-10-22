@@ -12,7 +12,7 @@ const Model = require('../../').Model;
  */
 
 class Account extends Model {
-  
+
 }
 
 

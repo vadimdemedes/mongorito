@@ -30,20 +30,20 @@ const postFixture = require('./fixtures/post');
 * Tests
 */
 
-describe ('Mongorito', function () {
-	before (function * () {
+describe('Mongorito', function () {
+	before(function * () {
 		yield Mongorito.connect('mongodb://localhost/mongorito_test');
 	});
 
-	beforeEach (function * () {
+	beforeEach(function * () {
 		yield* Account.remove();
 		yield* Comment.remove();
 		yield* Post.remove();
 		yield* Task.remove();
 	});
 
-	describe ('Model', function () {
-		it ('expose mongodb module properties', function () {
+	describe('Model', function () {
+		it('expose mongodb module properties', function () {
 			const mongodb = require('mongodb');
 
 			let excludedKeys = [
@@ -61,12 +61,11 @@ describe ('Mongorito', function () {
 				}
 			});
 		});
-		it ('initialize model and manage attributes', function () {
-			let data, post, attrs;
 
-			data = postFixture();
-			post = new Post(data);
-			attrs = post.get();
+		it('initialize model and manage attributes', function () {
+			let data = postFixture();
+			let post = new Post(data);
+			let attrs = post.get();
 
 			attrs.should.deep.equal(data);
 
@@ -77,7 +76,7 @@ describe ('Mongorito', function () {
 			attrs.should.deep.equal(data);
 		});
 
-		it ('get nested property', function () {
+		it('get nested property', function () {
 			let data = postFixture();
 			let post = new Post(data);
 
@@ -86,7 +85,7 @@ describe ('Mongorito', function () {
 			author.should.equal(data.author.name);
 		});
 
-		it ('set nested property', function () {
+		it('set nested property', function () {
 			let data = postFixture();
 			let post = new Post(data);
 
@@ -94,7 +93,7 @@ describe ('Mongorito', function () {
 			post.get('author.name').should.equal('John Doe');
 		});
 
-		it ('correctly convert model to JSON', function () {
+		it('correctly convert model to JSON', function () {
 			let data = postFixture();
 			let post = new Post(data);
 
@@ -105,16 +104,16 @@ describe ('Mongorito', function () {
 			parsed.body.should.equal(data.body);
 		});
 
-		it ('remember previous attributes', function () {
+		it('remember previous attributes', function () {
 			let post = new Post({ title: 'Sad title' });
 			post.get('title').should.equal('Sad title');
 			post.set('title', 'Happy title');
 			post.previous.title.should.equal('Sad title');
 			post.get('title').should.equal('Happy title');
-			post.changed.title.should.be.true;
+			post.changed.title.should.equal(true);
 		});
 
-		it ('not remember anything if nothing changed', function () {
+		it('not remember anything if nothing changed', function () {
 			let post = new Post({ title: 'Sad title' });
 			post.get('title').should.equal('Sad title');
 			post.set('title', 'Sad title');
@@ -123,18 +122,18 @@ describe ('Mongorito', function () {
 			should.not.exist(post.changed.title);
 		});
 
-		it ('setup an index', function * () {
+		it('setup an index', function * () {
 			yield* Post.index('title');
 
 			let indexes = yield* Post.indexes();
-			indexes[indexes.length - 1].should.have.deep.property('name', 'title_1')
+			indexes[indexes.length - 1].should.have.deep.property('name', 'title_1');
 		});
 
-		it ('setup a unique index', function * () {
+		it('setup a unique index', function * () {
 			yield* Task.index('name', { unique: true });
 
 			let indexes = yield* Task.indexes();
-			indexes[indexes.length - 1].should.have.deep.property('name', 'name_1')
+			indexes[indexes.length - 1].should.have.deep.property('name', 'name_1');
 
 			let firstTask = new Task({ name: 'first' });
 			let secondTask = new Task({ name: 'first' });
@@ -153,7 +152,7 @@ describe ('Mongorito', function () {
 			(typeof err).should.equal('object');
 		});
 
-		it ('unset a property', function * () {
+		it('unset a property', function * () {
 			let data = { awesome: true };
 			let post = new Post(data);
 
@@ -172,7 +171,7 @@ describe ('Mongorito', function () {
 			should.not.exist(post.get('awesome'));
 		});
 
-		it ('create new a document', function * () {
+		it('create new a document', function * () {
 			let timestamp = Math.round(new Date().getTime() / 1000);
 
 			let data = postFixture();
@@ -192,7 +191,7 @@ describe ('Mongorito', function () {
 			updatedAt.should.equal(timestamp);
 		});
 
-		it ('create a new document with default values', function * () {
+		it('create a new document with default values', function * () {
 			let data = postFixture();
 			delete data.title;
 
@@ -202,7 +201,7 @@ describe ('Mongorito', function () {
 			post.get('title').should.equal('Default title');
 		});
 
-		it ('update a document', function * () {
+		it('update a document', function * () {
 			let createdAt = Math.round(new Date().getTime() / 1000);
 			let data = postFixture();
 			let post = new Post(data);
@@ -234,7 +233,7 @@ describe ('Mongorito', function () {
 			Math.round(updatedPost.get('updated_at').getTime() / 1000).should.equal(updatedAt);
 		});
 
-		it ('remove a document', function * () {
+		it('remove a document', function * () {
 			let post = new Post();
 			yield* post.save();
 
@@ -250,7 +249,7 @@ describe ('Mongorito', function () {
 			posts.length.should.equal(0);
 		});
 
-		it ('remove many documents', function * () {
+		it('remove many documents', function * () {
 			let n = 10;
 
 			while (n--) {
@@ -270,7 +269,7 @@ describe ('Mongorito', function () {
 			posts.length.should.equal(0);
 		});
 
-		it ('atomically increment a property', function * () {
+		it('atomically increment a property', function * () {
 			let data = postFixture();
 			let post = new Post(data);
 
@@ -291,8 +290,8 @@ describe ('Mongorito', function () {
 			post.get('views').should.equal(1);
 		});
 
-		describe ('Queries', function () {
-			it ('find all documents', function * () {
+		describe('Queries', function () {
+			it('find all documents', function * () {
 				let n = 10;
 
 				while (n--) {
@@ -311,7 +310,7 @@ describe ('Mongorito', function () {
 				});
 			});
 
-			it ('count all documents', function * () {
+			it('count all documents', function * () {
 				let n = 10;
 				let createdPosts = [];
 
@@ -327,7 +326,7 @@ describe ('Mongorito', function () {
 				posts.should.equal(10);
 			});
 
-			it ('find one document', function * () {
+			it('find one document', function * () {
 				let data = postFixture();
 				let post = new Post(data);
 				yield* post.save();
@@ -342,7 +341,7 @@ describe ('Mongorito', function () {
 				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			});
 
-			it ('find one document by Id', function * () {
+			it('find one document by Id', function * () {
 				let data = postFixture();
 				let post = new Post(data);
 				yield* post.save();
@@ -357,7 +356,7 @@ describe ('Mongorito', function () {
 				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			});
 
-			it ('find a document with .where()', function * () {
+			it('find a document with .where()', function * () {
 				let data = postFixture();
 				let post = new Post(data);
 				yield* post.save();
@@ -369,7 +368,7 @@ describe ('Mongorito', function () {
 				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			});
 
-			it ('find a document with .where() matching sub-properties', function * () {
+			it('find a document with .where() matching sub-properties', function * () {
 				let data = postFixture();
 				let post = new Post(data);
 				yield* post.save();
@@ -381,7 +380,7 @@ describe ('Mongorito', function () {
 				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			});
 
-			it ('find a document with .where() matching sub-documents using $elemMatch', function * () {
+			it('find a document with .where() matching sub-documents using $elemMatch', function * () {
 				let data = postFixture();
 				let post = new Post(data);
 				yield* post.save();
@@ -393,7 +392,7 @@ describe ('Mongorito', function () {
 				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			});
 
-			it ('find a document with .where() matching with regex', function * () {
+			it('find a document with .where() matching with regex', function * () {
 				let data = postFixture({ title: 'Something' });
 				let post = new Post(data);
 				yield* post.save();
@@ -405,7 +404,7 @@ describe ('Mongorito', function () {
 				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			});
 
-			it ('find documents with .limit()', function *() {
+			it('find documents with .limit()', function *() {
 				let n = 10;
 
 				while (n--) {
@@ -423,7 +422,7 @@ describe ('Mongorito', function () {
 				});
 			});
 
-			it ('find documents with .limit() and .skip()', function * () {
+			it('find documents with .limit() and .skip()', function * () {
 				let n = 10;
 
 				while (n--) {
@@ -441,7 +440,7 @@ describe ('Mongorito', function () {
 				});
 			});
 
-			it ('find documents with .exists()', function * () {
+			it('find documents with .exists()', function * () {
 				let n = 10;
 
 				while (n--) {
@@ -469,7 +468,7 @@ describe ('Mongorito', function () {
 				posts.length.should.equal(5);
 			});
 
-			it ('find documents with .lt(), .lte(), .gt(), .gte()', function * () {
+			it('find documents with .lt(), .lte(), .gt(), .gte()', function * () {
 				let n = 10;
 
 				while (n--) {
@@ -493,7 +492,7 @@ describe ('Mongorito', function () {
 				posts.length.should.equal(3);
 			});
 
-			it ('find documents with .or()', function * () {
+			it('find documents with .or()', function * () {
 				let firstPost = new Post(postFixture({
 					isPublic: true,
 					author: {
@@ -506,7 +505,7 @@ describe ('Mongorito', function () {
 					author: {
 						name: 'user2'
 					}
-				}))
+				}));
 
 				let thirdPost = new Post(postFixture({
 					isPublic: false,
@@ -526,7 +525,7 @@ describe ('Mongorito', function () {
 				posts[1].get('author').name.should.equal('user2');
 			});
 
-			it ('find documents with .and()', function * () {
+			it('find documents with .and()', function * () {
 				let firstPost = new Post(postFixture({
 					isPublic: true,
 					author: {
@@ -561,7 +560,7 @@ describe ('Mongorito', function () {
 				posts[1].get('title').should.equal('third');
 			});
 
-			it ('find documents with .in()', function * () {
+			it('find documents with .in()', function * () {
 				let n = 10;
 
 				while (n--) {
@@ -574,7 +573,7 @@ describe ('Mongorito', function () {
 				posts.length.should.equal(2);
 			});
 
-			it ('sort documents', function * () {
+			it('sort documents', function * () {
 				let n = 10;
 
 				while (n--) {
@@ -604,7 +603,7 @@ describe ('Mongorito', function () {
 				}
 			});
 
-			it ('populate the response', function * () {
+			it('populate the response', function * () {
 				let n = 3;
 				let comments = [];
 
@@ -639,7 +638,7 @@ describe ('Mongorito', function () {
 				});
 			});
 
-			it ('find documents and include only selected fields', function * () {
+			it('find documents and include only selected fields', function * () {
 				let post = new Post({
 					title: 'San Francisco',
 					featured: true
@@ -657,7 +656,7 @@ describe ('Mongorito', function () {
 				keys[1].should.equal('title');
 			});
 
-			it ('find documents and exclude selected fields', function * () {
+			it('find documents and exclude selected fields', function * () {
 				let post = new Post({
 					title: 'San Francisco',
 					featured: true
@@ -677,7 +676,7 @@ describe ('Mongorito', function () {
 				keys[3].should.equal('updated_at');
 			});
 
-			it ('search documents using text index', function * () {
+			it('search documents using text index', function * () {
 				try {
 					yield* Post.drop();
 				} catch (e) {
@@ -715,8 +714,8 @@ describe ('Mongorito', function () {
 			});
 		});
 
-		describe ('Hooks', function () {
-			it ('execute all hooks', function * () {
+		describe('Hooks', function () {
+			it('execute all hooks', function * () {
 				let hooks = [];
 
 				class Post extends Model {
@@ -859,7 +858,7 @@ describe ('Mongorito', function () {
 				hooks[3].should.equal('after:remove');
 			});
 
-			it ('abort if a hook throws an error', function * () {
+			it('abort if a hook throws an error', function * () {
 				let hooks = [];
 
 				class Post extends Model {
@@ -872,12 +871,10 @@ describe ('Mongorito', function () {
 						this.before('save', 'secondBeforeSave');
 					}
 
-					* firstBeforeSave (next) {
+					* firstBeforeSave () {
 						hooks.push('firstBeforeSave');
 
 						throw new Error('firstBeforeSave failed.');
-
-						yield* next;
 					}
 
 					* secondBeforeSave (next) {
@@ -905,7 +902,7 @@ describe ('Mongorito', function () {
 				}
 			});
 
-			it ('allow registration of hooks through an object, or with an array of methods', function * () {
+			it('allow registration of hooks through an object, or with an array of methods', function * () {
 				let hooks = [];
 
 				class Post extends Model {
@@ -998,7 +995,7 @@ describe ('Mongorito', function () {
 				hooks[10].should.equal('afterSave');
 			});
 
-			it ('skip selected middleware', function * () {
+			it('skip selected middleware', function * () {
 				let middlewareTriggered = false;
 
 				class Post extends Model {
@@ -1026,7 +1023,7 @@ describe ('Mongorito', function () {
 				middlewareTriggered.should.equal(false);
 			});
 
-			it ('rollback middleware in case of a failure', function * () {
+			it('rollback middleware in case of a failure', function * () {
 				let functionNames = [];
 
 				class Post extends Model {
@@ -1040,10 +1037,8 @@ describe ('Mongorito', function () {
 						yield* next;
 					}
 
-					* secondBeforeSave (next) {
+					* secondBeforeSave () {
 						throw new Error();
-
-						yield *next;
 					}
 
 					* thirdBeforeSave (next) {
@@ -1068,7 +1063,7 @@ describe ('Mongorito', function () {
 			});
 		});
 
-		it ('automatically set collection name', function * () {
+		it('automatically set collection name', function * () {
 			let account = new Account();
 			yield* account.save();
 
@@ -1079,7 +1074,7 @@ describe ('Mongorito', function () {
 		});
 	});
 
-	it ('be able to use multiple databases', function * () {
+	it('be able to use multiple databases', function * () {
 		// Post1 will be stored in first database
 		// Post2 will be stored in second database
 		class Post1 extends Model {
@@ -1106,15 +1101,13 @@ describe ('Mongorito', function () {
 		yield* Post1.remove();
 		yield* Post2.remove();
 
-		let posts, post;
-
-		post = new Post1({ title: 'Post in first db' });
+		let post = new Post1({ title: 'Post in first db' });
 		yield* post.save();
 
 		post = new Post2({ title: 'Post in second db' });
 		yield* post.save();
 
-		posts = yield* Post1.all();
+		let posts = yield* Post1.all();
 		posts.length.should.equal(1);
 		post = posts[0];
 		post.get('title').should.equal('Post in first db');
@@ -1127,25 +1120,28 @@ describe ('Mongorito', function () {
 		secondaryDb.close();
 	});
 
-	it ('be able to yield a close call', function * (){
+	it('be able to yield a close call', function * () {
 		let secondaryDb = yield Mongorito.connect('localhost/mongorito_test_2');
 		yield secondaryDb.close();
+
 		secondaryDb = yield Mongorito.connect('localhost/mongorito_test_2');
 		yield secondaryDb.close();
 	});
 
-	it ('should fail mongo setup and reject', function * (){
+	it('should fail mongo setup and reject', function * () {
 		let err;
+
 		try {
 			yield Mongorito.connect('badurl/nodb');
 		} catch (e) {
 			err = e;
 			e.name.should.equal('MongoError');
 		}
+
 		(typeof err).should.equal('object');
 	});
 
-	after (function () {
+	after(function () {
 		Mongorito.close();
 	});
 });

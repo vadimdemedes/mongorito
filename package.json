@@ -20,11 +20,12 @@
   "devDependencies": {
     "chai": "^3.3.0",
     "chance": "^0.8.0",
+    "eslint-config-vdemedes": "^1.0.0",
     "istanbul": "^0.4.0",
     "mocha": "^2.3.3",
     "mocha-generators": "^1.1.1",
     "rimraf": "^2.4.3",
-    "xo": "^0.9.0"
+    "xo": "sindresorhus/xo"
   },
   "main": "./index.js",
   "files": [
