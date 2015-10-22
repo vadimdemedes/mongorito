@@ -4,6 +4,7 @@
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
+    "array-generators": "^1.1.0",
     "bson": "^0.4.16",
     "clone": "^1.0.2",
     "co-monk": "^1.0.0",
@@ -17,14 +18,13 @@
     "set-value": "^0.2.0"
   },
   "devDependencies": {
-    "babel": "^5.8.23",
     "chai": "^3.3.0",
     "chance": "^0.8.0",
     "istanbul-harmony": "^0.3.16",
-    "make-lint": "vdemedes/make-lint",
     "mocha": "^2.3.3",
     "mocha-generators": "^1.1.1",
-    "rimraf": "^2.4.3"
+    "rimraf": "^2.4.3",
+    "xo": "^0.9.0"
   },
   "main": "./index.js",
   "files": [
@@ -51,5 +51,12 @@
     "odm",
     "es6"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "xo": {
+    "extends": "vdemedes",
+    "env": [
+      "node",
+      "mocha"
+    ]
+  }
 }
