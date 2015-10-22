@@ -32,8 +32,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "make test",
-    "coverage": "make coverage"
+    "test": "make lint && make test"
   },
   "repository": "vdemedes/mongorito",
   "keywords": [
