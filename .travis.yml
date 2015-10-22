@@ -1,9 +1,6 @@
 language: node_js
 node_js:
   - 'stable'
-  - '1'
-  - '2'
-  - '3'
 
 sudo: false
 addons:
