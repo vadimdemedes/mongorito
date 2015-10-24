@@ -14,7 +14,7 @@ Uses official [mongodb](https://www.npmjs.com/package/mongodb) driver under the 
 </h1>
 
 
-### Features
+## Features
 
 - Based on ES6 generators, which means **no callbacks**
 - Established API you've already used to
@@ -24,7 +24,7 @@ Uses official [mongodb](https://www.npmjs.com/package/mongodb) driver under the 
 - Using this module results in a beautiful code
 
 
-### Installation
+## Installation
 
 ```
 $ npm install mongorito --save
@@ -33,7 +33,7 @@ $ npm install mongorito --save
 **Note**: In order for the following examples to work, you need to use [co](https://github.com/tj/co) to run generators.
 
 
-### Usage
+## Usage
 
 ```js
 const Mongorito = require('mongorito');
@@ -78,21 +78,19 @@ posts = yield Post.where('title', /^node/i).find();
 ```
 
 
-### API
+## API
 
 Check out [Getting Started](http://mongorito.com/guides/getting-started) guide on [http://mongorito.com](http://mongorito.com).
 There are more guides available to learn more.
 
 
-### Tests
-
-[![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito)
+## Tests
 
 ```
-$ make test
+$ npm test
 ```
 
 
-### License
+## License
 
 Mongorito is released under the MIT License.
