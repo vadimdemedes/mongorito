@@ -34,7 +34,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "xo && mocha",
+    "test": "xo && nyc mocha",
     "coverage": "nyc npm test",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
