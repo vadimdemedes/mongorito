@@ -11,3 +11,4 @@ addons:
     packages:
       - mongodb-org-server
       - mongodb-org-shell
+after_success: npm run coveralls

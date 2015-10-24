@@ -1,4 +1,6 @@
-# Mongorito [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito)
+# Mongorito
+
+[![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito) [![Coverage Status](https://coveralls.io/repos/vdemedes/mongorito/badge.svg?branch=master&service=github)](https://coveralls.io/github/vdemedes/mongorito?branch=master)
 
 Awesome ES6 generator-based MongoDB ODM for Node.js v4.x (or newer).
 Just take a look on its pretty models and beautiful API.
