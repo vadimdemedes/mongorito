@@ -1022,45 +1022,6 @@ describe('Mongorito', function () {
 
 				middlewareTriggered.should.equal(false);
 			});
-
-			it('rollback middleware in case of a failure', function * () {
-				let functionNames = [];
-
-				class Post extends Model {
-					configure () {
-						this.before('save', 'firstBeforeSave');
-						this.before('save', 'secondBeforeSave');
-						this.before('save', 'thirdBeforeSave');
-					}
-
-					* firstBeforeSave (next) {
-						yield* next;
-					}
-
-					* secondBeforeSave () {
-						throw new Error();
-					}
-
-					* thirdBeforeSave (next) {
-						yield* next;
-					}
-
-					* rollback (method) {
-						functionNames.push(method);
-					}
-				}
-
-				let data = postFixture();
-				let post = new Post(data);
-
-				try {
-					yield* post.save();
-				} catch (err) {
-					functionNames.length.should.equal(2);
-					functionNames[0].should.equal('secondBeforeSave');
-					functionNames[1].should.equal('firstBeforeSave');
-				}
-			});
 		});
 
 		it('automatically set collection name', function * () {
