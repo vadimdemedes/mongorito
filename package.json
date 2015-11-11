@@ -17,14 +17,11 @@
     "set-value": "^0.2.0"
   },
   "devDependencies": {
-    "chai": "^3.3.0",
+    "ava": "^0.4.2",
     "chance": "^0.8.0",
     "coveralls": "^2.11.4",
     "eslint-config-vdemedes": "*",
-    "mocha": "^2.3.3",
-    "mocha-generators": "^1.1.1",
     "nyc": "^3.2.2",
-    "rimraf": "^2.4.3",
     "xo": "^0.10.0"
   },
   "main": "index.js",
@@ -33,7 +30,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "xo && nyc mocha",
+    "test": "xo && nyc ava --serial test/test.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": "vdemedes/mongorito",
