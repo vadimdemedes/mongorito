@@ -1,6 +1,7 @@
 language: node_js
 node_js:
-  - 'stable'
+  - '5'
+	- '4'
 
 sudo: false
 addons:
@@ -11,4 +12,5 @@ addons:
     packages:
       - mongodb-org-server
       - mongodb-org-shell
+
 after_success: npm run coveralls
