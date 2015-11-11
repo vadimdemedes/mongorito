@@ -341,7 +341,7 @@ describe('Mongorito', function () {
 				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 			});
 
-			it('find one document by Id', function * () {
+			it('find one document by id', function * () {
 				let data = postFixture();
 				let post = new Post(data);
 				yield* post.save();
@@ -350,6 +350,21 @@ describe('Mongorito', function () {
 				posts.length.should.equal(1);
 
 				let createdPost = yield* Post.findById(post.get('_id'));
+				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+
+				createdPost = yield* Post.findOne({ title: post.get('title') });
+				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
+			});
+
+			it('find one document by id string', function * () {
+				let data = postFixture();
+				let post = new Post(data);
+				yield* post.save();
+
+				let posts = yield* Post.all();
+				posts.length.should.equal(1);
+
+				let createdPost = yield* Post.findById(post.get('_id').toString());
 				createdPost.get('_id').toString().should.equal(post.get('_id').toString());
 
 				createdPost = yield* Post.findOne({ title: post.get('title') });
