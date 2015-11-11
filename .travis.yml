@@ -1,7 +1,7 @@
 language: node_js
 node_js:
   - '5'
-	- '4'
+  - '4'
 
 sudo: false
 addons:
