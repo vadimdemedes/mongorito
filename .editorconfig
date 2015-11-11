@@ -11,8 +11,5 @@ insert_final_newline = true
 [{package.json,*.yml}]
 indent_style = space
 
-[Makefile]
-indent_size = 4
-
 [*.md]
 trim_trailing_whitespace = false
