@@ -27,7 +27,7 @@
   "main": "index.js",
   "files": [
     "index.js",
-		"util",
+    "util",
     "lib"
   ],
   "scripts": {
