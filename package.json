@@ -1,6 +1,6 @@
 {
   "name": "mongorito",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
@@ -27,7 +27,7 @@
   "main": "index.js",
   "files": [
     "index.js",
-		"util",
+    "util",
     "lib"
   ],
   "scripts": {
