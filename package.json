@@ -5,6 +5,7 @@
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
     "array-generators": "^1.1.0",
+    "class-extend": "^0.1.2",
     "clone": "^1.0.2",
     "get-value": "^1.3.1",
     "is_js": "^0.7.4",

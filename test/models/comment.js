@@ -11,9 +11,9 @@ const Model = require('../../').Model;
  * Comment model
  */
 
-class Comment extends Model {
-
-}
+const Comment = Model.extend({
+	collection: 'comments'
+});
 
 
 /**
