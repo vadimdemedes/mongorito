@@ -56,8 +56,6 @@ test('expose mongodb properties', function (t) {
 			t.is(mongorito[key], mongodb[key]);
 		}
 	});
-
-	t.end();
 });
 
 test('initialize and manage attributes', function (t) {
@@ -70,8 +68,6 @@ test('initialize and manage attributes', function (t) {
 	post.set(data);
 	attrs = post.get();
 	t.same(attrs, data);
-
-	t.end();
 });
 
 test('get property', function (t) {
@@ -80,8 +76,6 @@ test('get property', function (t) {
 
 	let author = post.get('author.name');
 	t.is(author, data.author.name);
-
-	t.end();
 });
 
 test('set property', function (t) {
@@ -92,8 +86,6 @@ test('set property', function (t) {
 
 	let author = post.get('author.name');
 	t.is(author, 'John Doe');
-
-	t.end();
 });
 
 test('unset property', function * (t) {
@@ -145,8 +137,6 @@ test('convert to JSON', function (t) {
 	let json = JSON.stringify(post);
 	let parsed = JSON.parse(json);
 	t.same(parsed, attrs);
-
-	t.end();
 });
 
 test('remember previous attributes', function (t) {
@@ -157,8 +147,6 @@ test('remember previous attributes', function (t) {
 	t.is(post.previous.title, 'Sad title');
 	t.is(post.get('title'), 'Happy title');
 	t.true(post.changed.title);
-
-	t.end();
 });
 
 test('if nothing changed, no previous value stored', function (t) {
@@ -169,8 +157,6 @@ test('if nothing changed, no previous value stored', function (t) {
 	t.notOk(post.previous.title);
 	t.notOk(post.changed.title);
 	t.is(post.get('title'), 'Sad title');
-
-	t.end();
 });
 
 test('setup an index', function * (t) {
