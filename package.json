@@ -14,7 +14,7 @@
     "mongodb": "^2.0.48",
     "object-assign": "^4.0.1",
     "pluralize": "^1.2.1",
-    "set-value": "^0.2.0"
+    "set-value": "^0.3.2"
   },
   "devDependencies": {
     "ava": "^0.8.0",
