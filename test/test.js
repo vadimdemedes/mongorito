@@ -240,6 +240,20 @@ test('update', function * (t) {
 	t.false(post.get('awesome'));
 });
 
+test('update `updated_at` attribute', function * (t) {
+	let post = new Post();
+	yield* post.save();
+
+	let prevDate = post.get('updated_at').getTime();
+
+	post.set('awesome', true);
+	yield* post.save();
+
+	let nextDate = post.get('updated_at').getTime();
+
+	t.not(prevDate, nextDate);
+});
+
 test('remove', function * (t) {
 	let post = new Post();
 	yield* post.save();
