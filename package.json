@@ -4,12 +4,13 @@
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
-    "array-generators": "^1.1.0",
+    "bluebird": "^3.1.1",
     "class-extend": "^0.1.2",
     "clone": "^1.0.2",
+    "co": "^4.6.0",
     "get-value": "^2.0.2",
+    "is-generator-fn": "^1.0.0",
     "is_js": "^0.7.4",
-    "koa-compose": "^2.3.0",
     "lodash.result": "^3.1.2",
     "mongodb": "^2.0.48",
     "object-assign": "^4.0.1",
@@ -22,7 +23,7 @@
     "coveralls": "^2.11.4",
     "eslint-config-vdemedes": "*",
     "nyc": "^5.0.0",
-    "xo": "^0.11.2"
+    "xo": "^0.12.1"
   },
   "main": "index.js",
   "files": [
@@ -47,9 +48,14 @@
   "license": "MIT",
   "xo": {
     "extends": "vdemedes",
+    "esnext": true,
     "env": [
       "node",
       "mocha"
-    ]
+    ],
+    "rules": {
+      "prefer-arrow-callback": 0,
+      "prefer-spread": 0
+    }
   }
 }
