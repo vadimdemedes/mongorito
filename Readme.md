@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito) [![Coverage Status](https://coveralls.io/repos/vdemedes/mongorito/badge.svg?branch=master&service=github)](https://coveralls.io/github/vdemedes/mongorito?branch=master)
 
-Awesome ES6 generator-based MongoDB ODM for Node.js v4.x (or newer).
-Just take a look on its pretty models and beautiful API.
+Awesome MongoDB ODM for Node.js apps.
+Just take a look on its beautiful models and API.
 Uses official [mongodb](https://www.npmjs.com/package/mongodb) driver under the hood.
 
 <h1 align="center">
@@ -16,7 +16,7 @@ Uses official [mongodb](https://www.npmjs.com/package/mongodb) driver under the 
 
 ## Features
 
-- Based on ES6 generators, which means **no callbacks**
+- Based on Promises, which means **no callbacks**
 - Established API you've already used to
 - Hooks (before:save, around:create, after:remove, etc)
 - Very simple and easy-to-understand implementation
@@ -30,17 +30,17 @@ Uses official [mongodb](https://www.npmjs.com/package/mongodb) driver under the 
 $ npm install mongorito --save
 ```
 
-**Note**: In order for the following examples to work, you need to use [co](https://github.com/tj/co) to run generators.
-
 
 ## Usage
+
+Quick overview of basic functionality Mongorito provides:
 
 ```js
 const Mongorito = require('mongorito');
 const Model = Mongorito.Model;
 
 // connect to localhost/blog
-yield Mongorito.connect('localhost/blog');
+Mongorito.connect('localhost/blog');
 
 
 // define model
@@ -58,23 +58,23 @@ let post = new Post({
     }
 });
 
-yield post.save();
+post.save().then(() => {
+	// post created
+});
 
 
 // update document
 post.set('title', 'Post got a new title!');
 post.set('author.name', 'Doe John');
 
-yield post.save();
-
-// find posts where body equals "Long post body"
-let posts = yield Post.where('body', 'Long post body').find();
+post.save().then(() => {
+	// post updated
+});
 
 // find posts where author's name equals "John Doe"
-posts = yield Post.where('author.name', 'John Doe').find();
-
-// Bonus: find posts where title starts with "Node"
-posts = yield Post.where('title', /^node/i).find();
+Post.where('author.name', 'John Doe').find().then(posts => {
+	// done
+});
 ```
 
 

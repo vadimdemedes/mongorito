@@ -26,22 +26,22 @@ const after = test.after;
  * Tests
  */
 
-before(function * () {
-	yield mongorito.connect('localhost/mongorito_test');
+before(async () => {
+	await mongorito.connect('localhost/mongorito_test');
 });
 
-after(function * () {
-	yield mongorito.disconnect();
+after(async () => {
+	await mongorito.disconnect();
 });
 
-beforeEach(function * () {
-	yield* Account.remove();
-	yield* Comment.remove();
-	yield* Post.remove();
-	yield* Task.remove();
+beforeEach(async () => {
+	await Account.remove();
+	await Comment.remove();
+	await Post.remove();
+	await Task.remove();
 });
 
-test('expose mongodb properties', function (t) {
+test('expose mongodb properties', t => {
 	const mongodb = require('mongodb');
 
 	let excludedKeys = [
@@ -51,14 +51,14 @@ test('expose mongodb properties', function (t) {
 		'db'
 	];
 
-	Object.keys(mongodb).forEach(function (key) {
+	Object.keys(mongodb).forEach(key => {
 		if (excludedKeys.indexOf(key) === -1) {
 			t.is(mongorito[key], mongodb[key]);
 		}
 	});
 });
 
-test('initialize and manage attributes', function (t) {
+test('initialize and manage attributes', t => {
 	let data = postFixture();
 	let post = new Post(data);
 	let attrs = post.get();
@@ -70,7 +70,7 @@ test('initialize and manage attributes', function (t) {
 	t.same(attrs, data);
 });
 
-test('get property', function (t) {
+test('get property', t => {
 	let data = postFixture();
 	let post = new Post(data);
 
@@ -78,7 +78,7 @@ test('get property', function (t) {
 	t.is(author, data.author.name);
 });
 
-test('set property', function (t) {
+test('set property', t => {
 	let data = postFixture();
 	let post = new Post(data);
 
@@ -88,40 +88,40 @@ test('set property', function (t) {
 	t.is(author, 'John Doe');
 });
 
-test('unset property', function * (t) {
+test('unset property', async t => {
 	let data = { awesome: true };
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
 	t.true(post.get('awesome'));
 
 	post.unset('awesome');
-	yield* post.save();
+	await post.save();
 
 	t.notOk(post.get('awesome'));
 
-	post = yield* Post.findOne();
+	post = await Post.findOne();
 	t.notOk(post.get('awesome'));
 });
 
-test('increment property', function * (t) {
+test('increment property', async t => {
 	let post = new Post({ views: 1 });
-	yield* post.save();
+	await post.save();
 
 	t.is(post.get('views'), 1);
 
-	yield* post.inc({ views: 1 });
+	await post.inc({ views: 1 });
 
 	t.is(post.get('views'), 2);
 });
 
-test('fail if incrementing property on unsaved document', function * (t) {
+test('fail if incrementing property on unsaved document', async t => {
 	let post = new Post({ views: 1 });
 
 	let isFailed = false;
 
 	try {
-		yield* post.inc({ views: 1 });
+		await post.inc({ views: 1 });
 	} catch (_) {
 		isFailed = true;
 	}
@@ -129,7 +129,7 @@ test('fail if incrementing property on unsaved document', function * (t) {
 	t.true(isFailed);
 });
 
-test('convert to JSON', function (t) {
+test('convert to JSON', t => {
 	let data = postFixture();
 	let post = new Post(data);
 	let attrs = post.get();
@@ -139,7 +139,7 @@ test('convert to JSON', function (t) {
 	t.same(parsed, attrs);
 });
 
-test('remember previous attributes', function (t) {
+test('remember previous attributes', t => {
 	let post = new Post({ title: 'Sad title' });
 	t.is(post.get('title'), 'Sad title');
 
@@ -149,7 +149,7 @@ test('remember previous attributes', function (t) {
 	t.true(post.changed.title);
 });
 
-test('if nothing changed, no previous value stored', function (t) {
+test('if nothing changed, no previous value stored', t => {
 	let post = new Post({ title: 'Sad title' });
 	t.is(post.get('title'), 'Sad title');
 
@@ -159,10 +159,10 @@ test('if nothing changed, no previous value stored', function (t) {
 	t.is(post.get('title'), 'Sad title');
 });
 
-test('setup an index', function * (t) {
-	yield* Post.index('title');
+test('setup an index', async t => {
+	await Post.index('title');
 
-	let indexes = yield* Post.indexes();
+	let indexes = await Post.indexes();
 	let lastIndex = indexes[indexes.length - 1];
 	t.same(lastIndex, {
 		v: 1,
@@ -174,10 +174,10 @@ test('setup an index', function * (t) {
 	});
 });
 
-test('setup a unique index', function * (t) {
-	yield* Task.index('name', { unique: true });
+test('setup a unique index', async t => {
+	await Task.index('name', { unique: true });
 
-	let indexes = yield* Task.indexes();
+	let indexes = await Task.indexes();
 	let lastIndex = indexes[indexes.length - 1];
 	t.same(lastIndex, {
 		v: 1,
@@ -189,12 +189,12 @@ test('setup a unique index', function * (t) {
 		ns: 'mongorito_test.tasks'
 	});
 
-	yield* new Task({ name: 'first' }).save();
+	await new Task({ name: 'first' }).save();
 
 	let err;
 
 	try {
-		yield* new Task({ name: 'first' }).save();
+		await new Task({ name: 'first' }).save();
 	} catch (e) {
 		err = e;
 	}
@@ -203,11 +203,11 @@ test('setup a unique index', function * (t) {
 	t.is(err.name, 'MongoError');
 });
 
-test('create', function * (t) {
+test('create', async t => {
 	let post = new Post();
-	yield* post.save();
+	await post.save();
 
-	let posts = yield* Post.all();
+	let posts = await Post.all();
 	t.is(posts.length, 1);
 
 	let createdPost = posts[0];
@@ -216,85 +216,85 @@ test('create', function * (t) {
 	t.ok(createdPost.get('updated_at'));
 });
 
-test('create with default values', function * (t) {
+test('create with default values', async t => {
 	let data = postFixture();
 	delete data.title;
 
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
 	t.is(post.get('title'), 'Default title');
 });
 
-test('update', function * (t) {
+test('update', async t => {
 	let post = new Post({ awesome: true });
-	yield* post.save();
+	await post.save();
 
-	post = yield* Post.findOne();
+	post = await Post.findOne();
 	t.true(post.get('awesome'));
 
 	post.set('awesome', false);
-	yield* post.save();
+	await post.save();
 
-	post = yield* Post.findOne();
+	post = await Post.findOne();
 	t.false(post.get('awesome'));
 });
 
-test('update `updated_at` attribute', function * (t) {
+test('update `updated_at` attribute', async t => {
 	let post = new Post();
-	yield* post.save();
+	await post.save();
 
 	let prevDate = post.get('updated_at').getTime();
 
 	post.set('awesome', true);
-	yield* post.save();
+	await post.save();
 
 	let nextDate = post.get('updated_at').getTime();
 
 	t.not(prevDate, nextDate);
 });
 
-test('remove', function * (t) {
+test('remove', async t => {
 	let post = new Post();
-	yield* post.save();
+	await post.save();
 
-	let posts = yield* Post.count();
+	let posts = await Post.count();
 	t.is(posts, 1);
 
-	yield* post.remove();
+	await post.remove();
 
-	posts = yield* Post.count();
+	posts = await Post.count();
 	t.is(posts, 0);
 });
 
-test('remove by criteria', function * (t) {
-	yield* new Post({ awesome: true }).save();
-	yield* new Post({ awesome: false }).save();
+test('remove by criteria', async t => {
+	await new Post({ awesome: true }).save();
+	await new Post({ awesome: false }).save();
 
-	let posts = yield* Post.find();
+	let posts = await Post.find();
 	t.is(posts.length, 2);
 
-	yield* Post.remove({ awesome: false });
+	await Post.remove({ awesome: false });
 
-	posts = yield* Post.find();
+	posts = await Post.find();
 	t.is(posts.length, 1);
 	t.true(posts[0].get('awesome'));
 });
 
-test('remove all documents', function * (t) {
-	yield* new Post().save();
-	yield* new Post().save();
+test('remove all documents', async t => {
+	await new Post().save();
+	await new Post().save();
 
-	let posts = yield* Post.count();
+	let posts = await Post.count();
 	t.is(posts, 2);
 
-	yield* Post.remove();
+	await Post.remove();
 
-	posts = yield* Post.count();
+	posts = await Post.count();
 	t.is(posts, 0);
 });
 
-test('find all documents', function * (t) {
+test('find all documents', async t => {
 	t.plan(5);
 
 	let savedPosts = [];
@@ -302,15 +302,15 @@ test('find all documents', function * (t) {
 
 	while (n--) {
 		let post = new Post();
-		yield* post.save();
+		await post.save();
 
 		savedPosts.push(post);
 	}
 
-	let posts = yield* Post.all();
+	let posts = await Post.all();
 	t.is(posts.length, 4);
 
-	posts.forEach(function (post, index) {
+	posts.forEach((post, index) => {
 		let actualId = post.get('_id').toString();
 		let expectedId = savedPosts[index].get('_id').toString();
 
@@ -318,72 +318,72 @@ test('find all documents', function * (t) {
 	});
 });
 
-test('count all documents', function * (t) {
-	let posts = yield* Post.count();
+test('count all documents', async t => {
+	let posts = await Post.count();
 	t.is(posts, 0);
 
-	yield* new Post().save();
-	yield* new Post().save();
+	await new Post().save();
+	await new Post().save();
 
-	posts = yield* Post.count();
+	posts = await Post.count();
 	t.is(posts, 2);
 });
 
-test('count by criteria', function * (t) {
-	let posts = yield* Post.count();
+test('count by criteria', async t => {
+	let posts = await Post.count();
 	t.is(posts, 0);
 
-	yield* new Post({ awesome: true }).save();
-	yield* new Post({ awesome: false }).save();
+	await new Post({ awesome: true }).save();
+	await new Post({ awesome: false }).save();
 
-	posts = yield* Post.count({ awesome: true });
+	posts = await Post.count({ awesome: true });
 	t.is(posts, 1);
 });
 
-test('find one document', function * (t) {
+test('find one document', async t => {
 	let createdPost = new Post();
-	yield* createdPost.save();
+	await createdPost.save();
 
-	let posts = yield* Post.count();
+	let posts = await Post.count();
 	t.is(posts, 1);
 
-	let post = yield* Post.findOne();
+	let post = await Post.findOne();
 	let actualId = post.get('_id').toString();
 	let expectedId = createdPost.get('_id').toString();
 
 	t.is(actualId, expectedId);
 });
 
-test('find one document by id', function * (t) {
+test('find one document by id', async t => {
 	let data = postFixture();
 	let createdPost = new Post(data);
-	yield* createdPost.save();
+	await createdPost.save();
 
-	let posts = yield* Post.count();
+	let posts = await Post.count();
 	t.is(posts, 1);
 
-	let post = yield* Post.findById(createdPost.get('_id'));
+	let post = await Post.findById(createdPost.get('_id'));
 	t.is(post.get('title'), data.title);
 });
 
-test('find one document by id string', function * (t) {
+test('find one document by id string', async t => {
 	let data = postFixture();
 	let createdPost = new Post(data);
-	yield* createdPost.save();
+	await createdPost.save();
 
-	let posts = yield* Post.count();
+	let posts = await Post.count();
 	t.is(posts, 1);
 
-	let post = yield* Post.findById(createdPost.get('_id').toString());
+	let post = await Post.findById(createdPost.get('_id').toString());
 	t.is(post.get('title'), data.title);
 });
 
-test('find a document with .where()', function * (t) {
+test('find a document with .where()', async t => {
 	let data = postFixture();
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
-	let posts = yield* Post.where('title', data.title).find();
+	let posts = await Post.where('title', data.title).find();
 	t.is(posts.length, 1);
 
 	let actualId = posts[0].get('_id').toString();
@@ -391,12 +391,12 @@ test('find a document with .where()', function * (t) {
 	t.is(actualId, expectedId);
 });
 
-test('find a document with .where() matching sub-properties', function * (t) {
+test('find a document with .where() matching sub-properties', async t => {
 	let data = postFixture();
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
-	let posts = yield* Post.where('author.name', data.author.name).find();
+	let posts = await Post.where('author.name', data.author.name).find();
 	t.is(posts.length, 1);
 
 	let actualId = posts[0].get('_id').toString();
@@ -404,12 +404,12 @@ test('find a document with .where() matching sub-properties', function * (t) {
 	t.is(actualId, expectedId);
 });
 
-test('find a document with .where() matching sub-documents using $elemMatch', function * (t) {
+test('find a document with .where() matching sub-documents using $elemMatch', async t => {
 	let data = postFixture();
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
-	let posts = yield* Post.where('comments').matches({ body: data.comments[0].body }).find();
+	let posts = await Post.where('comments').matches({ body: data.comments[0].body }).find();
 	t.is(posts.length, 1);
 
 	let actualId = posts[0].get('_id').toString();
@@ -417,12 +417,12 @@ test('find a document with .where() matching sub-documents using $elemMatch', fu
 	t.is(actualId, expectedId);
 });
 
-test('find a document with .where() matching with regex', function * (t) {
+test('find a document with .where() matching with regex', async t => {
 	let data = postFixture({ title: 'Something' });
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
-	let posts = yield* Post.where('title', /something/i).find();
+	let posts = await Post.where('title', /something/i).find();
 	t.is(posts.length, 1);
 
 	let actualId = posts[0].get('_id').toString();
@@ -430,7 +430,7 @@ test('find a document with .where() matching with regex', function * (t) {
 	t.is(actualId, expectedId);
 });
 
-test('find documents with .limit()', function * (t) {
+test('find documents with .limit()', async t => {
 	t.plan(3);
 
 	let createdPosts = [];
@@ -438,22 +438,22 @@ test('find documents with .limit()', function * (t) {
 
 	while (n--) {
 		let post = new Post();
-		yield* post.save();
+		await post.save();
 
 		createdPosts.push(post);
 	}
 
-	let posts = yield* Post.limit(2).find();
+	let posts = await Post.limit(2).find();
 	t.is(posts.length, 2);
 
-	posts.forEach(function (post, index) {
+	posts.forEach((post, index) => {
 		let actualId = post.get('_id').toString();
 		let expectedId = createdPosts[index].get('_id').toString();
 		t.is(actualId, expectedId);
 	});
 });
 
-test('find documents with .limit() and .skip()', function * (t) {
+test('find documents with .limit() and .skip()', async t => {
 	t.plan(3);
 
 	let createdPosts = [];
@@ -461,22 +461,22 @@ test('find documents with .limit() and .skip()', function * (t) {
 
 	while (n--) {
 		let post = new Post();
-		yield* post.save();
+		await post.save();
 
 		createdPosts.push(post);
 	}
 
-	let posts = yield* Post.limit(2).skip(1).find();
+	let posts = await Post.limit(2).skip(1).find();
 	t.is(posts.length, 2);
 
-	posts.forEach(function (post, index) {
+	posts.forEach((post, index) => {
 		let actualId = post.get('_id').toString();
 		let expectedId = createdPosts[1 + index].get('_id').toString();
 		t.is(actualId, expectedId);
 	});
 });
 
-test('find documents with .exists()', function * (t) {
+test('find documents with .exists()', async t => {
 	let n = 5;
 
 	while (n--) {
@@ -486,45 +486,45 @@ test('find documents with .exists()', function * (t) {
 		}
 
 		let post = new Post(data);
-		yield* post.save();
+		await post.save();
 	}
 
-	let posts = yield* Post.exists('body').find();
+	let posts = await Post.exists('body').find();
 	t.is(posts.length, 3);
 
-	posts = yield* Post.where('body').exists().find();
+	posts = await Post.where('body').exists().find();
 	t.is(posts.length, 3);
 
-	posts = yield* Post.exists('body', false).find();
+	posts = await Post.exists('body', false).find();
 	t.is(posts.length, 2);
 
-	posts = yield* Post.where('body').exists(false).find();
+	posts = await Post.where('body').exists(false).find();
 	t.is(posts.length, 2);
 });
 
-test('find documents with .lt(), .lte(), .gt(), .gte()', function * (t) {
+test('find documents with .lt(), .lte(), .gt(), .gte()', async t => {
 	let n = 10;
 
 	while (n--) {
 		let data = postFixture({ index: n });
 		let post = new Post(data);
-		yield* post.save();
+		await post.save();
 	}
 
-	let posts = yield* Post.where('index').lt(5).find();
+	let posts = await Post.where('index').lt(5).find();
 	t.is(posts.length, 5);
 
-	posts = yield* Post.where('index').lte(5).find();
+	posts = await Post.where('index').lte(5).find();
 	t.is(posts.length, 6);
 
-	posts = yield* Post.where('index').gt(7).find();
+	posts = await Post.where('index').gt(7).find();
 	t.is(posts.length, 2);
 
-	posts = yield* Post.where('index').gte(7).find();
+	posts = await Post.where('index').gte(7).find();
 	t.is(posts.length, 3);
 });
 
-test('find documents with .or()', function * (t) {
+test('find documents with .or()', async t => {
 	let firstPost = new Post({
 		isPublic: true,
 		author: {
@@ -546,17 +546,17 @@ test('find documents with .or()', function * (t) {
 		}
 	});
 
-	yield* firstPost.save();
-	yield* secondPost.save();
-	yield* thirdPost.save();
+	await firstPost.save();
+	await secondPost.save();
+	await thirdPost.save();
 
-	let posts = yield* Post.or({ isPublic: true }, { 'author.name': 'user2' }).find();
+	let posts = await Post.or({ isPublic: true }, { 'author.name': 'user2' }).find();
 	t.is(posts.length, 2);
 	t.is(posts[0].get('author.name'), 'user1');
 	t.is(posts[1].get('author.name'), 'user2');
 });
 
-test('find documents with .and()', function * (t) {
+test('find documents with .and()', async t => {
 	let firstPost = new Post({
 		isPublic: true,
 		author: {
@@ -580,38 +580,38 @@ test('find documents with .and()', function * (t) {
 		title: 'third'
 	});
 
-	yield* firstPost.save();
-	yield* secondPost.save();
-	yield* thirdPost.save();
+	await firstPost.save();
+	await secondPost.save();
+	await thirdPost.save();
 
-	let posts = yield* Post.and({ isPublic: false }, { 'author.name': 'user2' }).find();
+	let posts = await Post.and({ isPublic: false }, { 'author.name': 'user2' }).find();
 	t.is(posts.length, 2);
 	t.is(posts[0].get('title'), 'second');
 	t.is(posts[1].get('title'), 'third');
 });
 
-test('find documents with .in()', function * (t) {
+test('find documents with .in()', async t => {
 	let n = 10;
 
 	while (n--) {
 		let data = postFixture({ index: n });
 		let post = new Post(data);
-		yield* post.save();
+		await post.save();
 	}
 
-	let posts = yield* Post.where('index').in([4, 5]).find();
+	let posts = await Post.where('index').in([4, 5]).find();
 	t.is(posts.length, 2);
 });
 
-test('sort documents', function * (t) {
+test('sort documents', async t => {
 	let n = 4;
 
 	while (n--) {
 		let post = new Post({ index: n });
-		yield* post.save();
+		await post.save();
 	}
 
-	let posts = yield* Post.sort({ _id: -1 }).find();
+	let posts = await Post.sort({ _id: -1 }).find();
 	t.is(posts.length, 4);
 
 	n = 4;
@@ -621,7 +621,7 @@ test('sort documents', function * (t) {
 		t.is(post.get('index'), n);
 	}
 
-	posts = yield* Post.sort({ _id: 1 }).find();
+	posts = await Post.sort({ _id: 1 }).find();
 	t.is(posts.length, 4);
 
 	n = 4;
@@ -632,30 +632,28 @@ test('sort documents', function * (t) {
 	}
 });
 
-test('populate the response', function * (t) {
+test('populate the response', async t => {
 	let n = 3;
 	let comments = [];
 
 	while (n--) {
 		let data = commentFixture();
 		let comment = new Comment(data);
-		yield* comment.save();
+		await comment.save();
 
 		comments.push(comment);
 	}
 
 	let data = postFixture({
-		comments: comments.map(function (comment) {
-			return comment.get('_id');
-		})
+		comments: comments.map(comment => comment.get('_id'))
 	});
 
 	let createdPost = new Post(data);
-	yield* createdPost.save();
+	await createdPost.save();
 
-	let post = yield* Post.populate('comments', Comment).findOne();
+	let post = await Post.populate('comments', Comment).findOne();
 
-	post.get('comments').forEach(function (comment, index) {
+	post.get('comments').forEach((comment, index) => {
 		let actualId = comment.get('_id').toString();
 		let expectedId = comments[index].get('_id').toString();
 		t.is(actualId, expectedId);
@@ -663,56 +661,56 @@ test('populate the response', function * (t) {
 
 	// now confirm that populated documents
 	// don't get saved to database
-	yield* post.save();
+	await post.save();
 
-	post = yield* Post.findOne();
-	post.get('comments').forEach(function (id, index) {
+	post = await Post.findOne();
+	post.get('comments').forEach((id, index) => {
 		let expectedId = comments[index].get('_id').toString();
 		let actualId = id.toString();
 		t.is(actualId, expectedId);
 	});
 });
 
-test('find documents and include only selected fields', function * (t) {
+test('find documents and include only selected fields', async t => {
 	let post = new Post({
 		title: 'San Francisco',
 		featured: true
 	});
 
-	yield* post.save();
+	await post.save();
 
-	let posts = yield* Post.include('title').find();
+	let posts = await Post.include('title').find();
 	let attrs = posts[0].toJSON();
 	let keys = Object.keys(attrs);
 	t.same(keys, ['_id', 'title']);
 });
 
-test('find documents and exclude selected fields', function * (t) {
+test('find documents and exclude selected fields', async t => {
 	let post = new Post({
 		title: 'San Francisco',
 		featured: true
 	});
 
-	yield* post.save();
+	await post.save();
 
-	let posts = yield* Post.exclude('title').find();
+	let posts = await Post.exclude('title').find();
 	let attrs = posts[0].toJSON();
 	let keys = Object.keys(attrs);
 	t.same(keys, ['_id', 'featured', 'created_at', 'updated_at']);
 });
 
-test('search documents using text index', function * (t) {
+test('search documents using text index', async t => {
 	try {
-		yield* Post.drop();
+		await Post.drop();
 	} catch (_) {}
 
-	yield* new Post({ title: 'San Francisco' }).save();
-	yield* new Post({ title: 'New York' }).save();
-	yield* new Post({ title: 'San Fran' }).save();
+	await new Post({ title: 'San Francisco' }).save();
+	await new Post({ title: 'New York' }).save();
+	await new Post({ title: 'San Fran' }).save();
 
-	yield* Post.index({ title: 'text' });
+	await Post.index({ title: 'text' });
 
-	let posts = yield* Post.search('San').sort('score', {
+	let posts = await Post.search('San').sort('score', {
 		'$meta': 'textScore'
 	}).include('score', {
 		'$meta': 'textScore'
@@ -723,7 +721,7 @@ test('search documents using text index', function * (t) {
 	t.is(posts[1].get('title'), 'San Fran');
 });
 
-test('execute all hooks', function * (t) {
+test('execute all hooks', async t => {
 	let hooks = [];
 
 	class Post extends Model {
@@ -750,85 +748,61 @@ test('execute all hooks', function * (t) {
 		}
 
 		// Save hooks
-		* beforeSave (next) {
+		* beforeSave () {
 			hooks.push('before:save');
-
-			yield* next;
 		}
 
-		* afterSave (next) {
+		* afterSave () {
 			hooks.push('after:save');
-
-			yield* next;
 		}
 
-		* aroundSave (next) {
+		* aroundSave () {
 			hooks.push('around:save');
-
-			yield* next;
 		}
 
 		// Create hooks
-		* beforeCreate (next) {
+		* beforeCreate () {
 			hooks.push('before:create');
-
-			yield* next;
 		}
 
-		* afterCreate (next) {
+		* afterCreate () {
 			hooks.push('after:create');
-
-			yield* next;
 		}
 
-		* aroundCreate (next) {
+		* aroundCreate () {
 			hooks.push('around:create');
-
-			yield* next;
 		}
 
 		// Update hooks
-		* beforeUpdate (next) {
+		* beforeUpdate () {
 			hooks.push('before:update');
-
-			yield* next;
 		}
 
-		* afterUpdate (next) {
+		* afterUpdate () {
 			hooks.push('after:update');
-
-			yield* next;
 		}
 
-		* aroundUpdate (next) {
+		* aroundUpdate () {
 			hooks.push('around:update');
-
-			yield* next;
 		}
 
 		// Remove hooks
-		* beforeRemove (next) {
+		* beforeRemove () {
 			hooks.push('before:remove');
-
-			yield* next;
 		}
 
-		* afterRemove (next) {
+		* afterRemove () {
 			hooks.push('after:remove');
-
-			yield* next;
 		}
 
-		* aroundRemove (next) {
+		* aroundRemove () {
 			hooks.push('around:remove');
-
-			yield* next;
 		}
 	}
 
 	let data = postFixture();
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
 	t.same(hooks, [
 		'before:create',
@@ -844,7 +818,7 @@ test('execute all hooks', function * (t) {
 	hooks = [];
 
 	post.set('title', 'New title');
-	yield* post.save();
+	await post.save();
 
 	t.same(hooks, [
 		'before:update',
@@ -859,7 +833,7 @@ test('execute all hooks', function * (t) {
 
 	hooks = [];
 
-	yield* post.remove();
+	await post.remove();
 
 	t.same(hooks, [
 		'before:remove',
@@ -869,7 +843,7 @@ test('execute all hooks', function * (t) {
 	]);
 });
 
-test('abort if a hook throws an error', function * (t) {
+test('abort if a hook throws an error', async t => {
 	let hooks = [];
 
 	class Post extends Model {
@@ -888,30 +862,28 @@ test('abort if a hook throws an error', function * (t) {
 			throw new Error('firstBeforeSave failed.');
 		}
 
-		* secondBeforeSave (next) {
+		* secondBeforeSave () {
 			hooks.push('secondBeforeSave');
-
-			yield* next;
 		}
 	}
 
-	let posts = yield* Post.all();
+	let posts = await Post.all();
 	t.is(posts.length, 0);
 
 	let data = postFixture();
 	let post = new Post(data);
 
 	try {
-		yield* post.save();
+		await post.save();
 	} catch (e) {
 		t.same(hooks, ['firstBeforeSave']);
 	} finally {
-		posts = yield* Post.all();
+		posts = await Post.all();
 		t.is(posts.length, 0);
 	}
 });
 
-test('allow registration of hooks through an object, or with an array of methods', function * (t) {
+test('allow registration of hooks through an object, or with an array of methods', async t => {
 	let hooks = [];
 
 	class Post extends Model {
@@ -931,64 +903,46 @@ test('allow registration of hooks through an object, or with an array of methods
 			this.after('create', ['secondAfterCreate', 'thirdAfterCreate']);
 		}
 
-		* beforeSave (next) {
+		* beforeSave () {
 			hooks.push('beforeSave');
-
-			yield* next;
 		}
 
-		* firstBeforeCreate (next) {
+		* firstBeforeCreate () {
 			hooks.push('firstBeforeCreate');
-
-			yield* next;
 		}
 
-		* secondBeforeCreate (next) {
+		* secondBeforeCreate () {
 			hooks.push('secondBeforeCreate');
-
-			yield* next;
 		}
 
-		* afterSave (next) {
+		* afterSave () {
 			hooks.push('afterSave');
-
-			yield* next;
 		}
 
-		* firstAfterCreate (next) {
+		* firstAfterCreate () {
 			hooks.push('firstAfterCreate');
-
-			yield* next;
 		}
 
-		* firstAroundCreate (next) {
+		* firstAroundCreate () {
 			hooks.push('firstAroundCreate');
-
-			yield* next;
 		}
 
-		* secondAroundCreate (next) {
+		* secondAroundCreate () {
 			hooks.push('secondAroundCreate');
-
-			yield* next;
 		}
 
-		* secondAfterCreate (next) {
+		* secondAfterCreate () {
 			hooks.push('secondAfterCreate');
-
-			yield* next;
 		}
 
-		* thirdAfterCreate (next) {
+		* thirdAfterCreate () {
 			hooks.push('thirdAfterCreate');
-
-			yield* next;
 		}
 	}
 
 	let data = postFixture();
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
 	t.same(hooks, [
 		'firstBeforeCreate',
@@ -1005,7 +959,7 @@ test('allow registration of hooks through an object, or with an array of methods
 	]);
 });
 
-test('skip selected middleware', function * (t) {
+test('skip selected middleware', async t => {
 	let middlewareTriggered = false;
 
 	class Post extends Model {
@@ -1013,36 +967,34 @@ test('skip selected middleware', function * (t) {
 			this.before('save', 'beforeSave');
 		}
 
-		* beforeSave (next) {
+		* beforeSave () {
 			middlewareTriggered = true;
-
-			yield* next;
 		}
 	}
 
 	let data = postFixture();
 	let post = new Post(data);
-	yield* post.save();
+	await post.save();
 
 	t.true(middlewareTriggered);
 	middlewareTriggered = false;
 
-	yield* post.save({ skip: 'beforeSave' });
+	await post.save({ skip: 'beforeSave' });
 
 	t.false(middlewareTriggered);
 });
 
-test('automatically set collection name', function * (t) {
+test('automatically set collection name', async t => {
 	let account = new Account();
-	yield* account.save();
+	await account.save();
 
 	t.is(account.collection, 'accounts');
 
-	let accounts = yield* Account.find();
+	let accounts = await Account.find();
 	t.is(accounts.length, 1);
 });
 
-test('use multiple databases', function * (t) {
+test('use multiple databases', async t => {
 	// Post1 will be stored in first database
 	// Post2 will be stored in second database
 	class Post1 extends Model {
@@ -1051,7 +1003,7 @@ test('use multiple databases', function * (t) {
 		}
 	}
 
-	let secondaryDb = yield mongorito.connect('localhost/mongorito_test_2');
+	let secondaryDb = await mongorito.connect('localhost/mongorito_test_2');
 
 	class Post2 extends Model {
 		db () {
@@ -1063,19 +1015,19 @@ test('use multiple databases', function * (t) {
 		}
 	}
 
-	yield* Post1.remove();
-	yield* Post2.remove();
+	await Post1.remove();
+	await Post2.remove();
 
-	yield* new Post1({ title: 'Post in first db' }).save();
-	yield* new Post2({ title: 'Post in second db' }).save();
+	await new Post1({ title: 'Post in first db' }).save();
+	await new Post2({ title: 'Post in second db' }).save();
 
-	let posts = yield* Post1.all();
+	let posts = await Post1.all();
 	t.is(posts.length, 1);
 	t.is(posts[0].get('title'), 'Post in first db');
 
-	posts = yield* Post2.all();
+	posts = await Post2.all();
 	t.is(posts.length, 1);
 	t.is(posts[0].get('title'), 'Post in second db');
 
-	yield secondaryDb.close();
+	await secondaryDb.close();
 });
