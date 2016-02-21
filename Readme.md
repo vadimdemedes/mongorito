@@ -58,11 +58,11 @@ $ npm install mongorito --save
 
 ## Usage
 
-- [#connection](Connection)
-- [#models](Models)
-- [#attributes](Attributes)
-- [#save-remove](Save & remove)
-- [#queries](Queries)
+- [Connection](#connection)
+- [Models](#models)
+- [Attributes](#attributes)
+- [Save & remove](#save--remove)
+- [Queries](#queries)
 
 ### Connection
 
