@@ -20,6 +20,7 @@
   "devDependencies": {
     "ava": "^0.9.0",
     "chance": "^0.8.0",
+    "co": "^4.6.0",
     "coveralls": "^2.11.4",
     "eslint-config-vdemedes": "*",
     "nyc": "^5.0.0",
@@ -52,6 +53,9 @@
     "env": [
       "node",
       "mocha"
+    ],
+    "ignore": [
+      "examples/*.js"
     ],
     "rules": {
       "prefer-arrow-callback": 0,
