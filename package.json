@@ -33,7 +33,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "xo && nyc ava --serial test/test.js",
+    "test": "xo && nyc ava --serial",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": "vdemedes/mongorito",
