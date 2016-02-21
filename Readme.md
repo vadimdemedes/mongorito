@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito) [![Coverage Status](https://coveralls.io/repos/vdemedes/mongorito/badge.svg?branch=master&service=github)](https://coveralls.io/github/vdemedes/mongorito?branch=master)
 
 Awesome MongoDB ODM for Node.js apps.
-Just take a look on its beautiful models and API.
+Just take a look at its beautiful models and API.
 Uses official [mongodb](https://www.npmjs.com/package/mongodb) driver under the hood.
 
 <h1 align="center">
