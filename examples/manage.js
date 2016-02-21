@@ -37,7 +37,7 @@ run(function * () {
 	console.log('Post removed');
 
 	// remove all posts with title = "Wow"
-	Post.remove({ title: 'Wow' });
+	yield Post.remove({ title: 'Wow' });
 
 	// done
 	console.log('Removed all posts matching a criteria');
