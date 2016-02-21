@@ -7,10 +7,10 @@
 const mongorito = require('../');
 const test = require('ava');
 
-const Comment = require('./models/comment');
-const Account = require('./models/account');
-const Post = require('./models/post');
-const Task = require('./models/task');
+const Comment = require('./fixtures/models/comment');
+const Account = require('./fixtures/models/account');
+const Post = require('./fixtures/models/post');
+const Task = require('./fixtures/models/task');
 
 const commentFixture = require('./fixtures/comment');
 const postFixture = require('./fixtures/post');
