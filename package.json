@@ -25,7 +25,6 @@
     "nyc": "^5.0.0",
     "xo": "^0.12.1"
   },
-  "main": "index.js",
   "files": [
     "index.js",
     "util",
