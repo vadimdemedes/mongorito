@@ -22,7 +22,7 @@
     "chance": "^0.8.0",
     "co": "^4.6.0",
     "coveralls": "^2.11.4",
-    "eslint-config-vdemedes": "*",
+    "eslint-config-vdemedes": "^1.0.2",
     "nyc": "^5.0.0",
     "xo": "^0.12.1"
   },
