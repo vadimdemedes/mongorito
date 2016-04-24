@@ -446,3 +446,42 @@ test('search documents using text index', async t => {
 	t.is(posts[0].get('title'), 'San Francisco');
 	t.is(posts[1].get('title'), 'San Fran');
 });
+
+test('get distinct', async t => {
+	try {
+		await Post.drop();
+	} catch (_) {}
+
+	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
+	await new Post({ title: 'New York', value: 'distinctVal' }).save();
+	await new Post({ title: 'San Fran', value: 'nondistinctVal' }).save();
+	let distincts = await Post.distinct('value');
+	t.is(distincts.length, 2);
+});
+
+test('get distinct with query', async t => {
+	try {
+		await Post.drop();
+	} catch (_) {}
+
+	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
+	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
+	await new Post({ title: 'New York', value: 'distinctVal' }).save();
+	await new Post({ title: 'San Fran', value: 'nondistinctVal' }).save();
+	let distincts = await Post.distinct('value', { title: 'San Francisco' });
+	t.is(distincts.length, 1);
+});
+
+test('get aggregate', async t => {
+	try {
+		await Post.drop();
+	} catch (_) {}
+
+	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
+	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
+	await new Post({ title: 'San Francisco', value: 'nondistinctVal' }).save();
+	await new Post({ title: 'New York', value: 'distinctVal' }).save();
+	await new Post({ title: 'San Fran', value: 'nondistinctVal' }).save();
+	let distincts = await Post.aggregate([{ $match: { 'title': 'San Francisco' } }, { $group: { '_id': '$title' } }, { $sort: { 'title': -1 } }, { $limit: 1 }, { $project: { 'projectName': 1 } }]);
+	t.is(distincts.length, 1);
+});
