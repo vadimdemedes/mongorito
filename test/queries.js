@@ -383,6 +383,53 @@ test('populate the response', async t => {
 		let actualId = comment.get('_id').toString();
 		let expectedId = comments[index].get('_id').toString();
 		t.is(actualId, expectedId);
+
+		let attrs = comment.toJSON();
+		let keys = Object.keys(attrs);
+		t.same(keys, ['_id', 'email', 'body', 'created_at', 'updated_at']);
+	});
+
+	// now confirm that populated documents
+	// don't get saved to database
+	await post.save();
+
+	post = await Post.findOne();
+	post.get('comments').forEach((id, index) => {
+		let expectedId = comments[index].get('_id').toString();
+		let actualId = id.toString();
+		t.is(actualId, expectedId);
+	});
+});
+
+test('populate the response excluding one selected field from the child model', async t => {
+	let n = 3;
+	let comments = [];
+
+	while (n--) {
+		let data = commentFixture();
+		let comment = new Comment(data);
+		await comment.save();
+
+		comments.push(comment);
+	}
+
+	let data = postFixture({
+		comments: comments.map(comment => comment.get('_id'))
+	});
+
+	let createdPost = new Post(data);
+	await createdPost.save();
+
+	let post = await Post.populate('comments', Comment.exclude('email')).findOne();
+
+	post.get('comments').forEach((comment, index) => {
+		let actualId = comment.get('_id').toString();
+		let expectedId = comments[index].get('_id').toString();
+		t.is(actualId, expectedId);
+
+		let attrs = comment.toJSON();
+		let keys = Object.keys(attrs);
+		t.same(keys, ['_id', 'body', 'created_at', 'updated_at']);
 	});
 
 	// now confirm that populated documents
