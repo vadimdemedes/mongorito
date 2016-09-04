@@ -4,17 +4,7 @@
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
-    "bluebird": "^3.3.1",
-    "clone": "^1.0.2",
-    "co": "^4.6.0",
-    "get-value": "^2.0.3",
-    "is-generator-fn": "^1.0.0",
-    "is_js": "^0.7.4",
-    "lodash.result": "^4.2.0",
-    "mongodb": "^2.0.48",
-    "object-assign": "^4.0.1",
-    "pluralize": "^1.2.1",
-    "set-value": "^0.2.0"
+    "mongodb": "^2.2.9"
   },
   "devDependencies": {
     "ava": "^0.16.0",
