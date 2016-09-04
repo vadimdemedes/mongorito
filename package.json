@@ -5,7 +5,6 @@
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
     "bluebird": "^3.3.1",
-    "class-extend": "^0.1.2",
     "clone": "^1.0.2",
     "co": "^4.6.0",
     "get-value": "^2.0.3",
