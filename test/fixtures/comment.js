@@ -14,6 +14,6 @@ const chance = require('chance')();
 module.exports = function commentFixture() {
 	return {
 		email: chance.email(),
-		body: chance.paragraph()
+		body: chance.word()
 	};
 };

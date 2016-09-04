@@ -4,7 +4,12 @@
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
-    "mongodb": "^2.2.9"
+    "arrify": "^1.0.1",
+    "get-value": "^2.0.6",
+    "is-plain-obj": "^1.1.0",
+    "lodash.result": "^4.5.2",
+    "mongodb": "^2.2.9",
+    "set-value": "^0.3.3"
   },
   "devDependencies": {
     "ava": "^0.16.0",

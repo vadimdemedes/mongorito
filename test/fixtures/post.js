@@ -22,8 +22,8 @@ module.exports = function postFixture (attrs) {
 	}
 
 	let post = {
-		title: chance.sentence(),
-		body: chance.paragraph(),
+		title: chance.word(),
+		body: chance.word(),
 		author: {
 			name: chance.word()
 		},
