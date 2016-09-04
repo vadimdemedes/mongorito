@@ -17,7 +17,7 @@ const Task = require('./fixtures/models/task');
  */
 
 function setup (test) {
-	test.before(() => mongorito.connect('localhost/mongorito_test'));
+	test.before(() => mongorito.connect((process.env.MONGO_URL ? process.env.MONGO_URL : 'localhost/mongorito_test')));
 
 	test.beforeEach(() => Account.remove());
 	test.beforeEach(() => Comment.remove());
