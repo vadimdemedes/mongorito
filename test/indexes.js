@@ -22,7 +22,7 @@ test('setup an index', async t => {
 
 	let indexes = await Post.indexes();
 	let lastIndex = indexes[indexes.length - 1];
-	t.same(lastIndex, {
+	t.deepEqual(lastIndex, {
 		v: 1,
 		key: {
 			title: 1
@@ -37,7 +37,7 @@ test('setup a unique index', async t => {
 
 	let indexes = await Task.indexes();
 	let lastIndex = indexes[indexes.length - 1];
-	t.same(lastIndex, {
+	t.deepEqual(lastIndex, {
 		v: 1,
 		unique: true,
 		key: {
@@ -57,6 +57,6 @@ test('setup a unique index', async t => {
 		err = e;
 	}
 
-	t.ok(err);
+	t.truthy(err);
 	t.is(err.name, 'MongoError');
 });

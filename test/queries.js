@@ -386,7 +386,7 @@ test('populate the response', async t => {
 
 		let attrs = comment.toJSON();
 		let keys = Object.keys(attrs);
-		t.same(keys, ['_id', 'email', 'body', 'created_at', 'updated_at']);
+		t.deepEqual(keys, ['_id', 'email', 'body', 'created_at', 'updated_at']);
 	});
 
 	// now confirm that populated documents
@@ -429,7 +429,7 @@ test('populate the response excluding one selected field from the child model', 
 
 		let attrs = comment.toJSON();
 		let keys = Object.keys(attrs);
-		t.same(keys, ['_id', 'body', 'created_at', 'updated_at']);
+		t.deepEqual(keys, ['_id', 'body', 'created_at', 'updated_at']);
 	});
 
 	// now confirm that populated documents
@@ -456,7 +456,7 @@ test('find documents and include only one selected field', async t => {
 	let posts = await Post.include('title').find();
 	let attrs = posts[0].toJSON();
 	let keys = Object.keys(attrs);
-	t.same(keys, ['_id', 'title']);
+	t.deepEqual(keys, ['_id', 'title']);
 });
 
 test('find documents and include only two selected fields', async t => {
@@ -471,7 +471,7 @@ test('find documents and include only two selected fields', async t => {
 	let posts = await Post.include(['title', 'featured']).find();
 	let attrs = posts[0].toJSON();
 	let keys = Object.keys(attrs);
-	t.same(keys, ['_id', 'title', 'featured']);
+	t.deepEqual(keys, ['_id', 'title', 'featured']);
 });
 
 test('find documents and exclude one selected field', async t => {
@@ -486,7 +486,7 @@ test('find documents and exclude one selected field', async t => {
 	let posts = await Post.exclude('title').find();
 	let attrs = posts[0].toJSON();
 	let keys = Object.keys(attrs);
-	t.same(keys, ['_id', 'featured', 'published', 'created_at', 'updated_at']);
+	t.deepEqual(keys, ['_id', 'featured', 'published', 'created_at', 'updated_at']);
 });
 
 test('find documents and exclude two selected fields', async t => {
@@ -501,7 +501,7 @@ test('find documents and exclude two selected fields', async t => {
 	let posts = await Post.exclude(['title', 'published']).find();
 	let attrs = posts[0].toJSON();
 	let keys = Object.keys(attrs);
-	t.same(keys, ['_id', 'featured', 'created_at', 'updated_at']);
+	t.deepEqual(keys, ['_id', 'featured', 'created_at', 'updated_at']);
 });
 
 test('search documents using text index', async t => {

@@ -67,12 +67,12 @@ test('initialize and manage attributes', t => {
 	let data = postFixture();
 	let post = new Post(data);
 	let attrs = post.get();
-	t.same(attrs, data);
+	t.deepEqual(attrs, data);
 
 	data = postFixture();
 	post.set(data);
 	attrs = post.get();
-	t.same(attrs, data);
+	t.deepEqual(attrs, data);
 });
 
 test('get property', t => {
@@ -103,10 +103,10 @@ test('unset property', async t => {
 	post.unset('awesome');
 	await post.save();
 
-	t.notOk(post.get('awesome'));
+	t.falsy(post.get('awesome'));
 
 	post = await Post.findOne();
-	t.notOk(post.get('awesome'));
+	t.falsy(post.get('awesome'));
 });
 
 test('increment property', async t => {
@@ -141,7 +141,7 @@ test('convert to JSON', t => {
 
 	let json = JSON.stringify(post);
 	let parsed = JSON.parse(json);
-	t.same(parsed, attrs);
+	t.deepEqual(parsed, attrs);
 });
 
 test('remember previous attributes', t => {
@@ -159,7 +159,7 @@ test('if nothing changed, no previous value stored', t => {
 	t.is(post.get('title'), 'Sad title');
 
 	post.set('title', 'Sad title');
-	t.notOk(post.previous.title);
-	t.notOk(post.changed.title);
+	t.falsy(post.previous.title);
+	t.falsy(post.changed.title);
 	t.is(post.get('title'), 'Sad title');
 });

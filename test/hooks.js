@@ -103,7 +103,7 @@ test('execute all hooks', async t => {
 	await post.create();
 	await post.update();
 
-	t.same(hooks, [
+	t.deepEqual(hooks, [
 		'before:create',
 		'around:create',
 		'before:save',
@@ -127,7 +127,7 @@ test('execute all hooks', async t => {
 	post.set('title', 'New title');
 	await post.save();
 
-	t.same(hooks, [
+	t.deepEqual(hooks, [
 		'before:update',
 		'around:update',
 		'before:save',
@@ -142,7 +142,7 @@ test('execute all hooks', async t => {
 
 	await post.remove();
 
-	t.same(hooks, [
+	t.deepEqual(hooks, [
 		'before:remove',
 		'around:remove',
 		'around:remove',
@@ -183,7 +183,7 @@ test('abort if a hook throws an error', async t => {
 	try {
 		await post.save();
 	} catch (e) {
-		t.same(hooks, ['firstBeforeSave']);
+		t.deepEqual(hooks, ['firstBeforeSave']);
 	} finally {
 		posts = await Post.all();
 		t.is(posts.length, 0);
@@ -251,7 +251,7 @@ test('allow registration of hooks through an object, or with an array of methods
 	let post = new Post(data);
 	await post.save();
 
-	t.same(hooks, [
+	t.deepEqual(hooks, [
 		'firstBeforeCreate',
 		'secondBeforeCreate',
 		'firstAroundCreate',

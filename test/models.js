@@ -31,8 +31,8 @@ test('create', async t => {
 
 	let createdPost = posts[0];
 	t.is(createdPost.get('_id').toString(), post.get('_id').toString());
-	t.ok(createdPost.get('created_at'));
-	t.ok(createdPost.get('updated_at'));
+	t.truthy(createdPost.get('created_at'));
+	t.truthy(createdPost.get('updated_at'));
 });
 
 test('create with default values', async t => {
