@@ -104,11 +104,5 @@ test('remove all documents', async t => {
 });
 
 test('automatically set collection name', async t => {
-	let account = new Account();
-	await account.save();
-
-	t.is(account.collection, 'accounts');
-
-	let accounts = await Account.find();
-	t.is(accounts.length, 1);
+	t.is(Account.collection(), 'accounts');
 });
