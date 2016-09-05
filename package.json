@@ -10,7 +10,7 @@
     "lodash.result": "^4.5.2",
     "mongodb": "^2.2.9",
     "mquery": "^1.11.0",
-    "set-value": "^0.3.3"
+    "set-value": "github:vdemedes/set-value#fix-set-object"
   },
   "devDependencies": {
     "ava": "^0.16.0",
