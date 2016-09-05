@@ -1,28 +1,18 @@
 'use strict';
 
-/**
- * Dependencies
- */
-
 const mongorito = require('../');
-const setup = require('./_setup');
 const test = require('ava');
 
-const Post = require('./fixtures/models/post');
-
 const postFixture = require('./fixtures/post');
-
-
-/**
- * Tests
- */
+const setup = require('./_setup');
+const Post = require('./fixtures/models/post');
 
 setup(test);
 
 test.skip('expose mongodb properties', t => {
 	const mongodb = require('mongodb');
 
-	let excludedKeys = [
+	const excludedKeys = [
 		'connect',
 		'MongoClient',
 		'Db',
@@ -65,7 +55,7 @@ test('set mock mongodb driver and connect', t => {
 
 test('initialize and manage attributes', t => {
 	let data = postFixture();
-	let post = new Post(data);
+	const post = new Post(data);
 	let attrs = post.get();
 	t.deepEqual(attrs, data);
 
@@ -75,27 +65,17 @@ test('initialize and manage attributes', t => {
 	t.deepEqual(attrs, data);
 });
 
-test('get property', t => {
-	let data = postFixture();
-	let post = new Post(data);
-
-	let author = post.get('author.name');
-	t.is(author, data.author.name);
-});
-
-test('set property', t => {
-	let data = postFixture();
-	let post = new Post(data);
-
+test('set & get property', t => {
+	const data = postFixture();
+	const post = new Post(data);
 	post.set('author.name', 'John Doe');
 
-	let author = post.get('author.name');
-	t.is(author, 'John Doe');
+	t.is(post.get('author.name'), 'John Doe');
 });
 
 test('unset property', async t => {
-	let data = { awesome: true };
-	let post = new Post(data);
+	const data = { awesome: true };
+	const post = new Post(data);
 	await post.save();
 
 	t.true(post.get('awesome'));
@@ -107,7 +87,7 @@ test('unset property', async t => {
 });
 
 test('increment property', async t => {
-	let post = new Post({ views: 1, total: 0 });
+	const post = new Post({ views: 1, total: 0 });
 	await post.save();
 
 	t.is(post.get('views'), 1);
@@ -120,32 +100,24 @@ test('increment property', async t => {
 });
 
 test('fail if incrementing property on unsaved document', async t => {
-	let post = new Post({ views: 1 });
+	const post = new Post({ views: 1 });
 
-	let isFailed = false;
-
-	try {
-		await post.inc({ views: 1 });
-	} catch (_) {
-		isFailed = true;
-	}
-
-	t.true(isFailed);
+	await t.throws(post.inc({ views: 1 }));
 });
 
 test('convert to JSON', t => {
-	let data = postFixture();
-	let post = new Post(data);
-	let attrs = post.get();
+	const data = postFixture();
+	const post = new Post(data);
+	const attrs = post.get();
 
-	let json = JSON.stringify(post);
-	let parsed = JSON.parse(json);
+	const json = JSON.stringify(post);
+	const parsed = JSON.parse(json);
 
 	t.deepEqual(parsed, attrs);
 });
 
 test('remember previous attributes', t => {
-	let post = new Post({ title: 'Sad title' });
+	const post = new Post({ title: 'Sad title' });
 	t.is(post.get('title'), 'Sad title');
 
 	post.set('title', 'Happy title');
@@ -155,7 +127,7 @@ test('remember previous attributes', t => {
 });
 
 test('no previous value stored initially', t => {
-	let post = new Post({ title: 'Sad title' });
+	const post = new Post({ title: 'Sad title' });
 	t.is(post.get('title'), 'Sad title');
 
 	post.set('title', 'Sad title');
