@@ -9,6 +9,7 @@ const ignore = [
 	'collection',
 	'findOne',
 	'remove',
+	'count',
 	'thunk',
 	'then',
 	'exec',
