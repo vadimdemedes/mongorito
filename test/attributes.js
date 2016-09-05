@@ -36,6 +36,33 @@ test('expose mongodb properties', t => {
 	});
 });
 
+test('set and get mongodb driver', t => {
+	const mockDriver = {
+		'MongoClient': true
+	};
+
+	mongorito.setDriver(mockDriver);
+
+	t.is(mongorito.getDriver(), mockDriver);
+});
+
+test('set mock mongodb driver and connect', t => {
+	const mockDriver = {
+		'MongoClient': {
+			'connect': () => {
+				return Promise.resolve('ok');
+			}
+		}
+	};
+
+	mongorito.setDriver(mockDriver);
+
+	// If setDriver was not successful, Mongorito would use a real driver here, which would fail on the invalid connect
+	// URL. This means: If this connect is successful, setDriver was successful, as the mockDriver that was used always
+	// fulfills.
+	t.ok(mongorito.connect('THIS:IS:AN:INVALID:MONGO_URL'));
+});
+
 test('initialize and manage attributes', t => {
 	let data = postFixture();
 	let post = new Post(data);
