@@ -7,6 +7,7 @@ const ignore = [
 	'toConstructor',
 	'setOptions',
 	'collection',
+	'findOne',
 	'remove',
 	'thunk',
 	'then',
