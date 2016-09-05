@@ -29,10 +29,10 @@ function setup (test) {
 		return db.connect(process.env.MONGO_URL || 'localhost/mongorito_test');
 	});
 
-	// test.beforeEach(() => Account.remove());
-	// test.beforeEach(() => Comment.remove());
-	// test.beforeEach(() => Post.remove());
-	// test.beforeEach(() => Task.remove());
+	test.beforeEach(() => Account.remove());
+	test.beforeEach(() => Comment.remove());
+	test.beforeEach(() => Post.remove());
+	test.beforeEach(() => Task.remove());
 
 	test.after(() => db.disconnect());
 }

@@ -1,35 +1,25 @@
 'use strict';
 
-/**
- * Dependencies
- */
-
 const mongorito = require('../');
-const setup = require('./_setup');
 const test = require('ava');
 
+const postFixture = require('./fixtures/post');
 const Account = require('./fixtures/models/account');
+const setup = require('./_setup');
 const Post = require('./fixtures/models/post');
 
-const postFixture = require('./fixtures/post');
-
 const Model = mongorito.Model;
-
-
-/**
- * Tests
- */
 
 setup(test);
 
 test('create', async t => {
-	let post = new Post();
+	const post = new Post();
 	await post.save();
 
-	let posts = await Post.all();
+	const posts = await Post.find();
 	t.is(posts.length, 1);
 
-	let createdPost = posts[0];
+	const createdPost = posts[0];
 	t.is(createdPost.get('_id').toString(), post.get('_id').toString());
 	t.truthy(createdPost.get('created_at'));
 	t.truthy(createdPost.get('updated_at'));

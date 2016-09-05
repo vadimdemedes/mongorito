@@ -12,12 +12,12 @@ const Model = require('../../../').Model;
  */
 
 class Post extends Model {
-	defaults () {
-		return {
-			title: 'Default title'
-		};
-	}
+
 }
+
+Post.defaultFields = {
+	title: 'Default title'
+};
 
 
 /**
