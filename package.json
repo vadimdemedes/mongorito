@@ -5,7 +5,6 @@
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
     "arrify": "^1.0.1",
-    "bluebird": "^3.4.6",
     "dot-prop": "^4.0.0",
     "is-plain-obj": "^1.1.0",
     "lodash.result": "^4.5.2",
@@ -17,6 +16,7 @@
     "ava": "^0.16.0",
     "babel-cli": "^6.14.0",
     "babel-plugin-transform-es2015-classes": "^6.14.0",
+    "babel-plugin-transform-es2015-destructuring": "^6.9.0",
     "babel-plugin-transform-es2015-parameters": "^6.11.4",
     "chance": "^1.0.4",
     "coveralls": "^2.11.12",
@@ -47,16 +47,19 @@
   "license": "MIT",
   "babel": {
     "plugins": [
+      "transform-es2015-destructuring",
       "transform-es2015-parameters",
       "transform-es2015-classes"
-    ],
-    "sourceMaps": "inline"
+    ]
   },
   "xo": {
     "extends": "vdemedes",
     "esnext": true,
     "env": "node",
-    "ignore": "lib/**/*.js"
+    "ignore": "lib/**/*.js",
+    "rules": {
+      "array-callback-return": 0
+    }
   },
   "ava": {
     "serial": true,
