@@ -5,9 +5,10 @@ const isObject = require('is-plain-obj');
 const result = require('lodash.result');
 const arrify = require('arrify');
 
-const queryMethods = require('../util/query-methods');
-const flatten = require('../util/join-obj-keys');
+const queryMethods = require('./util/query-methods');
+const flatten = require('./util/join-obj-keys');
 const Fields = require('./fields');
+const Hooks = require('./hooks');
 const Query = require('./query');
 
 class Model {

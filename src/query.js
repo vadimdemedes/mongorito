@@ -3,8 +3,8 @@
 const isObject = require('is-plain-obj');
 const mquery = require('mquery');
 
-const queryMethods = require('../util/query-methods');
-const toObjectId = require('../util/to-objectid');
+const queryMethods = require('./util/query-methods');
+const toObjectId = require('./util/to-objectid');
 
 function convertObjectIds(obj = {}, fields = ['_id']) {
 	const newObj = Object.assign({}, obj);

@@ -14,6 +14,10 @@
   },
   "devDependencies": {
     "ava": "^0.16.0",
+    "babel-cli": "^6.14.0",
+    "babel-plugin-async-to-promises": "^1.0.5",
+    "babel-plugin-transform-es2015-classes": "^6.14.0",
+    "babel-plugin-transform-es2015-parameters": "^6.11.4",
     "chance": "^1.0.4",
     "coveralls": "^2.11.12",
     "eslint-config-vdemedes": "^1.0.2",
@@ -26,7 +30,8 @@
     "lib"
   ],
   "scripts": {
-    "test": "xo && nyc ava --serial",
+    "build": "babel src -d lib",
+    "test": "npm run build && xo && nyc ava --serial",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": "vdemedes/mongorito",
@@ -40,6 +45,13 @@
     "es6"
   ],
   "license": "MIT",
+  "babel": {
+    "plugins": [
+      "transform-es2015-parameters",
+      "transform-es2015-classes",
+      "async-to-promises"
+    ]
+  },
   "xo": {
     "extends": "vdemedes",
     "esnext": true,

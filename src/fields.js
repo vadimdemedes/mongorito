@@ -4,7 +4,7 @@ const isObject = require('is-plain-obj');
 const dotProp = require('dot-prop');
 const arrify = require('arrify');
 
-const flatten = require('../util/join-obj-keys');
+const flatten = require('./util/join-obj-keys');
 
 class Fields {
 	constructor(fields = {}) {
