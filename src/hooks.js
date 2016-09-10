@@ -1,7 +1,5 @@
 'use strict';
 
-const Promise = require('bluebird');
-
 class Hooks {
 	constructor() {
 		this.hooks = {
@@ -22,19 +20,26 @@ class Hooks {
 		};
 	}
 
-	before(event, handler) {
-		this.hooks.before[event].push(handler);
+	before(event, handler, { priority }) {
+		this.hooks.before[event].push({ handler, priority });
 	}
 
-	after(event, handler) {
-		this.hooks.after[event].push(handler);
+	after(event, handler, { priority }) {
+		this.hooks.after[event].push({ handler, priority });
 	}
 
-	run(place, event, args, context) {
-		return Promise
-			.each(this.hooks[place][event], hook => {
-				return hook.apply(context, args);
+	run(place, event, args = [], context) {
+		let p = Promise.resolve();
+
+		this.hooks[place][event]
+			.sort((a, b) => a.priority < b.priority)
+			.forEach(({ handler }) => {
+				p = p.then(ret => {
+					return handler.apply(context, ret === undefined ? args : [ret]);
+				});
 			});
+
+		return p;
 	}
 }
 

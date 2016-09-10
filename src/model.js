@@ -8,6 +8,7 @@ const arrify = require('arrify');
 const queryMethods = require('./util/query-methods');
 const flatten = require('./util/join-obj-keys');
 const Fields = require('./fields');
+const Hooks = require('./hooks');
 const Query = require('./query');
 
 class Model {
@@ -17,9 +18,15 @@ class Model {
 		this.fields = new Fields(Object.assign({}, flatten(defaultFields), flatten(fields)));
 		this.previous = new Fields();
 
+		this.hooks = new Hooks();
+
 		// keep track of unset fields to delete on the next update
 		this._unsetFields = [];
+
+		this.configure();
 	}
+
+	configure() {}
 
 	get(key) {
 		return this.fields.get(key);
@@ -60,33 +67,50 @@ class Model {
 		return this.get();
 	}
 
+	before(event, handler) {
+		if (typeof handler === 'string') {
+			handler = this[handler];
+		}
+
+		this.hooks.before(event, handler, { priority: 5 });
+	}
+
+	after(event, handler) {
+		if (typeof handler === 'string') {
+			handler = this[handler];
+		}
+
+		this.hooks.after(event, handler, { priority: 5 });
+	}
+
 	save() {
 		const isSaved = Boolean(this.get('_id'));
 
-		if (isSaved) {
-			return this.update();
-		}
-
-		return this.create();
+		return this.hooks.run('before', 'save', [], this)
+			.then(() => isSaved ? this.update() : this.create())
+			.then(() => this.hooks.run('after', 'save', [], this));
 	}
 
 	create() {
 		this.set('created_at', new Date());
 		this.set('updated_at', new Date());
 
-		return this.constructor.dbCollection()
+		return this.hooks.run('before', 'create', [], this)
+			.then(() => this.constructor.dbCollection())
 			.then(collection => {
 				return collection.insert(this.get());
 			})
 			.then(inserted => {
 				this.set('_id', inserted.ops[0]._id);
-			});
+			})
+			.then(() => this.hooks.run('after', 'create', [], this));
 	}
 
 	update() {
 		this.set('updated_at', new Date());
 
-		return this.constructor.dbCollection()
+		return this.hooks.run('before', 'update', [], this)
+			.then(() => this.constructor.dbCollection())
 			.then(collection => {
 				const update = {
 					$set: this.get()
@@ -103,7 +127,8 @@ class Model {
 				}
 
 				return collection.update({ _id: this.get('_id') }, update);
-			});
+			})
+			.then(() => this.hooks.run('after', 'update', [], this));
 	}
 
 	inc(key, value = 1) {
@@ -125,13 +150,17 @@ class Model {
 			};
 		}
 
-		return this.constructor.dbCollection()
+		return this.hooks.run('before', 'update', [], this)
+			.then(() => this.constructor.dbCollection())
 			.then(collection => {
-				return collection.update({ _id: this.get('_id') }, { '$inc': fields, '$set': { 'updated_at': this.get('updated_at') } });
+				const update = {
+					$inc: fields,
+					$set: { 'updated_at': this.get('updated_at') }
+				};
+
+				return collection.update({ _id: this.get('_id') }, update);
 			})
-			.then(() => {
-				return this.refresh();
-			});
+			.then(() => this.hooks.run('after', 'update', [], this));
 	}
 
 	refresh() {
@@ -157,10 +186,12 @@ class Model {
 			return Promise.reject(new Error('Unsaved model can\'t be removed.'));
 		}
 
-		return this.constructor.dbCollection()
+		return this.hooks.run('before', 'remove', [], this)
+			.then(() => this.constructor.dbCollection())
 			.then(collection => {
 				return collection.remove({ _id: this.get('_id') });
-			});
+			})
+			.then(() => this.hooks.run('after', 'remove', [], this));
 	}
 }
 
@@ -200,6 +231,29 @@ Model.indexes = function (...args) {
 		.then(collection => collection.listIndexes(...args).toArray());
 };
 
+Model.setupDefaultHooks = function () {
+	this.hooks = new Hooks();
+	this.hooks.after('find', docs => {
+		return docs.map(doc => new this(doc)); // eslint-disable-line babel/new-cap
+	}, { priority: 0 });
+};
+
+Model.before = function (event, handler) {
+	if (!this.hooks) {
+		this.setupDefaultHooks();
+	}
+
+	this.hooks.before(event, handler, { priority: 5 });
+};
+
+Model.after = function (event, handler) {
+	if (!this.hooks) {
+		this.setupDefaultHooks();
+	}
+
+	this.hooks.after(event, handler, { priority: 5 });
+};
+
 const customMethods = [
 	'findById',
 	'findOne',
@@ -214,6 +268,10 @@ const customMethods = [
 
 queryMethods.concat(customMethods).forEach(name => {
 	Model[name] = function (...args) {
+		if (!this.hooks) {
+			this.setupDefaultHooks();
+		}
+
 		const query = new Query();
 		query.model = this;
 		return query[name].apply(query, args);

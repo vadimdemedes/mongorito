@@ -1,292 +1,258 @@
 'use strict';
 
-/**
- * Dependencies
- */
-
-const mongorito = require('../');
-const setup = require('./_setup');
 const test = require('ava');
+const mongorito = require('../');
 
-const postFixture = require('./fixtures/post');
+const setup = require('./_setup');
 
 const Model = mongorito.Model;
 
-
-/**
- * Tests
- */
-
 setup(test);
 
-test('execute all hooks', async t => {
+test('instance - execute create hooks', async t => {
+	const hooks = [];
+
+	class Post extends Model {
+		configure() {
+			this.before('create', 'beforeCreate');
+			this.before('create', () => {
+				hooks.push(2);
+			});
+
+			this.after('create', 'afterCreate');
+			this.after('create', () => {
+				hooks.push(4);
+			});
+		}
+
+		beforeCreate() {
+			hooks.push(1);
+		}
+
+		afterCreate() {
+			hooks.push(3);
+		}
+	}
+
+	const { db } = t.context;
+	db.register(Post);
+
+	const post = new Post();
+	await post.save();
+	t.deepEqual(hooks, [1, 2, 3, 4]);
+});
+
+test('instance - execute update hooks', async t => {
+	const hooks = [];
+
+	class Post extends Model {
+		configure() {
+			this.before('update', 'beforeUpdate');
+			this.before('update', () => {
+				hooks.push(2);
+			});
+
+			this.after('update', 'afterUpdate');
+			this.after('update', () => {
+				hooks.push(4);
+			});
+		}
+
+		beforeUpdate() {
+			hooks.push(1);
+		}
+
+		afterUpdate() {
+			hooks.push(3);
+		}
+	}
+
+	const { db } = t.context;
+	db.register(Post);
+
+	const post = new Post();
+	await post.save();
+	t.deepEqual(hooks, []);
+
+	await post.save();
+	t.deepEqual(hooks, [1, 2, 3, 4]);
+});
+
+test('instance - execute save hooks', async t => {
+	const hooks = [];
+
+	class Post extends Model {
+		configure() {
+			this.before('save', 'beforeSave');
+			this.before('save', () => {
+				hooks.push(2);
+			});
+
+			this.after('save', 'afterSave');
+			this.after('save', () => {
+				hooks.push(4);
+			});
+		}
+
+		beforeSave() {
+			hooks.push(1);
+		}
+
+		afterSave() {
+			hooks.push(3);
+		}
+	}
+
+	const { db } = t.context;
+	db.register(Post);
+
+	const post = new Post();
+	await post.save();
+	t.deepEqual(hooks, [1, 2, 3, 4]);
+
+	await post.save();
+	t.deepEqual(hooks, [1, 2, 3, 4, 1, 2, 3, 4]);
+});
+
+test('instance - execute remove hooks', async t => {
+	const hooks = [];
+
+	class Post extends Model {
+		configure() {
+			this.before('remove', 'beforeRemove');
+			this.before('remove', () => {
+				hooks.push(2);
+			});
+
+			this.after('remove', 'afterRemove');
+			this.after('remove', () => {
+				hooks.push(4);
+			});
+		}
+
+		beforeRemove() {
+			hooks.push(1);
+		}
+
+		afterRemove() {
+			hooks.push(3);
+		}
+	}
+
+	const { db } = t.context;
+	db.register(Post);
+
+	const post = new Post();
+	await post.save();
+	t.deepEqual(hooks, []);
+
+	await post.remove();
+	t.deepEqual(hooks, [1, 2, 3, 4]);
+});
+
+test('instance - execution order of create, update and save hooks', async t => {
 	let hooks = [];
 
 	class Post extends Model {
-		collection () {
-			return 'posts';
-		}
-
-		configure () {
-			this.before('save', 'beforeSave');
-			this.after('save', 'afterSave');
-			this.around('save', 'aroundSave');
-
+		configure() {
 			this.before('create', 'beforeCreate');
-			this.after('create', 'afterCreate');
-			this.around('create', 'aroundCreate');
-
 			this.before('update', 'beforeUpdate');
+			this.before('save', 'beforeSave');
+			this.after('create', 'afterCreate');
 			this.after('update', 'afterUpdate');
-			this.around('update', 'aroundUpdate');
-
-			this.before('remove', 'beforeRemove');
-			this.after('remove', 'afterRemove');
-			this.around('remove', 'aroundRemove');
+			this.after('save', 'afterSave');
 		}
 
-		// Save hooks
-		* beforeSave () {
-			hooks.push('before:save');
-		}
-
-		* afterSave () {
-			hooks.push('after:save');
-		}
-
-		* aroundSave () {
-			hooks.push('around:save');
-		}
-
-		// Create hooks
-		* beforeCreate () {
+		beforeCreate() {
 			hooks.push('before:create');
 		}
 
-		* afterCreate () {
+		afterCreate() {
 			hooks.push('after:create');
 		}
 
-		* aroundCreate () {
-			hooks.push('around:create');
-		}
-
-		// Update hooks
-		* beforeUpdate () {
+		beforeUpdate() {
 			hooks.push('before:update');
 		}
 
-		* afterUpdate () {
+		afterUpdate() {
 			hooks.push('after:update');
 		}
 
-		* aroundUpdate () {
-			hooks.push('around:update');
+		beforeSave() {
+			hooks.push('before:save');
 		}
 
-		// Remove hooks
-		* beforeRemove () {
-			hooks.push('before:remove');
-		}
-
-		* afterRemove () {
-			hooks.push('after:remove');
-		}
-
-		* aroundRemove () {
-			hooks.push('around:remove');
+		afterSave() {
+			hooks.push('after:save');
 		}
 	}
 
-	let data = postFixture();
-	let post = new Post(data);
-	await post.create();
-	await post.update();
+	const { db } = t.context;
+	db.register(Post);
 
+	const post = new Post();
+
+	// test create hooks
+	await post.save();
 	t.deepEqual(hooks, [
+		'before:save',
 		'before:create',
-		'around:create',
-		'before:save',
-		'around:save',
-		'around:create',
 		'after:create',
-		'around:save',
-		'after:save',
-		'before:update',
-		'around:update',
-		'before:save',
-		'around:save',
-		'around:update',
-		'after:update',
-		'around:save',
 		'after:save'
 	]);
 
+	// test update hooks
 	hooks = [];
 
-	post.set('title', 'New title');
 	await post.save();
-
 	t.deepEqual(hooks, [
-		'before:update',
-		'around:update',
 		'before:save',
-		'around:save',
-		'around:update',
+		'before:update',
 		'after:update',
-		'around:save',
 		'after:save'
 	]);
-
-	hooks = [];
-
-	await post.remove();
-
-	t.deepEqual(hooks, [
-		'before:remove',
-		'around:remove',
-		'around:remove',
-		'after:remove'
-	]);
 });
 
-test('abort if a hook throws an error', async t => {
-	let hooks = [];
+test('class - execute find hooks on find()', async t => {
+	class Post extends Model {}
 
-	class Post extends Model {
-		collection () {
-			return 'posts';
-		}
+	Post.before('find', function () {
+		this.where('cool', true);
+	});
 
-		configure () {
-			this.before('save', 'firstBeforeSave');
-			this.before('save', 'secondBeforeSave');
-		}
+	Post.after('find', docs => {
+		return docs.map(doc => Object.assign({}, doc, { awesome: true }));
+	});
 
-		* firstBeforeSave () {
-			hooks.push('firstBeforeSave');
+	const { db } = t.context;
+	db.register(Post);
 
-			throw new Error('firstBeforeSave failed.');
-		}
-
-		* secondBeforeSave () {
-			hooks.push('secondBeforeSave');
-		}
-	}
-
-	let posts = await Post.all();
-	t.is(posts.length, 0);
-
-	let data = postFixture();
-	let post = new Post(data);
-
-	try {
-		await post.save();
-	} catch (e) {
-		t.deepEqual(hooks, ['firstBeforeSave']);
-	} finally {
-		posts = await Post.all();
-		t.is(posts.length, 0);
-	}
-});
-
-test('allow registration of hooks through an object, or with an array of methods', async t => {
-	let hooks = [];
-
-	class Post extends Model {
-		collection () {
-			return 'posts';
-		}
-
-		configure () {
-			this.hooks({
-				'before:save': 'beforeSave',
-				'before:create': ['firstBeforeCreate', 'secondBeforeCreate'],
-				'after:save': 'afterSave',
-				'after:create': 'firstAfterCreate',
-				'around:create': ['firstAroundCreate', 'secondAroundCreate']
-			});
-
-			this.after('create', ['secondAfterCreate', 'thirdAfterCreate']);
-		}
-
-		* beforeSave () {
-			hooks.push('beforeSave');
-		}
-
-		* firstBeforeCreate () {
-			hooks.push('firstBeforeCreate');
-		}
-
-		* secondBeforeCreate () {
-			hooks.push('secondBeforeCreate');
-		}
-
-		* afterSave () {
-			hooks.push('afterSave');
-		}
-
-		* firstAfterCreate () {
-			hooks.push('firstAfterCreate');
-		}
-
-		* firstAroundCreate () {
-			hooks.push('firstAroundCreate');
-		}
-
-		* secondAroundCreate () {
-			hooks.push('secondAroundCreate');
-		}
-
-		* secondAfterCreate () {
-			hooks.push('secondAfterCreate');
-		}
-
-		* thirdAfterCreate () {
-			hooks.push('thirdAfterCreate');
-		}
-	}
-
-	let data = postFixture();
-	let post = new Post(data);
+	const post = new Post({ cool: true });
 	await post.save();
 
-	t.deepEqual(hooks, [
-		'firstBeforeCreate',
-		'secondBeforeCreate',
-		'firstAroundCreate',
-		'secondAroundCreate',
-		'beforeSave',
-		'secondAroundCreate',
-		'firstAroundCreate',
-		'firstAfterCreate',
-		'secondAfterCreate',
-		'thirdAfterCreate',
-		'afterSave'
-	]);
+	const posts = await Post.where('cool', false).find();
+	t.true(posts[0].get('cool', true));
+	t.true(posts[0].get('awesome'));
 });
 
-test('skip selected middleware', async t => {
-	let middlewareTriggered = false;
+test('class - execute find hooks on findOne()', async t => {
+	class Post extends Model {}
 
-	class Post extends Model {
-		configure () {
-			this.before('save', 'beforeSave');
-		}
+	Post.before('find', function () {
+		this.where('cool', true);
+	});
 
-		* beforeSave () {
-			middlewareTriggered = true;
-		}
-	}
+	Post.after('find', docs => {
+		return docs.map(doc => Object.assign({}, doc, { awesome: true }));
+	});
 
-	let data = postFixture();
-	let post = new Post(data);
-	await post.save();
+	const { db } = t.context;
+	db.register(Post);
 
-	t.true(middlewareTriggered);
-	middlewareTriggered = false;
+	await new Post({ cool: true }).save();
 
-	await post.save({ skip: 'beforeSave' });
-
-	t.false(middlewareTriggered);
+	const post = await Post.where('cool', false).findOne();
+	t.true(post.get('cool', true));
+	t.true(post.get('awesome'));
 });

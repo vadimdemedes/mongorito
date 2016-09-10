@@ -23,43 +23,45 @@ class Query {
 		this.mquery = mquery();
 	}
 
-	find(query) {
-		return this.model.dbCollection()
+	find(query = {}) {
+		this.where(query);
+
+		return this.model.hooks.run('before', 'find', [], this)
+			.then(() => this.model.dbCollection())
 			.then(collection => {
 				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).find(convertObjectIds(query), (err, docs) => {
+					this.mquery.collection(collection).find((err, docs) => {
 						if (err) {
 							reject(err);
 							return;
 						}
 
-						const models = docs.map(doc => new this.model(doc)); // eslint-disable-line babel/new-cap
-						resolve(models);
+						resolve(docs);
 					});
 				});
-			});
+			})
+			.then(docs => this.model.hooks.run('after', 'find', [docs], this));
 	}
 
-	findOne(query) {
-		return this.model.dbCollection()
+	findOne(query = {}) {
+		this.where(query);
+
+		return this.model.hooks.run('before', 'find', [], this)
+			.then(() => this.model.dbCollection())
 			.then(collection => {
 				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).findOne(convertObjectIds(query), (err, doc) => {
+					this.mquery.collection(collection).findOne((err, doc) => {
 						if (err) {
 							reject(err);
 							return;
 						}
 
-						if (!doc) {
-							resolve(null);
-							return;
-						}
-
-						const model = new this.model(doc); // eslint-disable-line babel/new-cap
-						resolve(model);
+						resolve(doc ? [doc] : []);
 					});
 				});
-			});
+			})
+			.then(docs => this.model.hooks.run('after', 'find', [docs], this))
+			.then(models => models[0]);
 	}
 
 	findById(id) {
