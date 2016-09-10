@@ -1,28 +1,19 @@
 'use strict';
 
-/**
- * Dependencies
- */
-
-const setup = require('./_setup');
 const test = require('ava');
+const setup = require('./_setup');
 
 const Post = require('./fixtures/models/post');
 const Task = require('./fixtures/models/task');
 
-
-/**
- * Tests
- */
-
 setup(test);
 
 test('setup an index', async t => {
+	await Post.drop();
 	await Post.index('title');
 
-	let indexes = await Post.indexes();
-	let lastIndex = indexes[indexes.length - 1];
-	t.deepEqual(lastIndex, {
+	const indexes = await Post.indexes();
+	t.deepEqual(indexes.pop(), {
 		v: 1,
 		key: {
 			title: 1
@@ -33,11 +24,11 @@ test('setup an index', async t => {
 });
 
 test('setup a unique index', async t => {
+	await Task.drop();
 	await Task.index('name', { unique: true });
 
-	let indexes = await Task.indexes();
-	let lastIndex = indexes[indexes.length - 1];
-	t.deepEqual(lastIndex, {
+	const indexes = await Task.indexes();
+	t.deepEqual(indexes.pop(), {
 		v: 1,
 		unique: true,
 		key: {
@@ -48,15 +39,5 @@ test('setup a unique index', async t => {
 	});
 
 	await new Task({ name: 'first' }).save();
-
-	let err;
-
-	try {
-		await new Task({ name: 'first' }).save();
-	} catch (e) {
-		err = e;
-	}
-
-	t.truthy(err);
-	t.is(err.name, 'MongoError');
+	t.throws(new Task({ name: 'first' }).save(), 'E11000 duplicate key error index: mongorito_test.tasks.$name_1 dup key: { : "first" }');
 });
