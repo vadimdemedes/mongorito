@@ -5,13 +5,12 @@
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
     "arrify": "^1.0.1",
-    "get-value": "^2.0.6",
+    "dot-prop": "^4.0.0",
     "is-plain-obj": "^1.1.0",
     "lodash.result": "^4.5.2",
     "mongodb": "^2.2.9",
     "mquery": "^1.11.0",
-    "pluralize": "^3.0.0",
-    "set-value": "github:vdemedes/set-value#fix-set-object"
+    "pluralize": "^3.0.0"
   },
   "devDependencies": {
     "ava": "^0.16.0",
