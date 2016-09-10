@@ -16,7 +16,6 @@
   "devDependencies": {
     "ava": "^0.16.0",
     "babel-cli": "^6.14.0",
-    "babel-plugin-async-to-promises": "^1.0.5",
     "babel-plugin-transform-es2015-classes": "^6.14.0",
     "babel-plugin-transform-es2015-parameters": "^6.11.4",
     "chance": "^1.0.4",
@@ -49,9 +48,9 @@
   "babel": {
     "plugins": [
       "transform-es2015-parameters",
-      "transform-es2015-classes",
-      "async-to-promises"
-    ]
+      "transform-es2015-classes"
+    ],
+    "sourceMaps": "inline"
   },
   "xo": {
     "extends": "vdemedes",
