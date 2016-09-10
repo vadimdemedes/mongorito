@@ -22,6 +22,10 @@ function setup (test) {
 		return db.connect();
 	});
 
+	test.beforeEach(t => {
+		t.context.db = db;
+	});
+
 	test.beforeEach(() => Account.remove());
 	test.beforeEach(() => Comment.remove());
 	test.beforeEach(() => Post.remove());
