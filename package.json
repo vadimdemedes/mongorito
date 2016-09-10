@@ -5,6 +5,7 @@
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "dependencies": {
     "arrify": "^1.0.1",
+    "bluebird": "^3.4.6",
     "dot-prop": "^4.0.0",
     "is-plain-obj": "^1.1.0",
     "lodash.result": "^4.5.2",
@@ -55,17 +56,7 @@
   "xo": {
     "extends": "vdemedes",
     "esnext": true,
-    "env": [
-      "node",
-      "mocha"
-    ],
-    "ignore": [
-      "examples/*.js"
-    ],
-    "rules": {
-      "prefer-arrow-callback": 0,
-      "prefer-spread": 0,
-      "no-use-extend-native/no-use-extend-native": 0
-    }
+    "env": "node",
+    "ignore": "lib/**/*.js"
   }
 }
