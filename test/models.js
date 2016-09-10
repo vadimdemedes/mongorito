@@ -1,14 +1,11 @@
 'use strict';
 
-const mongorito = require('../');
 const test = require('ava');
 
 const postFixture = require('./fixtures/post');
 const Account = require('./fixtures/models/account');
 const setup = require('./_setup');
 const Post = require('./fixtures/models/post');
-
-const Model = mongorito.Model;
 
 setup(test);
 

@@ -1,7 +1,7 @@
 'use strict';
 
-const mongorito = require('../');
 const test = require('ava');
+const mongorito = require('../');
 
 const postFixture = require('./fixtures/post');
 const setup = require('./_setup');
@@ -9,7 +9,7 @@ const Post = require('./fixtures/models/post');
 
 setup(test);
 
-test.skip('expose mongodb properties', t => {
+test.failing('expose mongodb properties', t => {
 	const mongodb = require('mongodb');
 
 	const excludedKeys = [

@@ -21,7 +21,7 @@ test('find all documents', async t => {
 
 	while (n--) {
 		const post = new Post();
-		await post.save();
+		await post.save(); // eslint-disable-line babel/no-await-in-loop
 
 		savedPosts.push(post);
 	}
@@ -130,7 +130,7 @@ test('find documents with .limit()', async t => {
 
 	while (n--) {
 		const post = new Post();
-		await post.save();
+		await post.save(); // eslint-disable-line babel/no-await-in-loop
 
 		createdPosts.push(post);
 	}
@@ -146,7 +146,7 @@ test('find documents with .limit() and .skip()', async t => {
 
 	while (n--) {
 		const post = new Post();
-		await post.save();
+		await post.save(); // eslint-disable-line babel/no-await-in-loop
 
 		createdPosts.push(post);
 	}
@@ -166,7 +166,7 @@ test('find documents with .exists()', async t => {
 		}
 
 		const post = new Post(data);
-		await post.save();
+		await post.save(); // eslint-disable-line babel/no-await-in-loop
 	}
 
 	let posts = await Post.exists('body').find();
@@ -188,7 +188,7 @@ test('find documents with .lt(), .lte(), .gt(), .gte()', async t => {
 	while (n--) {
 		const data = postFixture({ index: n });
 		const post = new Post(data);
-		await post.save();
+		await post.save(); // eslint-disable-line babel/no-await-in-loop
 	}
 
 	let posts = await Post.where('index').lt(5).find();
@@ -272,7 +272,7 @@ test('find documents with .in()', async t => {
 	while (n--) {
 		const data = postFixture({ index: n });
 		const post = new Post(data);
-		await post.save();
+		await post.save(); // eslint-disable-line babel/no-await-in-loop
 	}
 
 	const posts = await Post.where('index').in([4, 5]).find();
@@ -284,7 +284,7 @@ test('sort documents', async t => {
 
 	while (n--) {
 		const post = new Post({ index: n });
-		await post.save();
+		await post.save(); // eslint-disable-line babel/no-await-in-loop
 	}
 
 	let posts = await Post.sort({ _id: -1 }).find();
@@ -308,14 +308,14 @@ test('sort documents', async t => {
 	}
 });
 
-test.skip('populate the response', async t => {
+test.failing('populate the response', async t => {
 	let n = 3;
 	const comments = [];
 
 	while (n--) {
 		const data = commentFixture();
 		const comment = new Comment(data);
-		await comment.save();
+		await comment.save(); // eslint-disable-line babel/no-await-in-loop
 
 		comments.push(comment);
 	}
@@ -351,14 +351,14 @@ test.skip('populate the response', async t => {
 	});
 });
 
-test.skip('populate the response excluding one selected field from the child model', async t => {
+test.failing('populate the response excluding one selected field from the child model', async t => {
 	let n = 3;
 	const comments = [];
 
 	while (n--) {
 		const data = commentFixture();
 		const comment = new Comment(data);
-		await comment.save();
+		await comment.save(); // eslint-disable-line babel/no-await-in-loop
 
 		comments.push(comment);
 	}
