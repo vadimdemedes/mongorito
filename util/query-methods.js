@@ -13,7 +13,8 @@ const ignore = [
 	'thunk',
 	'then',
 	'exec',
-	'find'
+	'find',
+	'sort'
 ];
 
 const methods = Object.keys(mquery.prototype)
