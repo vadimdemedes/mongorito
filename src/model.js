@@ -8,7 +8,6 @@ const arrify = require('arrify');
 const queryMethods = require('./util/query-methods');
 const flatten = require('./util/join-obj-keys');
 const Fields = require('./fields');
-const Hooks = require('./hooks');
 const Query = require('./query');
 
 class Model {
@@ -17,6 +16,9 @@ class Model {
 
 		this.fields = new Fields(Object.assign({}, flatten(defaultFields), flatten(fields)));
 		this.previous = new Fields();
+
+		// keep track of unset fields to delete on the next update
+		this._unsetFields = [];
 	}
 
 	get(key) {
@@ -46,19 +48,8 @@ class Model {
 	}
 
 	unset(keys = []) {
-		const unsetKeys = {};
-
-		arrify(keys).forEach(key => {
-			unsetKeys[key] = '';
-		});
-
-		return this.constructor.dbCollection()
-			.then(collection => {
-				return collection.update({ _id: this.get('_id') }, { '$unset': unsetKeys });
-			})
-			.then(() => {
-				this.fields.unset(keys);
-			});
+		this.fields.unset(keys);
+		this._unsetFields.push(...arrify(keys));
 	}
 
 	changed(key) {
@@ -97,7 +88,21 @@ class Model {
 
 		return this.constructor.dbCollection()
 			.then(collection => {
-				return collection.update({ _id: this.get('_id') }, this.get());
+				const update = {
+					$set: this.get()
+				};
+
+				if (this._unsetFields.length > 0) {
+					update.$unset = {};
+
+					this._unsetFields.forEach(field => {
+						update.$unset[field] = '';
+					});
+
+					this._unsetFields.length = 0;
+				}
+
+				return collection.update({ _id: this.get('_id') }, update);
 			});
 	}
 
