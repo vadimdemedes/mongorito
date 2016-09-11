@@ -1,30 +1,12 @@
 'use strict';
 
 const test = require('ava');
-const mongorito = require('../');
 
 const postFixture = require('./fixtures/post');
 const setup = require('./_setup');
 const Post = require('./fixtures/models/post');
 
 setup(test);
-
-test.failing('expose mongodb properties', t => {
-	const mongodb = require('mongodb');
-
-	const excludedKeys = [
-		'connect',
-		'MongoClient',
-		'Db',
-		'db'
-	];
-
-	Object.keys(mongodb).forEach(key => {
-		if (excludedKeys.indexOf(key) === -1) {
-			t.is(mongorito[key], mongodb[key]);
-		}
-	});
-});
 
 test('initialize and manage fields', t => {
 	let data = postFixture();

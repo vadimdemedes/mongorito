@@ -1,6 +1,7 @@
 'use strict';
 
 const test = require('ava');
+const mongorito = require('../');
 
 const postFixture = require('./fixtures/post');
 const Account = require('./fixtures/models/account');
@@ -8,6 +9,12 @@ const setup = require('./_setup');
 const Post = require('./fixtures/models/post');
 
 setup(test);
+
+test('expose mongodb properties', t => {
+	const mongodb = require('mongodb');
+
+	t.is(mongorito.ObjectId, mongodb.ObjectId);
+});
 
 test('create', async t => {
 	const post = new Post();
