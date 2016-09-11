@@ -69,18 +69,6 @@ test('find one document by id', async t => {
 	t.is(post.get('title'), data.title);
 });
 
-test('find one document by id string', async t => {
-	const data = postFixture();
-	const createdPost = new Post(data);
-	await createdPost.save();
-
-	const posts = await Post.count();
-	t.is(posts, 1);
-
-	const post = await Post.findById(getId(createdPost));
-	t.is(post.get('title'), data.title);
-});
-
 test('find a document with .where()', async t => {
 	const data = postFixture();
 	const post = new Post(data);

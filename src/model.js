@@ -277,7 +277,6 @@ const customMethods = [
 	'exclude',
 	'search',
 	'remove',
-	'where',
 	'count',
 	'find',
 	'sort'

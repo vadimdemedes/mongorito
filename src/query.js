@@ -3,7 +3,6 @@
 const isObject = require('is-plain-obj');
 const mquery = require('mquery');
 
-const convertObjectIds = require('./util/convert-object-ids');
 const queryMethods = require('./util/query-methods');
 
 class Query {
@@ -175,23 +174,6 @@ class Query {
 				'$search': query
 			}
 		});
-	}
-
-	where(key, value) {
-		if (!isObject(key) && !value) {
-			this.mquery.where(key);
-			return this;
-		}
-
-		if (!isObject(key)) {
-			return this.where({
-				[key]: value
-			});
-		}
-
-		this.mquery.where(convertObjectIds(key));
-
-		return this;
 	}
 }
 
