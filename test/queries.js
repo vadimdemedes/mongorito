@@ -1,13 +1,10 @@
 'use strict';
 
 const test = require('ava');
-const setup = require('./_setup');
 
-const Comment = require('./fixtures/models/comment');
-const Post = require('./fixtures/models/post');
-
-const commentFixture = require('./fixtures/comment');
 const postFixture = require('./fixtures/post');
+const Post = require('./fixtures/models/post');
+const setup = require('./_setup');
 
 function getId(model) {
 	return String(model.get('_id'));
@@ -308,92 +305,6 @@ test('sort documents', async t => {
 	}
 });
 
-test.failing('populate the response', async t => {
-	let n = 3;
-	const comments = [];
-
-	while (n--) {
-		const data = commentFixture();
-		const comment = new Comment(data);
-		await comment.save(); // eslint-disable-line babel/no-await-in-loop
-
-		comments.push(comment);
-	}
-
-	const data = postFixture({
-		comments: comments.map(comment => comment.get('_id'))
-	});
-
-	const createdPost = new Post(data);
-	await createdPost.save();
-
-	let post = await Post.populate('comments', Comment).findOne();
-
-	post.get('comments').forEach((comment, index) => {
-		const actualId = comment.get('_id').toString();
-		const expectedId = comments[index].get('_id').toString();
-		t.is(actualId, expectedId);
-
-		const attrs = comment.toJSON();
-		const keys = Object.keys(attrs);
-		t.deepEqual(keys, ['_id', 'email', 'body', 'created_at', 'updated_at']);
-	});
-
-	// now confirm that populated documents
-	// don't get saved to database
-	await post.save();
-
-	post = await Post.findOne();
-	post.get('comments').forEach((id, index) => {
-		const expectedId = comments[index].get('_id').toString();
-		const actualId = id.toString();
-		t.is(actualId, expectedId);
-	});
-});
-
-test.failing('populate the response excluding one selected field from the child model', async t => {
-	let n = 3;
-	const comments = [];
-
-	while (n--) {
-		const data = commentFixture();
-		const comment = new Comment(data);
-		await comment.save(); // eslint-disable-line babel/no-await-in-loop
-
-		comments.push(comment);
-	}
-
-	const data = postFixture({
-		comments: comments.map(comment => comment.get('_id'))
-	});
-
-	const createdPost = new Post(data);
-	await createdPost.save();
-
-	let post = await Post.populate('comments', Comment.exclude('email')).findOne();
-
-	post.get('comments').forEach((comment, index) => {
-		const actualId = comment.get('_id').toString();
-		const expectedId = comments[index].get('_id').toString();
-		t.is(actualId, expectedId);
-
-		const attrs = comment.toJSON();
-		const keys = Object.keys(attrs);
-		t.deepEqual(keys, ['_id', 'body', 'created_at', 'updated_at']);
-	});
-
-	// now confirm that populated documents
-	// don't get saved to database
-	await post.save();
-
-	post = await Post.findOne();
-	post.get('comments').forEach((id, index) => {
-		const expectedId = comments[index].get('_id').toString();
-		const actualId = id.toString();
-		t.is(actualId, expectedId);
-	});
-});
-
 test('find documents and include only one selected field', async t => {
 	const post = new Post({
 		title: 'San Francisco',
@@ -466,37 +377,4 @@ test('search documents using text index', async t => {
 	}).find();
 
 	t.deepEqual(posts.map(post => post.get('title')), ['San Francisco', 'San Fran']);
-});
-
-test.failing('get distinct', async t => {
-	await Post.drop();
-
-	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
-	await new Post({ title: 'New York', value: 'distinctVal' }).save();
-	await new Post({ title: 'San Fran', value: 'nondistinctVal' }).save();
-	const distincts = await Post.distinct('value');
-	t.is(distincts.length, 2);
-});
-
-test.failing('get distinct with query', async t => {
-	await Post.drop();
-
-	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
-	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
-	await new Post({ title: 'New York', value: 'distinctVal' }).save();
-	await new Post({ title: 'San Fran', value: 'nondistinctVal' }).save();
-	const distincts = await Post.distinct({ title: 'San Francisco' }, 'value').find();
-	t.is(distincts.length, 1);
-});
-
-test.failing('get aggregate', async t => {
-	await Post.drop();
-
-	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
-	await new Post({ title: 'San Francisco', value: 'distinctVal' }).save();
-	await new Post({ title: 'San Francisco', value: 'nondistinctVal' }).save();
-	await new Post({ title: 'New York', value: 'distinctVal' }).save();
-	await new Post({ title: 'San Fran', value: 'nondistinctVal' }).save();
-	const distincts = await Post.aggregate([{ $match: { 'title': 'San Francisco' } }, { $group: { '_id': '$title' } }, { $sort: { 'title': -1 } }, { $limit: 1 }, { $project: { 'projectName': 1 } }]);
-	t.is(distincts.length, 1);
 });
