@@ -238,6 +238,11 @@ Model.index = function (...args) {
 		.then(collection => collection.ensureIndex(...args));
 };
 
+Model.dropIndex = function (...args) {
+	return this.dbCollection()
+		.then(collection => collection.dropIndex(...args));
+};
+
 Model.indexes = function (...args) {
 	return this.dbCollection()
 		.then(collection => collection.listIndexes(...args).toArray());
