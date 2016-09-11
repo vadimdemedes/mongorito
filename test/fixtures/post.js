@@ -4,7 +4,7 @@ const chance = require('chance')();
 
 const commentFixture = require('./comment');
 
-function postFixture (attrs = {}) {
+function postFixture (attrs) {
 	let n = 2;
 	const comments = [];
 
