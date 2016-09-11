@@ -266,6 +266,10 @@ Model.after = function (event, handler) {
 	this.hooks.after(event, handler, { priority: 5 });
 };
 
+Model.use = function (plugin) {
+	return plugin(this);
+};
+
 const customMethods = [
 	'findById',
 	'findOne',

@@ -19,6 +19,8 @@ class Database {
 
 		this.options = options;
 		this.state = STATE_DISCONNECTED;
+		this.models = [];
+		this.plugins = [];
 	}
 
 	connect() {
@@ -63,6 +65,13 @@ class Database {
 
 	register(model) {
 		model.database = this;
+		this.plugins.forEach(plugin => model.use(plugin));
+		this.models.push(model);
+	}
+
+	use(plugin) {
+		this.models.forEach(model => model.use(plugin));
+		this.plugins.push(plugin);
 	}
 }
 

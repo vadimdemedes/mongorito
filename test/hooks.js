@@ -261,6 +261,154 @@ test('instance - execute per-model hooks', async t => {
 	]);
 });
 
+test('instance - execute hooks assigned via model plugin', async t => {
+	let hooks = [];
+
+	class Post extends Model {}
+
+	Post.use(model => {
+		model.before('create', () => hooks.push('before:create'));
+		model.before('update', () => hooks.push('before:update'));
+		model.before('remove', () => hooks.push('before:remove'));
+		model.before('save', () => hooks.push('before:save'));
+		model.after('create', () => hooks.push('after:create'));
+		model.after('update', () => hooks.push('after:update'));
+		model.after('remove', () => hooks.push('after:remove'));
+		model.after('save', () => hooks.push('after:save'));
+	});
+
+	const { db } = t.context;
+	db.register(Post);
+
+	const post = new Post();
+
+	// test create
+	await post.save();
+	t.deepEqual(hooks, [
+		'before:save',
+		'before:create',
+		'after:create',
+		'after:save'
+	]);
+
+	// test update
+	hooks = [];
+	await post.save();
+	t.deepEqual(hooks, [
+		'before:save',
+		'before:update',
+		'after:update',
+		'after:save'
+	]);
+
+	// test remove
+	hooks = [];
+	await post.remove();
+	t.deepEqual(hooks, [
+		'before:remove',
+		'after:remove'
+	]);
+});
+
+test('instance - execute hooks assigned via database plugin before model register', async t => {
+	let hooks = [];
+
+	class Post extends Model {}
+
+	const { db } = t.context;
+
+	db.use(model => {
+		model.before('create', () => hooks.push('before:create'));
+		model.before('update', () => hooks.push('before:update'));
+		model.before('remove', () => hooks.push('before:remove'));
+		model.before('save', () => hooks.push('before:save'));
+		model.after('create', () => hooks.push('after:create'));
+		model.after('update', () => hooks.push('after:update'));
+		model.after('remove', () => hooks.push('after:remove'));
+		model.after('save', () => hooks.push('after:save'));
+	});
+
+	db.register(Post);
+
+	const post = new Post();
+
+	// test create
+	await post.save();
+	t.deepEqual(hooks, [
+		'before:save',
+		'before:create',
+		'after:create',
+		'after:save'
+	]);
+
+	// test update
+	hooks = [];
+	await post.save();
+	t.deepEqual(hooks, [
+		'before:save',
+		'before:update',
+		'after:update',
+		'after:save'
+	]);
+
+	// test remove
+	hooks = [];
+	await post.remove();
+	t.deepEqual(hooks, [
+		'before:remove',
+		'after:remove'
+	]);
+});
+
+test('instance - execute hooks assigned via database plugin after model register', async t => {
+	let hooks = [];
+
+	class Post extends Model {}
+
+	const { db } = t.context;
+	db.register(Post);
+
+	db.use(model => {
+		model.before('create', () => hooks.push('before:create'));
+		model.before('update', () => hooks.push('before:update'));
+		model.before('remove', () => hooks.push('before:remove'));
+		model.before('save', () => hooks.push('before:save'));
+		model.after('create', () => hooks.push('after:create'));
+		model.after('update', () => hooks.push('after:update'));
+		model.after('remove', () => hooks.push('after:remove'));
+		model.after('save', () => hooks.push('after:save'));
+	});
+
+	const post = new Post();
+
+	// test create
+	await post.save();
+	t.deepEqual(hooks, [
+		'before:save',
+		'before:create',
+		'after:create',
+		'after:save'
+	]);
+
+	// test update
+	hooks = [];
+	await post.save();
+	t.deepEqual(hooks, [
+		'before:save',
+		'before:update',
+		'after:update',
+		'after:save'
+	]);
+
+	// test remove
+	hooks = [];
+	await post.remove();
+	t.deepEqual(hooks, [
+		'before:remove',
+		'after:remove'
+	]);
+});
+
 test('class - execute find hooks on find()', async t => {
 	class Post extends Model {}
 
