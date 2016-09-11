@@ -1,9 +1,9 @@
 'use strict';
 
 const test = require('ava');
-const setup = require('./_setup');
 
 const Post = require('./fixtures/models/post');
+const setup = require('./_setup');
 
 setup(test);
 

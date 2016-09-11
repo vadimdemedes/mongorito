@@ -4,7 +4,6 @@ const test = require('ava');
 const mongorito = require('../');
 
 const postFixture = require('./fixtures/post');
-const Account = require('./fixtures/models/account');
 const setup = require('./_setup');
 const Post = require('./fixtures/models/post');
 
@@ -32,6 +31,10 @@ test('create', async t => {
 test('create with default values', async t => {
 	let data = postFixture();
 	delete data.title;
+
+	Post.defaultFields = {
+		title: 'Default title'
+	};
 
 	let post = new Post(data);
 	await post.save();
@@ -108,5 +111,5 @@ test('remove all documents', async t => {
 });
 
 test('automatically set collection name', async t => {
-	t.is(Account.collection(), 'accounts');
+	t.is(Post.collection(), 'posts');
 });

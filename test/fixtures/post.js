@@ -1,39 +1,28 @@
 'use strict';
 
-/**
- * Dependencies
- */
-
 const chance = require('chance')();
 
 const commentFixture = require('./comment');
 
-
-/**
- * Expose post fixture
- */
-
-module.exports = function postFixture (attrs) {
+function postFixture (attrs = {}) {
 	let n = 2;
-	let comments = [];
+	const comments = [];
 
 	while (n--) {
 		comments.push(commentFixture());
 	}
 
-	let post = {
+	const post = {
 		title: chance.word(),
 		body: chance.word(),
 		author: {
 			name: chance.word()
 		},
-		comments: comments,
+		comments,
 		views: 0
 	};
 
-	for (let key in attrs) {
-		post[key] = attrs[key];
-	}
-
-	return post;
+	return Object.assign(post, attrs);
 };
+
+module.exports = postFixture;

@@ -1,19 +1,12 @@
 'use strict';
 
-/**
- * Dependencies
- */
-
 const chance = require('chance')();
 
-
-/**
- * Expose comment fixture
- */
-
-module.exports = function commentFixture() {
+function commentFixture() {
 	return {
 		email: chance.email(),
 		body: chance.word()
 	};
 };
+
+module.exports = commentFixture;
