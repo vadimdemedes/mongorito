@@ -11,6 +11,7 @@ const ignore = [
 	'remove',
 	'count',
 	'thunk',
+	'where',
 	'then',
 	'exec',
 	'find',

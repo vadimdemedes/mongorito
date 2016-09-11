@@ -3,20 +3,8 @@
 const isObject = require('is-plain-obj');
 const mquery = require('mquery');
 
+const convertObjectIds = require('./util/convert-object-ids');
 const queryMethods = require('./util/query-methods');
-const toObjectId = require('./util/to-objectid');
-
-function convertObjectIds(obj = {}, fields = ['_id']) {
-	const newObj = Object.assign({}, obj);
-
-	Object.keys(obj)
-		.filter(key => fields.indexOf(key) >= 0)
-		.forEach(key => {
-			newObj[key] = toObjectId(newObj[key]);
-		});
-
-	return newObj;
-}
 
 class Query {
 	constructor() {
@@ -65,10 +53,12 @@ class Query {
 	}
 
 	findById(id) {
+		this.where('_id', id);
+
 		return this.model.dbCollection()
 			.then(collection => {
 				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).findOne({ '_id': toObjectId(id) }, (err, doc) => {
+					this.mquery.collection(collection).findOne((err, doc) => {
 						if (err) {
 							reject(err);
 							return;
@@ -86,11 +76,13 @@ class Query {
 			});
 	}
 
-	remove(query) {
+	remove(query = {}) {
+		this.where(query);
+
 		return this.model.dbCollection()
 			.then(collection => {
 				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).remove(convertObjectIds(query), err => {
+					this.mquery.collection(collection).remove(err => {
 						if (err) {
 							reject(err);
 							return;
@@ -102,11 +94,13 @@ class Query {
 			});
 	}
 
-	count(query) {
+	count(query = {}) {
+		this.where(query);
+
 		return this.model.dbCollection()
 			.then(collection => {
 				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).count(convertObjectIds(query), (err, count) => {
+					this.mquery.collection(collection).count((err, count) => {
 						if (err) {
 							reject(err);
 							return;
@@ -181,6 +175,23 @@ class Query {
 				'$search': query
 			}
 		});
+	}
+
+	where(key, value) {
+		if (!isObject(key) && !value) {
+			this.mquery.where(key);
+			return this;
+		}
+
+		if (!isObject(key)) {
+			return this.where({
+				[key]: value
+			});
+		}
+
+		this.mquery.where(convertObjectIds(key));
+
+		return this;
 	}
 }
 
