@@ -4,12 +4,10 @@ const test = require('ava');
 const setup = require('./_setup');
 
 const Post = require('./fixtures/models/post');
-const Task = require('./fixtures/models/task');
 
 setup(test);
 
 test('setup an index', async t => {
-	await Post.drop();
 	await Post.index('title');
 
 	const indexes = await Post.indexes();
@@ -21,13 +19,14 @@ test('setup an index', async t => {
 		name: 'title_1',
 		ns: 'mongorito_test.posts'
 	});
+
+	await Post.dropIndex('title_1');
 });
 
 test('setup a unique index', async t => {
-	await Task.drop();
-	await Task.index('name', { unique: true });
+	await Post.index('name', { unique: true });
 
-	const indexes = await Task.indexes();
+	const indexes = await Post.indexes();
 	t.deepEqual(indexes.pop(), {
 		v: 1,
 		unique: true,
@@ -35,9 +34,20 @@ test('setup a unique index', async t => {
 			name: 1
 		},
 		name: 'name_1',
-		ns: 'mongorito_test.tasks'
+		ns: 'mongorito_test.posts'
 	});
 
-	await new Task({ name: 'first' }).save();
-	t.throws(new Task({ name: 'first' }).save(), 'E11000 duplicate key error index: mongorito_test.tasks.$name_1 dup key: { : "first" }');
+	await new Post({ name: 'first' }).save();
+	await t.throws(new Post({ name: 'first' }).save());
+	await Post.dropIndex('name_1');
+});
+
+test('drop index', async t => {
+	await Post.index('name', { unique: true });
+
+	await new Post({ name: 'first' }).save();
+	await t.throws(new Post({ name: 'first' }).save());
+
+	await Post.dropIndex('name_1');
+	await new Post({ name: 'first' }).save();
 });
