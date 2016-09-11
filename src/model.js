@@ -18,6 +18,7 @@ class Model {
 		this.fields = new Fields(Object.assign({}, flatten(defaultFields), flatten(fields)));
 		this.previous = new Fields();
 
+		this.globalHooks = this.constructor.hooks || new Hooks();
 		this.hooks = new Hooks();
 
 		// keep track of unset fields to delete on the next update
@@ -86,16 +87,19 @@ class Model {
 	save() {
 		const isSaved = Boolean(this.get('_id'));
 
-		return this.hooks.run('before', 'save', [], this)
+		return this.globalHooks.run('before', 'save', [], this)
+			.then(() => this.hooks.run('before', 'save', [], this))
 			.then(() => isSaved ? this.update() : this.create())
-			.then(() => this.hooks.run('after', 'save', [], this));
+			.then(() => this.hooks.run('after', 'save', [], this))
+			.then(() => this.globalHooks.run('after', 'save', [], this));
 	}
 
 	create() {
 		this.set('created_at', new Date());
 		this.set('updated_at', new Date());
 
-		return this.hooks.run('before', 'create', [], this)
+		return this.globalHooks.run('before', 'create', [], this)
+			.then(() => this.hooks.run('before', 'create', [], this))
 			.then(() => this.constructor.dbCollection())
 			.then(collection => {
 				return collection.insert(this.get());
@@ -103,13 +107,15 @@ class Model {
 			.then(inserted => {
 				this.set('_id', inserted.ops[0]._id);
 			})
-			.then(() => this.hooks.run('after', 'create', [], this));
+			.then(() => this.hooks.run('after', 'create', [], this))
+			.then(() => this.globalHooks.run('after', 'create', [], this));
 	}
 
 	update() {
 		this.set('updated_at', new Date());
 
-		return this.hooks.run('before', 'update', [], this)
+		return this.globalHooks.run('before', 'update', [], this)
+			.then(() => this.hooks.run('before', 'update', [], this))
 			.then(() => this.constructor.dbCollection())
 			.then(collection => {
 				const update = {
@@ -128,7 +134,8 @@ class Model {
 
 				return collection.update({ _id: this.get('_id') }, update);
 			})
-			.then(() => this.hooks.run('after', 'update', [], this));
+			.then(() => this.hooks.run('after', 'update', [], this))
+			.then(() => this.globalHooks.run('after', 'update', [], this));
 	}
 
 	inc(key, value = 1) {
@@ -150,7 +157,8 @@ class Model {
 			};
 		}
 
-		return this.hooks.run('before', 'update', [], this)
+		return this.globalHooks.run('before', 'update', [], this)
+			.then(() => this.hooks.run('before', 'update', [], this))
 			.then(() => this.constructor.dbCollection())
 			.then(collection => {
 				const update = {
@@ -161,7 +169,8 @@ class Model {
 				return collection.update({ _id: this.get('_id') }, update);
 			})
 			.then(() => this.refresh())
-			.then(() => this.hooks.run('after', 'update', [], this));
+			.then(() => this.hooks.run('after', 'update', [], this))
+			.then(() => this.globalHooks.run('after', 'update', [], this));
 	}
 
 	refresh() {
@@ -187,12 +196,14 @@ class Model {
 			return Promise.reject(new Error('Unsaved model can\'t be removed.'));
 		}
 
-		return this.hooks.run('before', 'remove', [], this)
+		return this.globalHooks.run('before', 'remove', [], this)
+			.then(() => this.hooks.run('before', 'remove', [], this))
 			.then(() => this.constructor.dbCollection())
 			.then(collection => {
 				return collection.remove({ _id: this.get('_id') });
 			})
-			.then(() => this.hooks.run('after', 'remove', [], this));
+			.then(() => this.hooks.run('after', 'remove', [], this))
+			.then(() => this.globalHooks.run('after', 'remove', [], this));
 	}
 }
 

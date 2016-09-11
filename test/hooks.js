@@ -214,6 +214,53 @@ test('instance - execution order of create, update and save hooks', async t => {
 	]);
 });
 
+test('instance - execute per-model hooks', async t => {
+	let hooks = [];
+
+	class Post extends Model {}
+
+	const { db } = t.context;
+	db.register(Post);
+
+	Post.before('create', () => hooks.push('before:create'));
+	Post.before('update', () => hooks.push('before:update'));
+	Post.before('remove', () => hooks.push('before:remove'));
+	Post.before('save', () => hooks.push('before:save'));
+	Post.after('create', () => hooks.push('after:create'));
+	Post.after('update', () => hooks.push('after:update'));
+	Post.after('remove', () => hooks.push('after:remove'));
+	Post.after('save', () => hooks.push('after:save'));
+
+	const post = new Post();
+
+	// test create
+	await post.save();
+	t.deepEqual(hooks, [
+		'before:save',
+		'before:create',
+		'after:create',
+		'after:save'
+	]);
+
+	// test update
+	hooks = [];
+	await post.save();
+	t.deepEqual(hooks, [
+		'before:save',
+		'before:update',
+		'after:update',
+		'after:save'
+	]);
+
+	// test remove
+	hooks = [];
+	await post.remove();
+	t.deepEqual(hooks, [
+		'before:remove',
+		'after:remove'
+	]);
+});
+
 test('class - execute find hooks on find()', async t => {
 	class Post extends Model {}
 
