@@ -31,7 +31,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "babel src -d lib",
+    "build": "rm -rf lib && babel src -d lib",
     "test": "npm run build && xo && nyc ava --serial",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
