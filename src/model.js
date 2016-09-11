@@ -160,6 +160,7 @@ class Model {
 
 				return collection.update({ _id: this.get('_id') }, update);
 			})
+			.then(() => this.refresh())
 			.then(() => this.hooks.run('after', 'update', [], this));
 	}
 
