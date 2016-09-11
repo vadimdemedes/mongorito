@@ -4,7 +4,6 @@ const Mongorito = require('../');
 
 const Account = require('./fixtures/models/account');
 const Post = require('./fixtures/models/post');
-const Task = require('./fixtures/models/task');
 
 function setup (test) {
 	let db;
@@ -15,7 +14,6 @@ function setup (test) {
 		db = new Mongorito(url);
 		db.register(Account);
 		db.register(Post);
-		db.register(Task);
 
 		return db.connect();
 	});
@@ -26,7 +24,6 @@ function setup (test) {
 
 	test.beforeEach(() => Account.remove());
 	test.beforeEach(() => Post.remove());
-	test.beforeEach(() => Task.remove());
 
 	test.after(() => db.disconnect());
 }
