@@ -15,18 +15,7 @@ class Query {
 
 		return this.model.hooks.run('before', 'find', [], this)
 			.then(() => this.model.dbCollection())
-			.then(collection => {
-				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).find((err, docs) => {
-						if (err) {
-							reject(err);
-							return;
-						}
-
-						resolve(docs);
-					});
-				});
-			})
+			.then(collection => this.mquery.collection(collection).find())
 			.then(docs => this.model.hooks.run('after', 'find', [docs], this));
 	}
 
@@ -35,18 +24,8 @@ class Query {
 
 		return this.model.hooks.run('before', 'find', [], this)
 			.then(() => this.model.dbCollection())
-			.then(collection => {
-				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).findOne((err, doc) => {
-						if (err) {
-							reject(err);
-							return;
-						}
-
-						resolve(doc ? [doc] : []);
-					});
-				});
-			})
+			.then(collection => this.mquery.collection(collection).findOne())
+			.then(doc => doc ? [doc] : [])
 			.then(docs => this.model.hooks.run('after', 'find', [docs], this))
 			.then(models => models[0]);
 	}
@@ -55,60 +34,22 @@ class Query {
 		this.where('_id', id);
 
 		return this.model.dbCollection()
-			.then(collection => {
-				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).findOne((err, doc) => {
-						if (err) {
-							reject(err);
-							return;
-						}
-
-						if (!doc) {
-							resolve(null);
-							return;
-						}
-
-						const model = new this.model(doc); // eslint-disable-line babel/new-cap
-						resolve(model);
-					});
-				});
-			});
+			.then(collection => this.mquery.collection(collection).findOne())
+			.then(doc => doc ? new this.model(doc) : null); // eslint-disable-line babel/new-cap
 	}
 
 	remove(query = {}) {
 		this.where(query);
 
 		return this.model.dbCollection()
-			.then(collection => {
-				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).remove(err => {
-						if (err) {
-							reject(err);
-							return;
-						}
-
-						resolve();
-					});
-				});
-			});
+			.then(collection => this.mquery.collection(collection).remove());
 	}
 
 	count(query = {}) {
 		this.where(query);
 
 		return this.model.dbCollection()
-			.then(collection => {
-				return new Promise((resolve, reject) => {
-					this.mquery.collection(collection).count((err, count) => {
-						if (err) {
-							reject(err);
-							return;
-						}
-
-						resolve(count);
-					});
-				});
-			});
+			.then(collection => this.mquery.collection(collection).count());
 	}
 
 	include(field, value = 1) {
