@@ -3,6 +3,9 @@
   "version": "2.2.0",
   "description": "ES6 generator-based MongoDB ODM. It rocks.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
+  "engines": {
+    "node": ">= 4"
+  },
   "dependencies": {
     "arrify": "^1.0.1",
     "dot-prop": "^4.0.0",
@@ -14,11 +17,6 @@
   },
   "devDependencies": {
     "ava": "^0.16.0",
-    "babel-cli": "^6.14.0",
-    "babel-plugin-transform-es2015-classes": "^6.14.0",
-    "babel-plugin-transform-es2015-destructuring": "^6.9.0",
-    "babel-plugin-transform-es2015-parameters": "^6.11.4",
-    "babel-plugin-transform-es2015-spread": "^6.8.0",
     "chance": "^1.0.4",
     "coveralls": "^2.11.12",
     "nyc": "^8.1.0",
@@ -30,8 +28,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "rm -rf lib && babel src -d lib",
-    "test": "npm run build && xo && nyc ava --serial",
+    "test": "xo && nyc ava --serial",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": "vdemedes/mongorito",
@@ -45,18 +42,9 @@
     "es6"
   ],
   "license": "MIT",
-  "babel": {
-    "plugins": [
-      "transform-es2015-destructuring",
-      "transform-es2015-parameters",
-      "transform-es2015-classes",
-      "transform-es2015-spread"
-    ]
-  },
   "xo": {
     "esnext": true,
     "env": "node",
-    "ignore": "lib/**/*.js",
     "rules": {
       "array-callback-return": 1
     }

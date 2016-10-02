@@ -3,4 +3,3 @@ node_modules
 coverage
 html-report
 .nyc_output
-lib
