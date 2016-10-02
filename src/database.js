@@ -1,6 +1,6 @@
 'use strict';
 
-const { MongoClient } = require('mongodb');
+const {MongoClient} = require('mongodb');
 const arrify = require('arrify');
 
 const STATE_CONNECTED = 0;

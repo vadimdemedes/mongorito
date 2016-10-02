@@ -4,7 +4,7 @@ const Mongorito = require('../');
 
 const Post = require('./fixtures/models/post');
 
-function setup (test) {
+function setup(test) {
 	let db;
 
 	test.before(() => {

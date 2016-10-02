@@ -40,10 +40,10 @@ test('count all documents', async t => {
 test('count by criteria', async t => {
 	t.is(await Post.count(), 0);
 
-	await new Post({ awesome: true }).save();
-	await new Post({ awesome: false }).save();
+	await new Post({awesome: true}).save();
+	await new Post({awesome: false}).save();
 
-	t.is(await Post.count({ awesome: true }), 1);
+	t.is(await Post.count({awesome: true}), 1);
 });
 
 test('find one document', async t => {
@@ -94,13 +94,13 @@ test('find a document with .where() matching sub-documents using $elemMatch', as
 	const post = new Post(data);
 	await post.save();
 
-	const posts = await Post.where('comments').elemMatch({ body: data.comments[0].body }).find();
+	const posts = await Post.where('comments').elemMatch({body: data.comments[0].body}).find();
 	t.is(posts.length, 1);
 	t.is(getId(posts[0]), getId(post));
 });
 
 test('find a document with .where() matching with regex', async t => {
-	const data = postFixture({ title: 'Something' });
+	const data = postFixture({title: 'Something'});
 	const post = new Post(data);
 	await post.save();
 
@@ -171,7 +171,7 @@ test('find documents with .lt(), .lte(), .gt(), .gte()', async t => {
 	let n = 10;
 
 	while (n--) {
-		const data = postFixture({ index: n });
+		const data = postFixture({index: n});
 		const post = new Post(data);
 		await post.save(); // eslint-disable-line babel/no-await-in-loop
 	}
@@ -215,7 +215,7 @@ test('find documents with .or()', async t => {
 	await secondPost.save();
 	await thirdPost.save();
 
-	const posts = await Post.or([{ isPublic: true }, { 'author.name': 'user2' }]).find();
+	const posts = await Post.or([{isPublic: true}, {'author.name': 'user2'}]).find();
 	t.deepEqual(posts.map(getId), [getId(firstPost), getId(secondPost)]);
 });
 
@@ -247,7 +247,7 @@ test('find documents with .and()', async t => {
 	await secondPost.save();
 	await thirdPost.save();
 
-	const posts = await Post.and({ isPublic: false }, { 'author.name': 'user2' }).find();
+	const posts = await Post.and({isPublic: false}, {'author.name': 'user2'}).find();
 	t.deepEqual(posts.map(getId), [getId(secondPost), getId(thirdPost)]);
 });
 
@@ -255,7 +255,7 @@ test('find documents with .in()', async t => {
 	let n = 10;
 
 	while (n--) {
-		const data = postFixture({ index: n });
+		const data = postFixture({index: n});
 		const post = new Post(data);
 		await post.save(); // eslint-disable-line babel/no-await-in-loop
 	}
@@ -268,11 +268,11 @@ test('sort documents', async t => {
 	let n = 4;
 
 	while (n--) {
-		const post = new Post({ index: n });
+		const post = new Post({index: n});
 		await post.save(); // eslint-disable-line babel/no-await-in-loop
 	}
 
-	let posts = await Post.sort({ _id: -1 }).find();
+	let posts = await Post.sort({_id: -1}).find();
 	t.is(posts.length, 4);
 
 	n = 4;
@@ -282,7 +282,7 @@ test('sort documents', async t => {
 		t.is(post.get('index'), n);
 	}
 
-	posts = await Post.sort({ _id: 1 }).find();
+	posts = await Post.sort({_id: 1}).find();
 	t.is(posts.length, 4);
 
 	n = 4;
@@ -352,16 +352,16 @@ test('find documents and exclude two selected fields', async t => {
 test('search documents using text index', async t => {
 	await Post.drop();
 
-	await new Post({ title: 'San Francisco' }).save();
-	await new Post({ title: 'New York' }).save();
-	await new Post({ title: 'San Fran' }).save();
+	await new Post({title: 'San Francisco'}).save();
+	await new Post({title: 'New York'}).save();
+	await new Post({title: 'San Fran'}).save();
 
-	await Post.index({ title: 'text' });
+	await Post.index({title: 'text'});
 
 	const posts = await Post.search('San').sort('score', {
-		'$meta': 'textScore'
+		$meta: 'textScore'
 	}).include('score', {
-		'$meta': 'textScore'
+		$meta: 'textScore'
 	}).find();
 
 	t.deepEqual(posts.map(post => post.get('title')), ['San Francisco', 'San Fran']);

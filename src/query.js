@@ -111,8 +111,8 @@ class Query {
 
 	search(query) {
 		return this.where({
-			'$text': {
-				'$search': query
+			$text: {
+				$search: query
 			}
 		});
 	}

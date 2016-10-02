@@ -29,21 +29,21 @@ test('create', async t => {
 });
 
 test('create with default values', async t => {
-	let data = postFixture();
+	const data = postFixture();
 	delete data.title;
 
 	Post.defaultFields = {
 		title: 'Default title'
 	};
 
-	let post = new Post(data);
+	const post = new Post(data);
 	await post.save();
 
 	t.is(post.get('title'), 'Default title');
 });
 
 test('update', async t => {
-	let post = new Post({ awesome: true });
+	let post = new Post({awesome: true});
 	await post.save();
 
 	post = await Post.findOne();
@@ -57,21 +57,20 @@ test('update', async t => {
 });
 
 test('update `updated_at` attribute', async t => {
-	let post = new Post();
+	const post = new Post();
 	await post.save();
 
-	let prevDate = post.get('updated_at').getTime();
+	const prevDate = post.get('updated_at').getTime();
 
 	post.set('awesome', true);
 	await post.save();
 
-	let nextDate = post.get('updated_at').getTime();
-
+	const nextDate = post.get('updated_at').getTime();
 	t.not(prevDate, nextDate);
 });
 
 test('remove', async t => {
-	let post = new Post();
+	const post = new Post();
 	await post.save();
 
 	let posts = await Post.count();
@@ -84,13 +83,13 @@ test('remove', async t => {
 });
 
 test('remove by criteria', async t => {
-	await new Post({ awesome: true }).save();
-	await new Post({ awesome: false }).save();
+	await new Post({awesome: true}).save();
+	await new Post({awesome: false}).save();
 
 	let posts = await Post.find();
 	t.is(posts.length, 2);
 
-	await Post.remove({ awesome: false });
+	await Post.remove({awesome: false});
 
 	posts = await Post.find();
 	t.is(posts.length, 1);

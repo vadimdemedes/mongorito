@@ -21,7 +21,6 @@
     "babel-plugin-transform-es2015-spread": "^6.8.0",
     "chance": "^1.0.4",
     "coveralls": "^2.11.12",
-    "eslint-config-vdemedes": "^1.0.2",
     "nyc": "^8.1.0",
     "xo": "^0.16.0"
   },
@@ -55,12 +54,11 @@
     ]
   },
   "xo": {
-    "extends": "vdemedes",
     "esnext": true,
     "env": "node",
     "ignore": "lib/**/*.js",
     "rules": {
-      "array-callback-return": 0
+      "array-callback-return": 1
     }
   },
   "ava": {

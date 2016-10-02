@@ -20,12 +20,12 @@ class Hooks {
 		};
 	}
 
-	before(event, handler, { priority }) {
-		this.hooks.before[event].push({ handler, priority });
+	before(event, handler, {priority}) {
+		this.hooks.before[event].push({handler, priority});
 	}
 
-	after(event, handler, { priority }) {
-		this.hooks.after[event].push({ handler, priority });
+	after(event, handler, {priority}) {
+		this.hooks.after[event].push({handler, priority});
 	}
 
 	run(place, event, args = [], context) {
@@ -33,7 +33,7 @@ class Hooks {
 
 		this.hooks[place][event]
 			.sort((a, b) => a.priority < b.priority)
-			.forEach(({ handler }) => {
+			.forEach(({handler}) => {
 				p = p.then(ret => {
 					return handler.apply(context, ret === undefined ? args : [ret]);
 				});

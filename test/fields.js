@@ -29,7 +29,7 @@ test('set & get fields', t => {
 });
 
 test('unset fields', async t => {
-	const data = { awesome: true };
+	const data = {awesome: true};
 	const post = new Post(data);
 	await post.save();
 
@@ -42,22 +42,22 @@ test('unset fields', async t => {
 });
 
 test('increment fields', async t => {
-	const post = new Post({ views: 1, total: 0 });
+	const post = new Post({views: 1, total: 0});
 	await post.save();
 
 	t.is(post.get('views'), 1);
 	t.is(post.get('total'), 0);
 
-	await post.inc({ views: 1, total: 3 });
+	await post.inc({views: 1, total: 3});
 
 	t.is(post.get('views'), 2);
 	t.is(post.get('total'), 3);
 });
 
 test('fail if incrementing fields on unsaved document', async t => {
-	const post = new Post({ views: 1 });
+	const post = new Post({views: 1});
 
-	await t.throws(post.inc({ views: 1 }));
+	await t.throws(post.inc({views: 1}));
 });
 
 test('convert to JSON', t => {
@@ -72,7 +72,7 @@ test('convert to JSON', t => {
 });
 
 test('remember previous fields', t => {
-	const post = new Post({ title: 'Sad title' });
+	const post = new Post({title: 'Sad title'});
 	t.is(post.get('title'), 'Sad title');
 
 	post.set('title', 'Happy title');
@@ -82,7 +82,7 @@ test('remember previous fields', t => {
 });
 
 test('no previous value stored initially', t => {
-	const post = new Post({ title: 'Sad title' });
+	const post = new Post({title: 'Sad title'});
 	t.is(post.get('title'), 'Sad title');
 
 	post.set('title', 'Sad title');

@@ -73,7 +73,7 @@ class Model {
 			handler = this[handler];
 		}
 
-		this.hooks.before(event, handler, { priority: 5 });
+		this.hooks.before(event, handler, {priority: 5});
 	}
 
 	after(event, handler) {
@@ -81,7 +81,7 @@ class Model {
 			handler = this[handler];
 		}
 
-		this.hooks.after(event, handler, { priority: 5 });
+		this.hooks.after(event, handler, {priority: 5});
 	}
 
 	save() {
@@ -132,7 +132,7 @@ class Model {
 					this._unsetFields.length = 0;
 				}
 
-				return collection.update({ _id: this.get('_id') }, update);
+				return collection.update({_id: this.get('_id')}, update);
 			})
 			.then(() => this.hooks.run('after', 'update', [], this))
 			.then(() => this.globalHooks.run('after', 'update', [], this));
@@ -163,10 +163,10 @@ class Model {
 			.then(collection => {
 				const update = {
 					$inc: fields,
-					$set: { 'updated_at': this.get('updated_at') }
+					$set: {'updated_at': this.get('updated_at')} // eslint-disable-line quote-props
 				};
 
-				return collection.update({ _id: this.get('_id') }, update);
+				return collection.update({_id: this.get('_id')}, update);
 			})
 			.then(() => this.refresh())
 			.then(() => this.hooks.run('after', 'update', [], this))
@@ -182,7 +182,7 @@ class Model {
 
 		return this.constructor.dbCollection()
 			.then(collection => {
-				return collection.findOne({ _id: this.get('_id') });
+				return collection.findOne({_id: this.get('_id')});
 			})
 			.then(fields => {
 				this.set(fields);
@@ -200,7 +200,7 @@ class Model {
 			.then(() => this.hooks.run('before', 'remove', [], this))
 			.then(() => this.constructor.dbCollection())
 			.then(collection => {
-				return collection.remove({ _id: this.get('_id') });
+				return collection.remove({_id: this.get('_id')});
 			})
 			.then(() => this.hooks.run('after', 'remove', [], this))
 			.then(() => this.globalHooks.run('after', 'remove', [], this));
@@ -252,7 +252,7 @@ Model.setupDefaultHooks = function () {
 	this.hooks = new Hooks();
 	this.hooks.after('find', docs => {
 		return docs.map(doc => new this(doc)); // eslint-disable-line babel/new-cap
-	}, { priority: 0 });
+	}, {priority: 0});
 };
 
 Model.before = function (event, handler) {
@@ -260,7 +260,7 @@ Model.before = function (event, handler) {
 		this.setupDefaultHooks();
 	}
 
-	this.hooks.before(event, handler, { priority: 5 });
+	this.hooks.before(event, handler, {priority: 5});
 };
 
 Model.after = function (event, handler) {
@@ -268,7 +268,7 @@ Model.after = function (event, handler) {
 		this.setupDefaultHooks();
 	}
 
-	this.hooks.after(event, handler, { priority: 5 });
+	this.hooks.after(event, handler, {priority: 5});
 };
 
 Model.use = function (plugin) {

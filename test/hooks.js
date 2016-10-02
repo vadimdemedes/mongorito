@@ -34,7 +34,7 @@ test('instance - execute create hooks', async t => {
 		}
 	}
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
 	const post = new Post();
@@ -67,7 +67,7 @@ test('instance - execute update hooks', async t => {
 		}
 	}
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
 	const post = new Post();
@@ -103,7 +103,7 @@ test('instance - execute save hooks', async t => {
 		}
 	}
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
 	const post = new Post();
@@ -139,7 +139,7 @@ test('instance - execute remove hooks', async t => {
 		}
 	}
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
 	const post = new Post();
@@ -188,7 +188,7 @@ test('instance - execution order of create, update and save hooks', async t => {
 		}
 	}
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
 	const post = new Post();
@@ -219,7 +219,7 @@ test('instance - execute per-model hooks', async t => {
 
 	class Post extends Model {}
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
 	Post.before('create', () => hooks.push('before:create'));
@@ -277,7 +277,7 @@ test('instance - execute hooks assigned via model plugin', async t => {
 		model.after('save', () => hooks.push('after:save'));
 	});
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
 	const post = new Post();
@@ -315,7 +315,7 @@ test('instance - execute hooks assigned via database plugin before model registe
 
 	class Post extends Model {}
 
-	const { db } = t.context;
+	const {db} = t.context;
 
 	db.use(model => {
 		model.before('create', () => hooks.push('before:create'));
@@ -365,7 +365,7 @@ test('instance - execute hooks assigned via database plugin after model register
 
 	class Post extends Model {}
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
 	db.use(model => {
@@ -417,13 +417,13 @@ test('class - execute find hooks on find()', async t => {
 	});
 
 	Post.after('find', docs => {
-		return docs.map(doc => Object.assign({}, doc, { awesome: true }));
+		return docs.map(doc => Object.assign({}, doc, {awesome: true}));
 	});
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
-	const post = new Post({ cool: true });
+	const post = new Post({cool: true});
 	await post.save();
 
 	const posts = await Post.where('cool', false).find();
@@ -439,13 +439,13 @@ test('class - execute find hooks on findOne()', async t => {
 	});
 
 	Post.after('find', docs => {
-		return docs.map(doc => Object.assign({}, doc, { awesome: true }));
+		return docs.map(doc => Object.assign({}, doc, {awesome: true}));
 	});
 
-	const { db } = t.context;
+	const {db} = t.context;
 	db.register(Post);
 
-	await new Post({ cool: true }).save();
+	await new Post({cool: true}).save();
 
 	const post = await Post.where('cool', false).findOne();
 	t.true(post.get('cool', true));

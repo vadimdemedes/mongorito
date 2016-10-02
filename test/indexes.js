@@ -24,7 +24,7 @@ test('setup an index', async t => {
 });
 
 test('setup a unique index', async t => {
-	await Post.index('name', { unique: true });
+	await Post.index('name', {unique: true});
 
 	const indexes = await Post.indexes();
 	t.deepEqual(indexes.pop(), {
@@ -37,17 +37,17 @@ test('setup a unique index', async t => {
 		ns: 'mongorito_test.posts'
 	});
 
-	await new Post({ name: 'first' }).save();
-	await t.throws(new Post({ name: 'first' }).save());
+	await new Post({name: 'first'}).save();
+	await t.throws(new Post({name: 'first'}).save());
 	await Post.dropIndex('name_1');
 });
 
 test('drop index', async t => {
-	await Post.index('name', { unique: true });
+	await Post.index('name', {unique: true});
 
-	await new Post({ name: 'first' }).save();
-	await t.throws(new Post({ name: 'first' }).save());
+	await new Post({name: 'first'}).save();
+	await t.throws(new Post({name: 'first'}).save());
 
 	await Post.dropIndex('name_1');
-	await new Post({ name: 'first' }).save();
+	await new Post({name: 'first'}).save();
 });
