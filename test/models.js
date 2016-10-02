@@ -12,7 +12,12 @@ setup(test);
 test('expose mongodb properties', t => {
 	const mongodb = require('mongodb');
 
+	t.is(mongorito.Timestamp, mongodb.Timestamp);
 	t.is(mongorito.ObjectId, mongodb.ObjectId);
+	t.is(mongorito.MinKey, mongodb.MinKey);
+	t.is(mongorito.MaxKey, mongodb.MaxKey);
+	t.is(mongorito.DBRef, mongodb.DBRef);
+	t.is(mongorito.Long, mongodb.Long);
 });
 
 test('create', async t => {
