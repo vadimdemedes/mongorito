@@ -100,7 +100,8 @@ test('execute all hooks', async t => {
 
 	let data = postFixture();
 	let post = new Post(data);
-	await post.save();
+	await post.create();
+	await post.update();
 
 	t.same(hooks, [
 		'before:create',
@@ -109,6 +110,14 @@ test('execute all hooks', async t => {
 		'around:save',
 		'around:create',
 		'after:create',
+		'around:save',
+		'after:save',
+		'before:update',
+		'around:update',
+		'before:save',
+		'around:save',
+		'around:update',
+		'after:update',
 		'around:save',
 		'after:save'
 	]);

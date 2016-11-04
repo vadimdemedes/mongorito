@@ -57,7 +57,8 @@
     ],
     "rules": {
       "prefer-arrow-callback": 0,
-      "prefer-spread": 0
+      "prefer-spread": 0,
+      "no-use-extend-native/no-use-extend-native": 0
     }
   }
 }
