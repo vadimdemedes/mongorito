@@ -1,12 +1,8 @@
-# Mongorito
+# Mongorito [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito) [![Coverage Status](https://coveralls.io/repos/vdemedes/mongorito/badge.svg?branch=master&service=github)](https://coveralls.io/github/vdemedes/mongorito?branch=master)
 
-[![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito)
-[![Coverage Status](https://coveralls.io/repos/vdemedes/mongorito/badge.svg?branch=master&service=github)](https://coveralls.io/github/vdemedes/mongorito?branch=master)
+> MongoDB ODM for Node.js apps.
 
-Awesome MongoDB ODM for Node.js apps.
-Just take a look at its beautiful models and API.
-
-Uses official [mongodb](https://www.npmjs.com/package/mongodb) driver under the hood.
+Uses the official [mongodb](https://www.npmjs.com/package/mongodb) driver under the hood.
 
 <h1 align="center">
   <br>
@@ -19,65 +15,54 @@ Uses official [mongodb](https://www.npmjs.com/package/mongodb) driver under the 
 ## Quick overview
 
 ```js
-const mongorito = require('mongorito');
-const Model = mongorito.Model;
+import Mongorito, {Model} from 'mongorito';
+
+const db = new Mongorito('localhost/blog');
+await db.connect();
 
 class Post extends Model {
 	
 }
 
-mongorito.connect('localhost/blog');
+db.register(Post);
 
-let post = new Post({
+const post = new Post({
 	title: 'Steve Angello rocks',
 	author: {
 		name: 'Emma'
 	}
 });
 
-post.save();
-// post saved
+await post.save();
 ```
-
-
-## Features
-
-- Based on Promises, which means **no callbacks**
-- Established API you've already used to
-- Hooks (before:save, around:create, after:remove, etc)
-- Fully covered by tests
-- Using this module results in a beautiful code
 
 
 ## Installation
 
 ```
-$ npm install mongorito --save
+$ npm install -- save mongorito
 ```
 
 
-## Usage
+## Documentation
 
 - [Connection](#connection)
 - [Models](#models)
 - [Attributes](#attributes)
-- [Save & remove](#save--remove)
+- [Persistence](#persistence)
 - [Queries](#queries)
 
 ### Connection
 
-*Check out [connection](examples/connection.js) example.*
-
-Here's how to connect to a `blog` database on `localhost`:
+Connect to a `blog` database on `localhost`:
 
 ```js
-await mongorito.connect('localhost/blog');
-```
+const db = new Mongorito('localhost/blog');
+await db.connect();
 
-To disconnect, use `mongorito.disconnect()`:
+// ...
 
-```js
-await mongorito.disconnect();
+await db.disconnect();
 ```
 
 ### Models
@@ -85,42 +70,32 @@ await mongorito.disconnect();
 Use classes to define models:
 
 ```js
-const Model = mongorito.Model;
-
 class Post extends Model {
 	
 }
+
+db.register(Post);
 ```
 
-This defines model `Post` with documents in `posts` collection.
+The example above defines model `Post` with documents in `posts` collection.
 To use a custom collection, add `collection()` method, which returns the name of the desired collection:
 
 ```js
 class Post extends Model {
-	collection () {
+	static collection () {
 		return 'super_cool_posts';
 	}
 }
+
+db.register(Post);
 ```
-
-Mongorito models can also be defined old-fashioned Backbone way:
-
-```js
-const Post = Model.extend({
-	collection: 'posts'
-});
-```
-
-**Note**: `collection` property has to be set.
 
 ### Attributes
 
-*Check out [attributes](examples/attributes.js) example.*
-
-To create a new instance of a model, simply use `new`:
+To create a new `Post` model instance:
 
 ```js
-let post = new Post({
+const post = new Post({
 	title: 'Great title',
 	author: {
 		name: 'Emma'
@@ -128,18 +103,30 @@ let post = new Post({
 });
 ```
 
-To retrieve a specific attribute (even a nested one):
+To get a specific attribute (even a nested one):
 
 ```js
-let title = post.get('title');
-let author = post.get('author.name');
+post.get('title');
+//=> 'Great title'
+
+post.get('author.name');
+//=> 'Emma'
 ```
 
 All attributes can be retrieved at once using either `toJSON()` or `get()`:
 
 ```js
-let attrs = post.toJSON();
-let attrs = post.get();
+post.toJSON();
+//=>
+// {
+// 	 title: 'Great title',
+// 		 author: {
+// 		 name: 'Emma'
+// 	 }
+// }
+
+post.get();
+//=> same as above
 ```
 
 Set new values via `set()` method:
@@ -149,102 +136,160 @@ post.set('title', 'New title');
 post.set('author.name', 'Rachel');
 ```
 
-### Save & Remove
-
-*Check out [manage](examples/manage.js) example.*
-
-Use a `save()` method to create/update (Mongorito handles that for you) a model:
+To unset a value and remove it from a document:
 
 ```js
-let post = new Post();
-
-await post.save(); // creates a new post
-
-post.set('title', 'New title');
-await post.save(); // updates an existing post
+post.unset('title');
+await post.save();
 ```
 
-To remove a model from collection:
+Models also keep track of previous and changed values.
+
+```js
+const post = new Post({title: 'Sad title'});
+
+post.get('title');
+//=> 'Sad title'
+
+post.set('title', 'Happy title');
+post.previous.get('title');
+//=> 'Sad title'
+
+post.changed('title');
+//=> true
+```
+
+### Persistence
+
+Use a `save()` method to create or update a document.
+Mongorito detects whether it's a new document or not and executes
+an appropriate operation.
+
+```js
+const post = new Post();
+
+// create a new post
+await post.save();
+
+post.set('title', 'New title');
+
+// update an existing post
+await post.save();
+```
+
+To remove a document from collection:
 
 ```js
 await post.remove();
 ```
 
-You can also remove all models matching a certain criteria:
+You can also remove documents matching a certain criteria:
 
 ```js
 await Post.remove({ title: 'New title' });
 ```
 
+Or all remove all documents alltogether:
+
+```js
+await Post.remove();
+```
+
 ### Queries
+
+All queries return documents automatically wrapped into appropriate models.
 
 #### Find all
 
-To fetch all models `find()` or `all()` can be used (they're identical):
-
 ```js
-Post.find();
-Post.all();
+await Post.find();
 ```
 
 #### Find one
 
 ```js
-Post.findOne({ title: 'New title' });
+await Post.findOne({title: 'New title'});
 ```
 
 #### Find by ID
 
 ```js
-Post.findById('56c9e0922cc9215110ab26dc');
+import {ObjectId} from 'mongorito';
+
+const id = new ObjectId('56c9e0922cc9215110ab26dc');
+await Post.findById(id);
 ```
 
-#### Find where value equals
+#### Find where field's value equals another value
 
 ```js
-Post.where('title', 'New title').find();
-Post.where('author.name', 'Emma').find();
+await Post.find({title: 'New title'});
+
+await Post.where('title', 'New title').find();
+await Post.where('author.name', 'Emma').find();
 ```
 
-#### Find where value matches a regular expression
+#### Find where field's value matches a regular expression
 
 ```js
-Post.where('title', /something/i).find();
+await Post.where('title', /something/i).find();
 ```
 
-#### Find where attribute exists
+#### Find where field exists
 
 ```js
-Post.exists('title').find();
+await Post.exists('title').find();
+await Post.where('title').exists().find();
 ```
 
-#### Find where value is less/greater than
+#### Find where field's value is less/greater than some value
 
 ```js
-Post.where('comments_number').lt(5).find(); // less than 5
-Post.where('comments_number').lte(5).find(); // less than or equal 5
-Post.where('comments_number').gt(5).find(); // greater than 5
-Post.where('comments_number').gte(5).find(); // greater than or equal 5
+// `comments_number` less than 5
+await Post.where('comments_number').lt(5).find(); 
+
+// `comments_number` less than or equal 5
+await Post.where('comments_number').lte(5).find();
+
+// `comments_number` greater than 5
+await Post.where('comments_number').gt(5).find();
+
+// `comments_number` greater than or equal 5
+await Post.where('comments_number').gte(5).find();
 ```
 
-### Find where value is one of
+### Find where field's value is one of possible values
 
 ```js
-Post.in('comments_number', [4, 8]).find();
+await Post.where('comments_number').in([4, 8]).find();
+```
+
+### Find documents and include only certain fields
+
+```js
+await Post.include('title').find();
+await Post.include(['title', 'is_featured']).find();
+```
+
+### Find documents and exclude certain fields
+
+```js
+await Post.exclude('title').find();
+await Post.exclude(['title', 'is_featured']).find();
 ```
 
 #### Find using OR
 
-Find all models where `title` equals either "First" or "Second":
+Find all documents where `title` equals either "First" or "Second":
 
 ```js
-Post.or({ title: 'First' }, { title: 'Second' }).find();
+await Post.or([{ title: 'First' }, { title: 'Second' }]).find();
 ```
 
 #### Limit results
 
 ```js
-Post.limit(10).find();
+await Post.limit(10).find();
 ```
 
 #### Skip results
@@ -252,17 +297,17 @@ Post.limit(10).find();
 Skip first N results:
 
 ```js
-Post.skip(4).find();
+await Post.skip(4).find();
 ```
 
 #### Sort results
 
 ```js
 // descending
-Post.sort('comments_number', -1);
+await Post.sort({comments_number: -1}).find();
 
 // ascending
-Post.sort('comments_number', 1);
+await Post.sort({comments_number: 1}).find();
 ```
 
 #### Count results
@@ -270,23 +315,25 @@ Post.sort('comments_number', 1);
 Count all documents in collection:
 
 ```js
-Post.count();
+await Post.count();
 ```
 
 Count all documents matching a certain criteria:
 
 ```js
-Post.count({ awesome: true });
+await Post.count({ awesome: true });
 ```
 
+### Search using text index
 
-## Tests
-
-```
-$ npm test
+```js
+await Post.search('Steve Angello')
+	.sort('score', {$meta: 'textScore'})
+	.include('score', {$meta: 'textScore'})
+	.find();
 ```
 
 
 ## License
 
-Mongorito is released under the MIT License.
+MIT © [Vadim Demedes](https://github.com/vdemedes)
