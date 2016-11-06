@@ -1,8 +1,24 @@
 {
   "name": "mongorito",
-  "version": "2.2.0",
-  "description": "ES6 generator-based MongoDB ODM. It rocks.",
+  "version": "2.1.2",
+  "description": "ES6 generator-based MongoDB ODM.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
+  "repository": "vdemedes/mongorito",
+  "keywords": [
+    "mongo",
+    "mongodb",
+    "odm"
+  ],
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "util",
+    "lib"
+  ],
+  "scripts": {
+    "test": "xo && nyc ava --serial",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+  },
   "engines": {
     "node": ">= 4"
   },
@@ -20,34 +36,10 @@
     "chance": "^1.0.4",
     "coveralls": "^2.11.12",
     "nyc": "^8.1.0",
-    "xo": "^0.16.0"
+    "xo": "^0.17.0"
   },
-  "files": [
-    "index.js",
-    "util",
-    "lib"
-  ],
-  "scripts": {
-    "test": "xo && nyc ava --serial",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
-  },
-  "repository": "vdemedes/mongorito",
-  "keywords": [
-    "mongo",
-    "mongodb",
-    "co-mongo",
-    "co-mongodb",
-    "orm",
-    "odm",
-    "es6"
-  ],
-  "license": "MIT",
   "xo": {
-    "esnext": true,
-    "env": "node",
-    "rules": {
-      "array-callback-return": 1
-    }
+    "env": "node"
   },
   "ava": {
     "serial": true,
