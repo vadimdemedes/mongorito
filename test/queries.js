@@ -349,6 +349,20 @@ test('find documents and exclude two selected fields', async t => {
 	t.deepEqual(keys.sort(), ['_id', 'title', 'created_at', 'updated_at'].sort());
 });
 
+test('include and exlude at the same time', async t => {
+	const post = new Post({
+		title: 'San Francisco',
+		featured: true,
+		published: false
+	});
+
+	await post.save();
+
+	const posts = await Post.include({featured: 1, published: 1}).find();
+	const keys = Object.keys(posts[0].get());
+	t.deepEqual(keys.sort(), ['_id', 'featured', 'published']);
+});
+
 test('search documents using text index', async t => {
 	await Post.drop();
 
