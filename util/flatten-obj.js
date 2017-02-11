@@ -14,10 +14,14 @@ function flattenObject(obj) {
 
 		if (isObject(value)) {
 			value = flattenObject(value);
-
-			Object.keys(value).forEach(childKey => {
-				newObj[childKey] = value[childKey];
-			});
+			const keys = Object.keys(value);
+			if (keys.length === 0) {
+				newObj[key] = value;
+			} else {
+				keys.forEach(childKey => {
+					newObj[childKey] = value[childKey];
+				});
+			}
 		} else {
 			newObj[key] = value;
 		}

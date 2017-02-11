@@ -41,6 +41,21 @@ test('unset fields', async t => {
 	t.falsy(post.get('awesome'));
 });
 
+test('empty object fields', async t => {
+	const data = {awesome: true, empty: {}, embed: {good: true}};
+	const post = new Post(data);
+	await post.save();
+
+	t.true(post.get('awesome'));
+	t.deepEqual(post.get('empty'), {});
+	t.true(post.get('embed.good'));
+
+	post.unset('empty');
+	await post.save();
+
+	t.is(post.get('empty'), undefined);
+});
+
 test('increment fields', async t => {
 	const post = new Post({views: 1, total: 0});
 	await post.save();
