@@ -1,23 +1,7 @@
 'use strict';
 
-/**
- * Dependencies
- */
-
 const Model = require('../../../').Model;
 
-
-/**
- * Comment model
- */
-
-const Comment = Model.extend({
-	collection: 'comments'
-});
-
-
-/**
- * Expose `Comment`
- */
+class Comment extends Model {}
 
 module.exports = Comment;

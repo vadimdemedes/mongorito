@@ -2,6 +2,6 @@
 
 const Model = require('../../../').Model;
 
-class Post extends Model {}
+class User extends Model {}
 
-module.exports = Post;
+module.exports = User;

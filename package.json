@@ -1,30 +1,15 @@
 {
   "name": "mongorito",
-  "version": "2.2.0",
-  "description": "ES6 generator-based MongoDB ODM. It rocks.",
+  "version": "2.1.2",
+  "description": "ES6 generator-based MongoDB ODM.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
-  "dependencies": {
-    "bluebird": "^3.3.1",
-    "class-extend": "^0.1.2",
-    "clone": "^1.0.2",
-    "co": "^4.6.0",
-    "get-value": "^2.0.3",
-    "is-generator-fn": "^1.0.0",
-    "is_js": "^0.7.4",
-    "lodash.result": "^4.2.0",
-    "mongodb": "^2.0.48",
-    "object-assign": "^4.0.1",
-    "pluralize": "^1.2.1",
-    "set-value": "^0.2.0"
-  },
-  "devDependencies": {
-    "ava": "^0.12.0",
-    "chance": "^0.8.0",
-    "coveralls": "^2.11.4",
-    "eslint-config-vdemedes": "^1.0.2",
-    "nyc": "^5.0.0",
-    "xo": "^0.12.1"
-  },
+  "repository": "vdemedes/mongorito",
+  "keywords": [
+    "mongo",
+    "mongodb",
+    "odm"
+  ],
+  "license": "MIT",
   "files": [
     "index.js",
     "util",
@@ -34,31 +19,35 @@
     "test": "xo && nyc ava --serial",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
-  "repository": "vdemedes/mongorito",
-  "keywords": [
-    "mongo",
-    "mongodb",
-    "co-mongo",
-    "co-mongodb",
-    "orm",
-    "odm",
-    "es6"
-  ],
-  "license": "MIT",
+  "engines": {
+    "node": ">= 6"
+  },
+  "dependencies": {
+    "arrify": "^1.0.1",
+    "dot-prop": "^4.0.0",
+    "is-plain-obj": "^1.1.0",
+    "lodash.merge": "^4.6.0",
+    "lodash.omit": "^4.5.0",
+    "lodash.result": "^4.5.2",
+    "map-obj": "^2.0.0",
+    "mongodb": "^2.2.9",
+    "mquery": "^1.11.0",
+    "pluralize": "^3.0.0",
+    "redux": "^3.6.0"
+  },
+  "devDependencies": {
+    "ava": "^0.16.0",
+    "chance": "^1.0.4",
+    "coveralls": "^2.11.12",
+    "nyc": "^8.1.0",
+    "sinon": "^2.1.0",
+    "xo": "^0.17.0"
+  },
   "xo": {
-    "extends": "vdemedes",
-    "esnext": true,
-    "env": [
-      "node",
-      "mocha"
-    ],
-    "ignore": [
-      "examples/*.js"
-    ],
-    "rules": {
-      "prefer-arrow-callback": 0,
-      "prefer-spread": 0,
-      "no-use-extend-native/no-use-extend-native": 0
-    }
+    "env": "node"
+  },
+  "ava": {
+    "serial": true,
+    "failFast": true
   }
 }
