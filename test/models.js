@@ -1,52 +1,149 @@
 'use strict';
 
-/**
- * Dependencies
- */
-
-const mongorito = require('../');
-const setup = require('./_setup');
 const test = require('ava');
-
-const Account = require('./fixtures/models/account');
-const Post = require('./fixtures/models/post');
+const mongorito = require('../');
 
 const postFixture = require('./fixtures/post');
-
-const Model = mongorito.Model;
-
-
-/**
- * Tests
- */
+const setup = require('./_setup');
+const Post = require('./fixtures/models/post');
 
 setup(test);
 
-test('create', async t => {
-	let post = new Post();
+test('expose mongodb properties', t => {
+	const mongodb = require('mongodb');
+
+	t.is(mongorito.Timestamp, mongodb.Timestamp);
+	t.is(mongorito.ObjectId, mongodb.ObjectId);
+	t.is(mongorito.MinKey, mongodb.MinKey);
+	t.is(mongorito.MaxKey, mongodb.MaxKey);
+	t.is(mongorito.DBRef, mongodb.DBRef);
+	t.is(mongorito.Long, mongodb.Long);
+});
+
+test('initialize and manage fields', t => {
+	let data = postFixture();
+	const post = new Post(data);
+	let attrs = post.get();
+	t.deepEqual(attrs, data);
+
+	data = postFixture();
+	post.set(data);
+	attrs = post.get();
+	t.deepEqual(attrs, data);
+});
+
+test('set & get fields', t => {
+	const data = postFixture();
+	const post = new Post(data);
+	post.set('author.name', 'John Doe');
+
+	t.is(post.get('author.name'), 'John Doe');
+});
+
+test('unset fields', async t => {
+	const data = {awesome: true};
+	const post = new Post(data);
 	await post.save();
 
-	let posts = await Post.all();
+	t.true(post.get('awesome'));
+
+	post.unset('awesome');
+	await post.save();
+
+	t.falsy(post.get('awesome'));
+});
+
+test('unset nested fields', async t => {
+	const data = {awesome: true, author: {name: 'Steve'}};
+	const post = new Post(data);
+	await post.save();
+
+	post.unset('author.name');
+	await post.save();
+
+	t.deepEqual(post.get(), {awesome: true, _id: post.get('_id'), author: {}});
+});
+
+test('empty object fields', async t => {
+	const data = {awesome: true, empty: {}, embed: {good: true}};
+	const post = new Post(data);
+	await post.save();
+
+	t.true(post.get('awesome'));
+	t.deepEqual(post.get('empty'), {});
+	t.true(post.get('embed.good'));
+
+	post.unset('empty');
+	await post.save();
+
+	t.is(post.get('empty'), undefined);
+});
+
+test('increment field', async t => {
+	const post = new Post({views: 1});
+	await post.save();
+	await post.increment('views');
+
+	t.is(post.get('views'), 2);
+});
+
+test('increment multiple fields', async t => {
+	const post = new Post({views: 1, total: 0});
+	await post.save();
+
+	t.is(post.get('views'), 1);
+	t.is(post.get('total'), 0);
+
+	await post.increment({views: 1, total: 3});
+
+	t.is(post.get('views'), 2);
+	t.is(post.get('total'), 3);
+});
+
+test('fail if incrementing fields on unsaved document', t => {
+	const post = new Post({views: 1});
+
+	t.throws(() => post.increment({views: 1}), 'Can\'t execute an increment on unsaved model');
+});
+
+test('convert to JSON', t => {
+	const data = postFixture();
+	const post = new Post(data);
+	const attrs = post.get();
+
+	const json = JSON.stringify(post);
+	const parsed = JSON.parse(json);
+
+	t.deepEqual(parsed, attrs);
+});
+
+test('create', async t => {
+	const post = new Post();
+	await post.save();
+
+	const posts = await Post.find();
 	t.is(posts.length, 1);
 
-	let createdPost = posts[0];
+	const createdPost = posts[0];
 	t.is(createdPost.get('_id').toString(), post.get('_id').toString());
-	t.ok(createdPost.get('created_at'));
-	t.ok(createdPost.get('updated_at'));
 });
 
 test('create with default values', async t => {
-	let data = postFixture();
+	const data = postFixture();
 	delete data.title;
 
-	let post = new Post(data);
+	Post.defaultFields = {
+		title: 'Default title'
+	};
+
+	const post = new Post(data);
 	await post.save();
 
 	t.is(post.get('title'), 'Default title');
 });
 
 test('update', async t => {
-	let post = new Post({ awesome: true });
+	let post = new Post({awesome: true});
 	await post.save();
 
 	post = await Post.findOne();
@@ -59,22 +156,32 @@ test('update', async t => {
 	t.false(post.get('awesome'));
 });
 
-test('update `updated_at` attribute', async t => {
-	let post = new Post();
+test('unset', async t => {
+	let post = new Post({a: 1, b: 2});
 	await post.save();
 
-	let prevDate = post.get('updated_at').getTime();
-
-	post.set('awesome', true);
+	post.unset('a');
 	await post.save();
 
-	let nextDate = post.get('updated_at').getTime();
+	post = await Post.findOne();
+	const keys = Object.keys(post.get()).sort();
+	t.deepEqual(keys, ['_id', 'title', 'b'].sort());
+});
 
-	t.not(prevDate, nextDate);
+test('refresh', async t => {
+	const postA = new Post({a: 1});
+	await postA.save();
+
+	const postB = await Post.findOne();
+	postB.set('a', 2);
+	await postB.save();
+
+	await postA.refresh();
+	t.deepEqual(postA.get(), postB.get());
 });
 
 test('remove', async t => {
-	let post = new Post();
+	const post = new Post();
 	await post.save();
 
 	let posts = await Post.count();
@@ -87,13 +194,13 @@ test('remove', async t => {
 });
 
 test('remove by criteria', async t => {
-	await new Post({ awesome: true }).save();
-	await new Post({ awesome: false }).save();
+	await new Post({awesome: true}).save();
+	await new Post({awesome: false}).save();
 
 	let posts = await Post.find();
 	t.is(posts.length, 2);
 
-	await Post.remove({ awesome: false });
+	await Post.remove({awesome: false});
 
 	posts = await Post.find();
 	t.is(posts.length, 1);
@@ -114,49 +221,5 @@ test('remove all documents', async t => {
 });
 
 test('automatically set collection name', async t => {
-	let account = new Account();
-	await account.save();
-
-	t.is(account.collection, 'accounts');
-
-	let accounts = await Account.find();
-	t.is(accounts.length, 1);
-});
-
-test('use multiple databases', async t => {
-	// Post1 will be stored in first database
-	// Post2 will be stored in second database
-	class Post1 extends Model {
-		collection () {
-			return 'posts';
-		}
-	}
-
-	let secondaryDb = await mongorito.connect((process.env.MONGO_URL ? process.env.MONGO_URL + '_2' : 'localhost/mongorito_test_2'));
-
-	class Post2 extends Model {
-		db () {
-			return secondaryDb;
-		}
-
-		collection () {
-			return 'posts';
-		}
-	}
-
-	await Post1.remove();
-	await Post2.remove();
-
-	await new Post1({ title: 'Post in first db' }).save();
-	await new Post2({ title: 'Post in second db' }).save();
-
-	let posts = await Post1.all();
-	t.is(posts.length, 1);
-	t.is(posts[0].get('title'), 'Post in first db');
-
-	posts = await Post2.all();
-	t.is(posts.length, 1);
-	t.is(posts[0].get('title'), 'Post in second db');
-
-	await secondaryDb.close();
+	t.is(Post.collection(), 'posts');
 });

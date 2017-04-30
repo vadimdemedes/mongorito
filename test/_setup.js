@@ -1,35 +1,28 @@
 'use strict';
 
-/**
- * Dependencies
- */
+const Mongorito = require('../');
 
-const mongorito = require('../');
-
-const Comment = require('./fixtures/models/comment');
-const Account = require('./fixtures/models/account');
 const Post = require('./fixtures/models/post');
-const Task = require('./fixtures/models/task');
 
+function setup(test) {
+	let db;
 
-/**
- * Setup hooks
- */
+	test.before(() => {
+		const url = process.env.MONGODB_URL || 'localhost/mongorito_test';
 
-function setup (test) {
-	test.before(() => mongorito.connect((process.env.MONGO_URL ? process.env.MONGO_URL : 'localhost/mongorito_test')));
+		db = new Mongorito(url);
+		db.register(Post);
 
-	test.beforeEach(() => Account.remove());
-	test.beforeEach(() => Comment.remove());
+		return db.connect();
+	});
+
+	test.beforeEach(t => {
+		t.context.db = db;
+	});
+
 	test.beforeEach(() => Post.remove());
-	test.beforeEach(() => Task.remove());
 
-	test.after(() => mongorito.disconnect());
+	test.after(() => db.disconnect());
 }
-
-
-/**
- * Expose fn
- */
 
 module.exports = setup;
