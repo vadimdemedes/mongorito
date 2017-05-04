@@ -1,9 +1,3 @@
-# Mongorito [![Build Status](https://travis-ci.org/vdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vdemedes/mongorito) [![Coverage Status](https://coveralls.io/repos/vdemedes/mongorito/badge.svg?branch=master&service=github)](https://coveralls.io/github/vdemedes/mongorito?branch=master)
-
-> MongoDB ODM for Node.js apps.
-
-Uses the official [mongodb](https://www.npmjs.com/package/mongodb) driver under the hood.
-
 <h1 align="center">
   <br>
   <img width="200" src="media/logo.png">
@@ -11,18 +5,39 @@ Uses the official [mongodb](https://www.npmjs.com/package/mongodb) driver under 
   <br>
 </h1>
 
+> Lightweight and flexible MongoDB ODM for Node.js apps based on Redux.
+
+[![Build Status](https://travis-ci.org/vadimdemedes/mongorito.svg?branch=master)](https://travis-ci.org/vadimdemedes/mongorito) [![Coverage Status](https://coveralls.io/repos/vadimdemedes/mongorito/badge.svg?branch=master&service=github)](https://coveralls.io/github/vadimdemedes/mongorito?branch=master)
+
+
+## Features
+
+**Flexible**
+
+Mongorito is based on [Redux](https://github.com/reactjs/redux), which opens the doors for customizing literally everything - from model's state (reducers) to the behavior of core methods, like `set()`, `save()` or `find()`.
+
+Each model instance has a separate Redux store, which ensures isolation between other models and easy extensibility.
+
+**No schemas**
+
+If MongoDB doesn't enforce schemas, why would Mongorito do? Enjoy the schema-free data management with Mongorito the same way you do in `mongo` console.
+
+**Lightweight**
+
+Mongorito is betting on 3rd-party plugins to deliver extra functionality to developers. Mongorito ships with a barebones model with basic get/set, save/remove and querying functionality and let's you be in control of what's included and what's not.
+
+Mongorito is basically a tiny Redux-based application, which uses the official MongoDB driver and [mquery](https://github.com/aheckmann/mquery) for querying. Not that amount of lines are relevant when measuring complexity, but each file (module) is less than 300 lines. Check out the source code and see for yourself!
+
 
 ## Quick overview
 
 ```js
-import Mongorito, {Model} from 'mongorito';
+const {Database, Model} = require('mongorito');
 
-const db = new Mongorito('localhost/blog');
+const db = new Database('localhost/blog');
 await db.connect();
 
-class Post extends Model {
-	
-}
+class Post extends Model {}
 
 db.register(Post);
 
@@ -34,306 +49,474 @@ const post = new Post({
 });
 
 await post.save();
+
+post.set('author.name', 'Rick');
+await post.save();
 ```
+
+*Note*: `await` won't work at top level, it's used to reduce the complexity of an example.
 
 
 ## Installation
 
 ```
-$ npm install -- save mongorito
+$ npm install --save mongorito
 ```
 
 
-## Documentation
+## Contents
 
 - [Connection](#connection)
 - [Models](#models)
-- [Attributes](#attributes)
-- [Persistence](#persistence)
+- - [Creating a model](#creating-a-model)
+- - [Working with fields](#working-with-fields)
+- - [Saving or removing documents](#saving-or-removing-documents)
+- - [Incrementing fields](#incrementing-fields)
+- - [Embedding other models](#embedding-other-models)
+- - [Configuration](#configuration)
 - [Queries](#queries)
+- [Plugins](#plugins)
+- - [Using plugins](#using-plugins)
+- - [Writing plugins](#writing-plugins)
+- - [Extending model with new methods](#extending-model-with-new-methods)
+- - [Modifying model's state](#modifying-models-state)
+- - [Changing behavior using middleware](#changing-behavior-using-middleware)
 
-### Connection
 
-Connect to a `blog` database on `localhost`:
+## Connection
+
+Mongorito exports several own classes, as well as a few properties from the MongoDB driver:
 
 ```js
-const db = new Mongorito('localhost/blog');
+const {
+	Database,
+	Model,
+	Timestamp,
+	ObjectId,
+	MinKey,
+	MaxKey,
+	DBRef,
+	Long
+} = require('mongorito');
+```
+
+`Database` and `Model` are Mongorito's own exports, all the other ones are exported straight from [`mongodb`](https://github.com/mongodb/node-mongodb-native) package for convenience. Normally, you'd need only `Database`, `Model` and `ObjectId`.
+
+To connect, initialize a `Database`, which accepts a MongoDB connection string and use `connect()` method, which returns a Promise.
+
+For convenience, `await` will be used in all examples below, even though it doesn't work at top level.
+
+```js
+const {Database, Model} = require('mongorito');
+
+const db = new Database('localhost/blog');
 await db.connect();
-
-// ...
-
-await db.disconnect();
 ```
 
-### Models
+You don't have to wait until connection establishes to perform operations. Mongorito automatically executes pending operations once connection is up.
 
-Use classes to define models:
+## Models
+
+### Creating a model
+
+Model is the connection between your data and a database. Each model represents a single collection. Model is a simple class, which doesn't even need to have any properties or methods.
 
 ```js
-class Post extends Model {
-	
-}
+class Post extends Model {}
+```
 
+For `Post` model to work and be aware of the database it's connected to, make sure to register it in the database we created earlier.
+
+```js
 db.register(Post);
 ```
 
-The example above defines model `Post` with documents in `posts` collection.
-To use a custom collection, add `collection()` method, which returns the name of the desired collection:
+That's it, the `Post` model is good to go!
+
+### Working with fields
+
+To create a new document, create an instance of `Post` model.
 
 ```js
-class Post extends Model {
-	static collection () {
-		return 'super_cool_posts';
-	}
-}
-
-db.register(Post);
+const post = new Post();
 ```
 
-### Attributes
-
-To create a new `Post` model instance:
+Model's constructor also accepts an object of fields to instantiate the document with:
 
 ```js
 const post = new Post({
-	title: 'Great title',
+	title: 'Great post',
 	author: {
-		name: 'Emma'
+		name: 'Sarah'
 	}
 });
 ```
 
-To get a specific attribute (even a nested one):
+Note, documents can contain nested fields and even models, just like in MongoDB.
+
+To get one or all fields from the `post` document, use a `get()` method.
 
 ```js
-post.get('title');
-//=> 'Great title'
+const title = post.get('title');
+//=> "Great post"
 
-post.get('author.name');
-//=> 'Emma'
-```
+const author = post.get('author.name');
+//=> "Sarah"
 
-All attributes can be retrieved at once using either `toJSON()` or `get()`:
-
-```js
-post.toJSON();
+const data = post.get();
 //=>
-// {
-// 	 title: 'Great title',
-// 		 author: {
-// 		 name: 'Emma'
-// 	 }
-// }
-
-post.get();
-//=> same as above
+//  {
+//    title: "Great post"
+//    author: {
+//      name: "Sarah"
+//    }
+//  }
 ```
 
-Set new values via `set()` method:
+Similarly, use `set()` to update fields:
 
 ```js
-post.set('title', 'New title');
-post.set('author.name', 'Rachel');
+// update fields one by one
+post.set('title', 'Amazing post');
+post.set('author.name', 'Monica');
+
+// or all at once
+post.set({
+	title: 'Amazing post',
+	author: {
+		name: 'Monica'
+	}
+});
 ```
 
-To unset a value and remove it from a document:
+To remove a field, use `unset()`:
 
 ```js
+// unset single fields
 post.unset('title');
-await post.save();
+post.unset('author.name');
+
+// or multiple fields at once
+post.unset(['title', 'author.name']);
 ```
 
-Models also keep track of previous and changed values.
+### Saving or removing documents
+
+To create or update documents, simply call `save()`. Even though Mongorito differentiates these two operations internally, you don't have to care about that! Mongorito also infers the collection name from the model, so the instances of the model `Post` will be saved to `posts` collection.
 
 ```js
-const post = new Post({title: 'Sad title'});
-
-post.get('title');
-//=> 'Sad title'
-
-post.set('title', 'Happy title');
-post.previous.get('title');
-//=> 'Sad title'
-
-post.changed('title');
-//=> true
+await post.save();
 ```
 
-### Persistence
-
-Use a `save()` method to create or update a document.
-Mongorito detects whether it's a new document or not and executes
-an appropriate operation.
+When a document is saved, an `_id` field is automatically added.
 
 ```js
-const post = new Post();
-
-// create a new post
-await post.save();
-
-post.set('title', 'New title');
-
-// update an existing post
-await post.save();
+post.get('_id');
+//=> ObjectId("5905cb6b543c3a50e03e810d")
 ```
 
-To remove a document from collection:
+To remove a document, use `remove()`.
 
 ```js
 await post.remove();
 ```
 
-You can also remove documents matching a certain criteria:
+To remove multiple documents, use `remove()` on the model itself with a query as an argument.
 
 ```js
-await Post.remove({ title: 'New title' });
+await Post.remove({good: false});
 ```
 
-Or all remove all documents alltogether:
+### Incrementing fields
+
+Mongorito also provides a handy `increment()` method to increment or decrement numerical fields:
 
 ```js
-await Post.remove();
+const post = new Post({
+	views: 0
+});
+
+await post.increment('views');
+
+post.get('views');
+//=> 1
 ```
 
-### Queries
-
-All queries return documents automatically wrapped into appropriate models.
-
-#### Find all
+You can also supply a value to increment a field by a specific amount.
 
 ```js
+await post.increment('views', 2);
+
+post.get('views');
+//=> 3
+```
+
+Multiple fields can be incremented at once, too.
+
+```js
+const post = new Post({
+	views: 10,
+	comments: 10
+});
+
+await post.increment({
+	views: 2,
+	comments: 5
+});
+
+post.get('views');
+//=> 12
+
+post.get('comments');
+//=> 15
+```
+
+### Embedding other models
+
+Just like MongoDB, Mongorito allows to effortlessly embed other models. They're transparently converted between JSON and Mongorito models.
+
+To embed models, use `embeds()` method on the model itself to help Mongorito with the model serialization when saving/reading from the database. `embeds()` method accepts a field name, where the embedded document (or array of documents) resides.
+
+Here's the quick overview on how it works. Note, that model registering via `register()` is skipped in the following example.
+
+```js
+class Post extends Model {}
+class Author extends Model {}
+class Comment extends Model {}
+
+Post.embeds('author', Author);
+Post.embeds('comments', Comment);
+
+const post = new Post({
+	title: 'Great post',
+	author: new Author({name: 'Steve'}),
+	comments: [new Comment({body: 'Interesting!'})]
+});
+
+await post.save();
+```
+
+The above post will be saved to the database as:
+
+```json
+{
+	"title": "Great post",
+	"author": {
+		"name": "Steve"
+	},
+	"comments": [
+		{
+			"body": "Interesting!"
+		}
+	]
+}
+```
+
+You can also just pass objects instead of model instances and Mongorito will take care of that too.
+
+```js
+const post = new Post({
+	title: 'Great post',
+	author: {
+		name: 'Steve'
+	},
+	comments: [{
+		body: 'Interesting!'
+	}]
+});
+```
+
+When that document will be retrieved from the database next time, all embedded documents will be wrapped with their corresponding models.
+
+```js
+const post = await Post.findOne();
+
+const author = post.get('author');
+//=> Author { name: "Steve" }
+
+author.get('name');
+//=> "Steve"
+```
+
+### Configuration
+
+#### Using a different collection name
+
+In case you need to store documents in a custom collection, you can override the default one using `collection()` method.
+
+```js
+class Post extends Model {
+	collection() {
+		return 'awesome_posts';
+	}
+}
+```
+
+## Queries
+
+Mongorito uses [mquery](https://github.com/aheckmann/mquery) to provide a simple and comfortable API for querying. It inherits all the methods from `mquery` with a few exceptions, which will be documented below. For documentation, please check out mquery's API - https://github.com/aheckmann/mquery.
+
+Here's a quick overview of how querying works in Mongorito. All documents returned from queries are automatically wrapped into their models.
+
+```js
+// find all posts
 await Post.find();
-```
 
-#### Find one
+// find all amazing posts
+await Post.find({amazing: true});
+await Post.where('amazing', true).find();
 
-```js
-await Post.findOne({title: 'New title'});
-```
-
-#### Find by ID
-
-```js
-import {ObjectId} from 'mongorito';
-
-const id = new ObjectId('56c9e0922cc9215110ab26dc');
-await Post.findById(id);
-```
-
-#### Find where field's value equals another value
-
-```js
-await Post.find({title: 'New title'});
-
-await Post.where('title', 'New title').find();
-await Post.where('author.name', 'Emma').find();
-```
-
-#### Find where field's value matches a regular expression
-
-```js
-await Post.where('title', /something/i).find();
-```
-
-#### Find where field exists
-
-```js
-await Post.exists('title').find();
-await Post.where('title').exists().find();
-```
-
-#### Find where field's value is less/greater than some value
-
-```js
-// `comments_number` less than 5
-await Post.where('comments_number').lt(5).find(); 
-
-// `comments_number` less than or equal 5
-await Post.where('comments_number').lte(5).find();
-
-// `comments_number` greater than 5
-await Post.where('comments_number').gt(5).find();
-
-// `comments_number` greater than or equal 5
-await Post.where('comments_number').gte(5).find();
-```
-
-### Find where field's value is one of possible values
-
-```js
-await Post.where('comments_number').in([4, 8]).find();
-```
-
-### Find documents and include only certain fields
-
-```js
-await Post.include('title').find();
-await Post.include(['title', 'is_featured']).find();
-```
-
-### Find documents and exclude certain fields
-
-```js
-await Post.exclude('title').find();
-await Post.exclude(['title', 'is_featured']).find();
-```
-
-#### Find using OR
-
-Find all documents where `title` equals either "First" or "Second":
-
-```js
-await Post.or([{ title: 'First' }, { title: 'Second' }]).find();
-```
-
-#### Limit results
-
-```js
-await Post.limit(10).find();
-```
-
-#### Skip results
-
-Skip first N results:
-
-```js
-await Post.skip(4).find();
-```
-
-#### Sort results
-
-```js
-// descending
-await Post.sort({comments_number: -1}).find();
-
-// ascending
-await Post.sort({comments_number: 1}).find();
-```
-
-#### Count results
-
-Count all documents in collection:
-
-```js
-await Post.count();
-```
-
-Count all documents matching a certain criteria:
-
-```js
-await Post.count({ awesome: true });
-```
-
-### Search using text index
-
-```js
-await Post.search('Steve Angello')
-	.sort('score', {$meta: 'textScore'})
-	.include('score', {$meta: 'textScore'})
+// find 5 recent posts
+await Post
+	.limit(5)
+	.sort('created_at', 'desc')
 	.find();
+
+// find one post
+await Post.findOne({incredible: 'yes'});
+
+// count posts
+await Post.count({super: false});
 ```
 
+## Plugins
+
+### Using plugins
+
+To use a 3rd-party plugin, all you have to do is to call `use()` method.
+
+```js
+const timestamps = require('mongorito-timestamps');
+
+db.use(timestamps);
+```
+
+This will apply [mongorito-timestamps](https://github.com/vadimdemedes/mongorito-timestamps) to all currently registered and future models.
+
+If you want to apply the plugin to a specific model only, call it on the model itself.
+
+```js
+Post.use(timestamps);
+```
+
+### Writing plugins
+
+A plugin is simply a function that accepts a model. A familiarity with Redux and its concepts will help you tremendously with writing plugins.
+
+```js
+const myPlugin = model => {
+	// do anything with model (Post, in this case)
+};
+
+Post.use(myPlugin);
+```
+
+Feel free to assign new methods to the model or instances, add new middleware, modify the model's state and anything that comes to your mind.
+
+### Extending model with new methods
+
+Here's an example of adding a class method and an instance method to a `Post` model.
+
+```js
+const extendPost = Post => {
+	Post.findRecent = function () {
+		return this
+			.limit(5)
+			.sort('created_at', 'desc')
+			.find();
+	};
+
+	Post.prototype.makeAmazing = function () {
+		this.set('amazing', true);
+	};
+};
+
+Post.use(extendPost);
+
+const post = new Post();
+post.makeAmazing();
+post.get('amazing');
+//=> true
+
+const posts = await Post.findRecent();
+//=> [Post, Post, Post]
+```
+
+### Modifying model's state
+
+If you plugin needs to have its own state, you can modify the model's reducer using `modifyReducer()` method. It accepts a function, which receives the existing reducer shape as an argument and should return a new object with added reducers.
+
+```js
+const customReducer = (state = null, action) => {
+	// reducer code...
+};
+
+const extendReducer = model => {
+	model.modifyReducer(reducer => {
+		return {
+			...reducer,
+			customState: customReducer
+		}
+	});
+};
+```
+
+### Changing behavior using middleware
+
+Middleware can be used to change or modify the behavior of model's operations. You can interact with everything, from get/set operations to queries.
+
+To add plugin's custom middleware to the default middleware stack, return it from the plugin function.
+
+```js
+const myPlugin = () => {
+	return store => next => action => {
+		// middleware code...
+	};
+};
+```
+
+Obviously, to detect what kind of action is being handled, you need to be aware of Mongorito's action types.
+
+```js
+const {ActionTypes} = require('mongorito');
+
+const myPlugin = () => {
+	return store => next => action => {
+		if (action.type === ActionTypes.SET) {
+			// alter set() behavior
+		}
+
+		return next(action);
+	};
+};
+```
+
+Again, the middleware is identical to the middleware you're used to when writing apps with Redux. There are only 2 new properties added to the `store`:
+
+- `model` - instance of the model (document) the middleware is currently running in. If middleware is running at the model level (without instantiated model), it will be `undefined`.
+- `modelClass` - model class (`Post`, for example).
+
+Here's an example on how to access all props of the store:
+
+```js
+const myPlugin = () => {
+	return ({getState, dispatch, model, modelClass}) => next => action => {
+		// `getState()` and `dispatch()` are from Redux itself
+		// `model` is `post`
+		// `modelClass` is `Post`
+
+		return next(action);
+	};
+};
+
+Post.use(myPlugin);
+
+const post = new Post();
+await post.save();
+```
+
+For examples on how to write middleware, check out Mongorito's native ones - https://github.com/vadimdemedes/mongorito/tree/master/lib/middleware.
 
 ## License
 
-MIT © [Vadim Demedes](https://github.com/vdemedes)
+MIT © [Vadim Demedes](https://github.com/vadimdemedes)
