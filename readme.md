@@ -391,7 +391,7 @@ const timestamps = require('mongorito-timestamps');
 db.use(timestamps);
 ```
 
-This will apply [mongorito-timestamps](https://github.com/vadimdemedes/mongorito-timestamps) to all currently registered and future models.
+This will apply [mongorito-timestamps](https://github.com/vadimdemedes/mongorito-timestamps) to models registered after that.
 
 If you want to apply the plugin to a specific model only, call it on the model itself.
 
