@@ -57,6 +57,11 @@ test('find one document', async t => {
 	t.is(getId(post), getId(createdPost));
 });
 
+test('find one document - missing', async t => {
+	const post = await Post.findOne({awesome: false});
+	t.is(post, null);
+});
+
 test('find one document by id', async t => {
 	const data = postFixture();
 	const createdPost = new Post(data);
@@ -67,6 +72,11 @@ test('find one document by id', async t => {
 
 	const post = await Post.findById(createdPost.get('_id'));
 	t.is(post.get('title'), data.title);
+});
+
+test('find one document by id - missing', async t => {
+	const post = await Post.findById('test');
+	t.is(post, null);
 });
 
 test('find a document with .where()', async t => {
