@@ -81,6 +81,7 @@ $ npm install --save mongorito
 - - [Extending model with new methods](#extending-model-with-new-methods)
 - - [Modifying model's state](#modifying-models-state)
 - - [Changing behavior using middleware](#changing-behavior-using-middleware)
+- [Migrating from legacy version](#migrating-from-legacy-version)
 
 
 ## Connection
@@ -516,6 +517,29 @@ await post.save();
 ```
 
 For examples on how to write middleware, check out Mongorito's native ones - https://github.com/vadimdemedes/mongorito/tree/master/lib/middleware.
+
+
+## Migrating from legacy version
+
+### Connection
+
+Before:
+
+```js
+const mongorito = require('mongorito');
+
+mongorito.connect('localhost/blog');
+```
+
+After:
+
+```js
+const {Database} = require('mongorito');
+
+const db = new Database('localhost/blog');
+await db.connect();
+```
+
 
 ## License
 
