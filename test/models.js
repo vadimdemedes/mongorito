@@ -221,5 +221,23 @@ test('remove all documents', async t => {
 });
 
 test('automatically set collection name', async t => {
-	t.is(Post.collection(), 'posts');
+	t.is(Post.prototype.collection(), 'posts');
+});
+
+test('override collection name', async t => {
+	const {db} = t.context;
+
+	class CustomPost extends mongorito.Model {
+		collection() {
+			return 'awesome_posts';
+		}
+	}
+
+	db.register(CustomPost);
+
+	const post = new CustomPost({title: 'Greatness'});
+	await post.save();
+
+	const collections = await db._connection.collections();
+	t.deepEqual(collections.map(c => c.collectionName).sort(), ['comments', 'posts', 'awesome_posts'].sort());
 });
