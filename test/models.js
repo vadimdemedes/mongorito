@@ -238,6 +238,11 @@ test('override collection name', async t => {
 	const post = new CustomPost({title: 'Greatness'});
 	await post.save();
 
-	const collections = await db._connection.collections();
-	t.deepEqual(collections.map(c => c.collectionName).sort(), ['comments', 'posts', 'awesome_posts'].sort());
+	const allCollections = await db._connection.collections();
+	const collections = allCollections
+		.map(c => c.collectionName)
+		.filter(name => !name.includes('system'))
+		.sort();
+
+	t.deepEqual(collections, ['posts', 'awesome_posts'].sort());
 });
