@@ -20,6 +20,9 @@ test('serialize embedded models', async t => {
 			new Comment({
 				author: new User({name: 'Sebastian'}),
 				body: 'WOW'
+			}),
+			new Comment({
+				body: 'Anonymous comment'
 			})
 		],
 		author: new User({name: 'Steve'}),
@@ -39,6 +42,9 @@ test('serialize embedded models', async t => {
 			{
 				author: {name: 'Sebastian'},
 				body: 'WOW'
+			},
+			{
+				body: 'Anonymous comment'
 			}
 		],
 		author: {name: 'Steve'},
@@ -55,6 +61,9 @@ test('deserialize embedded models', async t => {
 			new Comment({
 				author: new User({name: 'Sebastian'}),
 				body: 'WOW'
+			}),
+			new Comment({
+				body: 'Anonymous comment'
 			})
 		],
 		author: new User({name: 'Steve'}),
@@ -78,4 +87,23 @@ test('deserialize embedded models', async t => {
 	t.true(foundPost.get('comments')[0].get('author') instanceof User);
 	t.deepEqual(foundPost.get('comments')[0].get('author').get(), {name: 'Sebastian'});
 	t.is(foundPost.get('comments')[0].get('body'), 'WOW');
+
+	t.true(foundPost.get('comments')[1] instanceof Comment);
+	t.true(foundPost.get('comments')[1].get('author') === undefined);
+	t.is(foundPost.get('comments')[1].get('body'), 'Anonymous comment');
+});
+
+test('should not affect unecessary fields', async t => {
+	const post = new Post({
+		title: 'Will update later',
+		author: new User({name: 'Steve'})
+	});
+
+	post.set('title', 'Updated'); // used to trigger unexpected behavior
+
+	t.is(post.get('title'), 'Updated');
+
+	t.true(post.get('author') instanceof User);
+	t.deepEqual(post.get('author').get(), {name: 'Steve'});
+	t.true(post.get('comments') === undefined);
 });
