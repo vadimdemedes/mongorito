@@ -1,6 +1,6 @@
 {
   "name": "mongorito",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "ES6 generator-based MongoDB ODM.",
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "repository": "vdemedes/mongorito",
