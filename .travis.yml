@@ -4,13 +4,15 @@ node_js:
   - '6'
 
 sudo: false
+
+services:
+  - mongodb
+
 addons:
   apt:
     sources:
-      - mongodb-upstart
-      - mongodb-3.0-precise
+      - mongodb-3.4-precise
     packages:
       - mongodb-org-server
-      - mongodb-org-shell
 
 after_success: npm run coveralls
