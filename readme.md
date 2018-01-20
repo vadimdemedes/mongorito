@@ -52,6 +52,8 @@ await post.save();
 
 post.set('author.name', 'Rick');
 await post.save();
+
+await db.disconnect();
 ```
 
 *Note*: `await` won't work at top level, it's used to reduce the complexity of an example.
@@ -103,15 +105,21 @@ const {
 
 `Database` and `Model` are Mongorito's own exports, all the other ones are exported straight from [`mongodb`](https://github.com/mongodb/node-mongodb-native) package for convenience. Normally, you'd need only `Database`, `Model` and `ObjectId`.
 
-To connect, initialize a `Database`, which accepts a MongoDB connection string and use `connect()` method, which returns a Promise.
+To connect, initialize a `Database`, which accepts a MongoDB connection string and an optional configuration which will be passed to mongodb's [connect function](http://mongodb.github.io/node-mongodb-native/2.2/api/MongoClient.html).
+
+To connect and disconnect use `connect()`/`disconnect()` methods. Both returns a Promise.
 
 For convenience, `await` will be used in all examples below, even though it doesn't work at top level.
 
 ```js
 const {Database, Model} = require('mongorito');
 
-const db = new Database('localhost/blog');
+const db = new Database('localhost/blog', {
+	reconnectTries: 5
+});
+
 await db.connect();
+await db.disconnect();
 ```
 
 You don't have to wait until connection establishes to perform operations. Mongorito automatically executes pending operations once connection is up.
