@@ -397,7 +397,7 @@ To use a 3rd-party plugin, all you have to do is to call `use()` method.
 ```js
 const timestamps = require('mongorito-timestamps');
 
-db.use(timestamps);
+db.use(timestamps());
 ```
 
 This will apply [mongorito-timestamps](https://github.com/vadimdemedes/mongorito-timestamps) to models registered after that.
@@ -405,7 +405,7 @@ This will apply [mongorito-timestamps](https://github.com/vadimdemedes/mongorito
 If you want to apply the plugin to a specific model only, call it on the model itself.
 
 ```js
-Post.use(timestamps);
+Post.use(timestamps());
 ```
 
 ### Writing plugins
