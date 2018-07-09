@@ -1,7 +1,7 @@
 'use strict';
 
 const test = require('ava');
-const mongorito = require('../');
+const mongorito = require('..');
 
 const postFixture = require('./fixtures/post');
 const setup = require('./_setup');
@@ -220,7 +220,7 @@ test('remove all documents', async t => {
 	t.is(posts, 0);
 });
 
-test('automatically set collection name', async t => {
+test('automatically set collection name', t => {
 	t.is(Post.prototype.collection(), 'posts');
 });
 

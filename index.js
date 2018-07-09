@@ -5,7 +5,8 @@ const Database = require('./lib/database');
 const Model = require('./lib/model');
 const ActionTypes = require('./lib/action-types');
 
-const x = module.exports = Database;
+module.exports = Database;
+const x = module.exports;
 x.Database = Database;
 x.Model = Model;
 x.ActionTypes = ActionTypes;

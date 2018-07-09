@@ -18,7 +18,7 @@ test('find all documents', async t => {
 
 	while (n--) {
 		const post = new Post();
-		await post.save(); // eslint-disable-line babel/no-await-in-loop
+		await post.save(); // eslint-disable-line no-await-in-loop
 
 		savedPosts.push(post);
 	}
@@ -62,7 +62,7 @@ test('find one document - missing', async t => {
 	t.is(post, null);
 });
 
-test('findOneAndUpadate should throw error when given invalid parameters', async t => {
+test('findOneAndUpadate should throw error when given invalid parameters', t => {
 	t.throws(() => Post.findOneAndUpdate(1));
 	t.throws(() => Post.findOneAndUpdate({}, 1));
 	t.throws(() => Post.findOneAndUpdate({}, {}, 1));
@@ -170,7 +170,7 @@ test('sort documents', async t => {
 
 	while (n--) {
 		const post = new Post({index: n});
-		await post.save(); // eslint-disable-line babel/no-await-in-loop
+		await post.save(); // eslint-disable-line no-await-in-loop
 	}
 
 	let posts = await Post.sort({_id: -1}).find();

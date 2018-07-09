@@ -26,22 +26,22 @@
     "arrify": "^1.0.1",
     "dot-prop": "^4.0.0",
     "is-plain-obj": "^1.1.0",
-    "lodash.merge": "^4.6.0",
+    "lodash.merge": "^4.6.1",
     "lodash.omit": "^4.5.0",
     "lodash.result": "^4.5.2",
     "map-obj": "^2.0.0",
     "mongodb": "^2.2.9",
-    "mquery": "^1.11.0",
-    "pluralize": "^3.0.0",
+    "mquery": "^3.0.0",
+    "pluralize": "^7.0.0",
     "redux": "^3.6.0"
   },
   "devDependencies": {
-    "ava": "^0.16.0",
+    "ava": "^1.0.0-beta.6",
     "chance": "^1.0.4",
-    "coveralls": "^2.11.12",
-    "nyc": "^8.1.0",
-    "sinon": "^2.1.0",
-    "xo": "^0.17.0"
+    "coveralls": "^3.0.0",
+    "nyc": "^11.4.1",
+    "sinon": "^4.2.2",
+    "xo": "^0.21.1"
   },
   "xo": {
     "env": "node"

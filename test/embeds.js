@@ -93,13 +93,13 @@ test('deserialize embedded models', async t => {
 	t.is(foundPost.get('comments')[1].get('body'), 'Anonymous comment');
 });
 
-test('should not affect unecessary fields', async t => {
+test('should not affect unecessary fields', t => {
 	const post = new Post({
 		title: 'Will update later',
 		author: new User({name: 'Steve'})
 	});
 
-	post.set('title', 'Updated'); // used to trigger unexpected behavior
+	post.set('title', 'Updated'); // Used to trigger unexpected behavior
 
 	t.is(post.get('title'), 'Updated');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const Mongorito = require('../');
+const Mongorito = require('..');
 
 const Post = require('./fixtures/models/post');
 
