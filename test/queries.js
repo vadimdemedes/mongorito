@@ -62,6 +62,52 @@ test('find one document - missing', async t => {
 	t.is(post, null);
 });
 
+test('findOneAndUpadate should throw error when given invalid parameters', async t => {
+	t.throws(() => Post.findOneAndUpdate(1));
+	t.throws(() => Post.findOneAndUpdate({}, 1));
+	t.throws(() => Post.findOneAndUpdate({}, {}, 1));
+});
+
+test('find one document and update using findOneAndUpdate', async t => {
+	const createdPost = new Post();
+	await createdPost.save();
+
+	const posts = await Post.count();
+	t.is(posts, 1);
+
+	const post = await Post.findOneAndUpdate(
+		{_id: createdPost.get('_id')},
+		{foo: 'bar'}
+	);
+
+	t.is(getId(post), getId(createdPost));
+	t.deepEqual(post.get(), {
+		_id: createdPost.get('_id'),
+		foo: 'bar'
+	});
+});
+
+test('find one document - missing, don\'t upsert using findOneAndUpdate', async t => {
+	const post = await Post.findOneAndUpdate({awesome: false});
+	t.is(post, null);
+
+	const posts = await Post.count();
+	t.is(posts, 0);
+});
+
+test('find one document - missing, and upsert using findOneAndUpdate', async t => {
+	const post = await Post.findOneAndUpdate(
+		{awesome: false},
+		{foo: 'bar'},
+		{upsert: true}
+	);
+
+	t.is(post.get('foo'), 'bar');
+
+	const posts = await Post.count();
+	t.is(posts, 1);
+});
+
 test('find one document by id', async t => {
 	const data = postFixture();
 	const createdPost = new Post(data);
